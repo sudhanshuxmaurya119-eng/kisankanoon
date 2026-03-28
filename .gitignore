@@ -1,0 +1,39 @@
+# Flutter
+kisankanoon/build/
+kisankanoon/.dart_tool/
+kisankanoon/.flutter-plugins
+kisankanoon/.flutter-plugins-dependencies
+kisankanoon/.packages
+kisankanoon/pubspec.lock
+
+# Android
+kisankanoon/android/.gradle/
+kisankanoon/android/local.properties
+kisankanoon/android/key.properties
+
+# Firebase - DO NOT commit (loaded via GitHub Secret)
+kisankanoon/android/app/google-services.json
+
+# Node/Server
+server/node_modules/
+server/.env
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.apk
+*.aab
+analyze_out.txt
+analyze2.txt
+analyze3.txt
+build_out.txt
+build2.txt
+release_build.txt
+run_log*.txt
