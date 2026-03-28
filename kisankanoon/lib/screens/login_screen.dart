@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
@@ -17,6 +18,33 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   bool _obscure = true;
   String? _errorMsg;
+
+  // Password strength
+  String _passStrength = '';
+  Color _strengthColor = Colors.transparent;
+  double _strengthValue = 0;
+
+  void _checkStrength(String val) {
+    int score = 0;
+    if (val.length >= 8) score++;
+    if (val.contains(RegExp(r'[A-Z]'))) score++;
+    if (val.contains(RegExp(r'[0-9]'))) score++;
+    if (val.contains(RegExp(r'[!@#\$%^&*]'))) score++;
+
+    setState(() {
+      if (val.isEmpty) {
+        _passStrength = ''; _strengthColor = Colors.transparent; _strengthValue = 0;
+      } else if (score <= 1) {
+        _passStrength = '🔴 बहुत कमज़ोर (Very Weak)'; _strengthColor = Colors.red; _strengthValue = 0.25;
+      } else if (score == 2) {
+        _passStrength = '🟠 कमज़ोर (Weak)'; _strengthColor = Colors.orange; _strengthValue = 0.5;
+      } else if (score == 3) {
+        _passStrength = '🟡 ठीक है (Fair)'; _strengthColor = Colors.amber; _strengthValue = 0.75;
+      } else {
+        _passStrength = '🟢 मज़बूत (Strong)'; _strengthColor = AppTheme.primaryGreen; _strengthValue = 1.0;
+      }
+    });
+  }
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -37,6 +65,51 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showForgotPassword() {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('पासवर्ड भूल गए?', style: TextStyle(fontWeight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('अपना ईमेल डालें — हम आपको रीसेट लिंक भेजेंगे।',
+                style: TextStyle(fontSize: 13, color: AppTheme.textMid)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: ctrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                hintText: 'ईमेल पता',
+                prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryGreen),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('रद्द करें')),
+          ElevatedButton(
+            onPressed: () async {
+              final email = ctrl.text.trim();
+              if (email.isEmpty) return;
+              Navigator.pop(ctx);
+              final err = await AuthService.sendPasswordReset(email);
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(err ?? '✅ रीसेट लिंक आपके ईमेल पर भेज दिया गया!'),
+                backgroundColor: err != null ? Colors.red : AppTheme.primaryGreen,
+              ));
+            },
+            child: const Text('भेजें'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -55,10 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 48),
+              // Logo
               Center(
                 child: Container(
-                  width: 88,
-                  height: 88,
+                  width: 88, height: 88,
                   decoration: BoxDecoration(
                     color: AppTheme.bgGreen,
                     borderRadius: BorderRadius.circular(24),
@@ -66,22 +139,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Center(child: Text('⚖️', style: TextStyle(fontSize: 44))),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               const Center(
-                child: Text(
-                  'KisanKanoon',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppTheme.primaryGreen),
-                ),
+                child: Text('KisanKanoon',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppTheme.primaryGreen)),
               ),
               const Center(
                 child: Text('किसान का साथी', style: TextStyle(fontSize: 14, color: AppTheme.textMid)),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
               Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Email
                     const Text('ईमेल', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark)),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -91,14 +163,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         hintText: 'आपका ईमेल पता',
                         prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryGreen),
                       ),
-                      validator: (v) => (v?.isEmpty ?? true) ? 'ईमेल डालें' : null,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'ईमेल डालें';
+                        if (!v.contains('@')) return 'सही ईमेल डालें';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 20),
+                    // Password
                     const Text('पासवर्ड', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark)),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _passCtrl,
                       obscureText: _obscure,
+                      onChanged: _checkStrength,
                       decoration: InputDecoration(
                         hintText: '••••••••',
                         prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryGreen),
@@ -109,24 +187,48 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) => (v?.length ?? 0) < 6 ? 'कम से कम 6 अक्षर' : null,
                     ),
+                    // Password Strength Bar
+                    if (_passStrength.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: _strengthValue,
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor: AlwaysStoppedAnimation<Color>(_strengthColor),
+                          minHeight: 5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(_passStrength, style: TextStyle(fontSize: 12, color: _strengthColor, fontWeight: FontWeight.w600)),
+                    ],
+                    // Forgot Password
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: _showForgotPassword,
+                        child: const Text('पासवर्ड भूल गए?',
+                            style: TextStyle(color: AppTheme.primaryGreen, fontSize: 13, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                    // Error
                     if (_errorMsg != null) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.red.shade50, borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.shade200),
                         ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline, color: Colors.red, size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(_errorMsg!, style: const TextStyle(color: Colors.red, fontSize: 13))),
-                          ],
-                        ),
+                        child: Row(children: [
+                          const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(_errorMsg!, style: const TextStyle(color: Colors.red, fontSize: 13))),
+                        ]),
                       ),
                     ],
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
+                    // Login Button
                     SizedBox(
                       height: 52,
                       child: ElevatedButton(
@@ -137,17 +239,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('नया खाता बनाएं? ', style: TextStyle(color: AppTheme.textMid, fontSize: 14)),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).pushNamed('/register'),
-                          child: const Text('रजिस्टर करें', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.w700, fontSize: 14)),
-                        ),
-                      ],
-                    ),
+                    // Register link
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      const Text('नया खाता बनाएं? ', style: TextStyle(color: AppTheme.textMid, fontSize: 14)),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pushNamed('/register'),
+                        child: const Text('रजिस्टर करें',
+                            style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.w700, fontSize: 14)),
+                      ),
+                    ]),
                     const SizedBox(height: 32),
+                    // Helpline
                     GestureDetector(
                       onTap: () async {
                         final uri = Uri(scheme: 'tel', path: '15100');
@@ -155,20 +257,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: Container(
                         padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppTheme.bgGreen,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.phone, color: AppTheme.primaryGreen, size: 20),
-                            SizedBox(width: 8),
-                            Text('मुफ्त कानूनी मदद: 15100 (DLSA)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primaryGreen)),
-                          ],
-                        ),
+                        decoration: BoxDecoration(color: AppTheme.bgGreen, borderRadius: BorderRadius.circular(12)),
+                        child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.phone, color: AppTheme.primaryGreen, size: 20),
+                          SizedBox(width: 8),
+                          Text('मुफ्त कानूनी मदद: 15100 (DLSA)',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primaryGreen)),
+                        ]),
                       ),
                     ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),

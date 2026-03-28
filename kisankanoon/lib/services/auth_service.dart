@@ -74,6 +74,41 @@ class AuthService {
     }
   }
 
+  /// Send email verification (OTP link via Firebase)
+  static Future<String?> sendEmailVerification() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return 'पहले लॉगिन करें।';
+      if (user.emailVerified) return null; // already verified
+      await user.sendEmailVerification();
+      return null; // success
+    } catch (e) {
+      return 'ईमेल भेजने में समस्या हुई। पुनः प्रयास करें।';
+    }
+  }
+
+  /// Check if current user's email is verified
+  static Future<bool> isEmailVerified() async {
+    try {
+      await _auth.currentUser?.reload();
+      return _auth.currentUser?.emailVerified ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Send password reset email
+  static Future<String?> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return null; // success
+    } on FirebaseAuthException catch (e) {
+      return _friendlyError(e.code);
+    } catch (_) {
+      return 'ईमेल भेजने में समस्या हुई।';
+    }
+  }
+
   static String _friendlyError(String code) {
     switch (code) {
       case 'user-not-found':
