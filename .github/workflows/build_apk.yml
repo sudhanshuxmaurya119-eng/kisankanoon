@@ -55,10 +55,10 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.build_type }}" == "release" ]] || [[ "${{ github.event.head_commit.message }}" == *"[release]"* ]]; then
             echo "Building Shorebird Base Release (New APK)..."
-            shorebird release android --force
+            shorebird release android --artifact apk
           else
             echo "Pushing Shorebird OTA Patch..."
-            shorebird patch android --force
+            shorebird patch android
           fi
         working-directory: kisankanoon
 
