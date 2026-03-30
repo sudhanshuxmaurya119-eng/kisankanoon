@@ -19,33 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscure = true;
   String? _errorMsg;
 
-  // Password strength
-  String _passStrength = '';
-  Color _strengthColor = Colors.transparent;
-  double _strengthValue = 0;
-
-  void _checkStrength(String val) {
-    int score = 0;
-    if (val.length >= 8) score++;
-    if (val.contains(RegExp(r'[A-Z]'))) score++;
-    if (val.contains(RegExp(r'[0-9]'))) score++;
-    if (val.contains(RegExp(r'[!@#\$%^&*]'))) score++;
-
-    setState(() {
-      if (val.isEmpty) {
-        _passStrength = ''; _strengthColor = Colors.transparent; _strengthValue = 0;
-      } else if (score <= 1) {
-        _passStrength = '🔴 बहुत कमज़ोर (Very Weak)'; _strengthColor = Colors.red; _strengthValue = 0.25;
-      } else if (score == 2) {
-        _passStrength = '🟠 कमज़ोर (Weak)'; _strengthColor = Colors.orange; _strengthValue = 0.5;
-      } else if (score == 3) {
-        _passStrength = '🟡 ठीक है (Fair)'; _strengthColor = Colors.amber; _strengthValue = 0.75;
-      } else {
-        _passStrength = '🟢 मज़बूत (Strong)'; _strengthColor = AppTheme.primaryGreen; _strengthValue = 1.0;
-      }
-    });
-  }
-
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _errorMsg = null; });
@@ -176,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _passCtrl,
                       obscureText: _obscure,
-                      onChanged: _checkStrength,
                       decoration: InputDecoration(
                         hintText: '••••••••',
                         prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryGreen),
@@ -187,21 +159,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) => (v?.length ?? 0) < 6 ? 'कम से कम 6 अक्षर' : null,
                     ),
-                    // Password Strength Bar
-                    if (_passStrength.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: _strengthValue,
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation<Color>(_strengthColor),
-                          minHeight: 5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(_passStrength, style: TextStyle(fontSize: 12, color: _strengthColor, fontWeight: FontWeight.w600)),
-                    ],
                     // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
