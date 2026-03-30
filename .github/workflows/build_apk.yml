@@ -1,16 +1,25 @@
-name: Build KisanKanoon APK
+name: Build KisanKanoon APK (Shorebird)
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Choose build type (Release = New APK, Patch = OTA Update)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - release
+          - patch
 
 permissions:
   contents: write
 
 jobs:
   build-apk:
-    name: Build Flutter APK
+    name: Build & OTA with Shorebird
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +38,9 @@ jobs:
           flutter-version: '3.29.0'
           channel: 'stable'
 
+      - name: Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+        
       - name: Restore google-services.json
         run: |
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > kisankanoon/android/app/google-services.json
@@ -37,29 +49,37 @@ jobs:
         run: flutter pub get
         working-directory: kisankanoon
 
-      - name: Build APK
-        run: flutter build apk --debug
+      - name: Run Shorebird Build
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.build_type }}" == "release" ]] || [[ "${{ github.event.head_commit.message }}" == *"[release]"* ]]; then
+            echo "Building Shorebird Base Release (New APK)..."
+            shorebird release android --force
+          else
+            echo "Pushing Shorebird OTA Patch..."
+            shorebird patch android --force
+          fi
         working-directory: kisankanoon
 
-      - name: Upload APK artifact
+      - name: Upload APK artifact (Only if Release)
+        if: github.event.inputs.build_type == 'release' || contains(github.event.head_commit.message, '[release]')
         uses: actions/upload-artifact@v4
         with:
           name: KisanKanoon-APK
-          path: kisankanoon/build/app/outputs/flutter-apk/app-debug.apk
+          path: kisankanoon/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 90
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (Only if Release)
+        if: github.event.inputs.build_type == 'release' || contains(github.event.head_commit.message, '[release]')
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
-          name: "KisanKanoon v${{ github.run_number }}"
+          name: "KisanKanoon Shorebird v${{ github.run_number }}"
           body: |
-            ## 📲 KisanKanoon - किसान का साथी
-            **Download the APK below and install on your Android phone.**
-            
-            Build: #${{ github.run_number }}
-            Commit: ${{ github.event.head_commit.message }}
-          files: kisankanoon/build/app/outputs/flutter-apk/app-debug.apk
+            ## 📲 KisanKanoon - Shorebird Enabled
+            **OTA Updates Enabled! You will never need to download this again.**
+          files: kisankanoon/build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
         env:
