@@ -1,20 +1,28 @@
-name: Shorebird Android Release
+name: Shorebird Android Patch
 
 on:
   push:
     branches: [ main, master ]
+    paths:
+      - 'kisankanoon/lib/**'
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: Shorebird release version to patch. Use latest for the newest base release.
+        required: true
+        default: latest
+        type: string
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
 
 jobs:
-  release:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
-    name: Publish Shorebird base release
+  patch:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[release]')
+    name: Publish Shorebird OTA patch
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,24 +48,67 @@ jobs:
             exit 1
           fi
 
+      - name: Detect patch-safe change set
+        id: patch-safety
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "safe=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          before="${{ github.event.before }}"
+          after="${{ github.sha }}"
+          mapfile -t files < <(git diff --name-only "$before" "$after")
+
+          unsafe=()
+          for file in "${files[@]}"; do
+            if [[ "$file" != kisankanoon/* ]]; then
+              continue
+            fi
+
+            if [[ ! "$file" =~ ^kisankanoon/lib/.*\.dart$ ]]; then
+              unsafe+=("$file")
+            fi
+          done
+
+          if [[ "${#unsafe[@]}" -eq 0 ]]; then
+            echo "safe=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "safe=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Shorebird Patch Skipped"
+            echo "This push changed files outside \`kisankanoon/lib/*.dart\`, so it needs a new Shorebird base release instead of an OTA patch."
+            echo
+            echo "Non-patchable files detected:"
+            for file in "${unsafe[@]}"; do
+              echo "- $file"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Setup Java 17
+        if: steps.patch-safety.outputs.safe == 'true'
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Setup Shorebird
+        if: steps.patch-safety.outputs.safe == 'true'
         uses: shorebirdtech/setup-shorebird@v1
         with:
           cache: true
 
       - name: Restore google-services.json
+        if: steps.patch-safety.outputs.safe == 'true'
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           printf '%s' "$GOOGLE_SERVICES_JSON" > kisankanoon/android/app/google-services.json
 
       - name: Prepare Android signing
+        if: steps.patch-safety.outputs.safe == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -98,48 +149,36 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Get Flutter packages
+        if: steps.patch-safety.outputs.safe == 'true'
         run: flutter pub get
         working-directory: kisankanoon
 
-      - name: Shorebird Release
-        id: shorebird-release
-        uses: shorebirdtech/shorebird-release@v1
+      - name: Resolve target release version
+        if: steps.patch-safety.outputs.safe == 'true'
+        id: patch-version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "value=${{ inputs.release_version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Shorebird Patch
+        if: steps.patch-safety.outputs.safe == 'true'
+        id: shorebird-patch
+        uses: shorebirdtech/shorebird-patch@v1
         with:
-          args: --artifact=apk
-          flutter-version: 3.41.5
           platform: android
+          release-version: ${{ steps.patch-version.outputs.value }}
           working-directory: ./kisankanoon
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: KisanKanoon-Shorebird-APK
-          path: kisankanoon/build/app/outputs/apk/release/app-release.apk
-          retention-days: 90
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: shorebird-android-${{ steps.shorebird-release.outputs.release-version }}
-          name: KisanKanoon Shorebird ${{ steps.shorebird-release.outputs.release-version }}
-          body: |
-            ## KisanKanoon Shorebird base release
-            Install this APK once to receive future Shorebird OTA Dart patches.
-
-            Release Version: ${{ steps.shorebird-release.outputs.release-version }}
-            Commit: ${{ github.sha }}
-          files: kisankanoon/build/app/outputs/apk/release/app-release.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish job summary
+        if: steps.patch-safety.outputs.safe == 'true'
         run: |
           {
-            echo "## Shorebird Release"
-            echo "Release version: \`${{ steps.shorebird-release.outputs.release-version }}\`"
-            echo "APK path: \`kisankanoon/build/app/outputs/apk/release/app-release.apk\`"
+            echo "## Shorebird Patch"
+            echo "Target release version: \`${{ steps.patch-version.outputs.value }}\`"
+            echo "Patch number: \`${{ steps.shorebird-patch.outputs.patch-number }}\`"
             echo
-            echo "Install this Shorebird release once, then Dart-only patches can arrive over the air."
+            echo "This patch will download on the next app launch for users already running the matching Shorebird base release."
           } >> "$GITHUB_STEP_SUMMARY"
