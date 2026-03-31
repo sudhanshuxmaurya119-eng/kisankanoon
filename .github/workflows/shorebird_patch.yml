@@ -150,7 +150,7 @@ jobs:
 
       - name: Get Flutter packages
         if: steps.patch-safety.outputs.safe == 'true'
-        run: flutter pub get
+        run: shorebird flutter pub get
         working-directory: kisankanoon
 
       - name: Resolve target release version
