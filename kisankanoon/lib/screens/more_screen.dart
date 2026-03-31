@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../theme/app_theme.dart';
+
+import '../services/app_language_service.dart';
+import '../services/app_strings.dart';
 import '../services/auth_service.dart';
-import '../services/storage_service.dart';
+import '../theme/app_theme.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
@@ -17,30 +19,47 @@ class _MoreScreenState extends State<MoreScreen> {
   String _email = '';
   String _state = '';
   String _country = '';
+  String _languageCode = AppLanguageService.currentCode.value;
 
   @override
   void initState() {
     super.initState();
+    AppLanguageService.currentCode.addListener(_handleLanguageChanged);
     _loadUser();
   }
 
+  @override
+  void dispose() {
+    AppLanguageService.currentCode.removeListener(_handleLanguageChanged);
+    super.dispose();
+  }
+
+  String _t(String key) => AppStrings.t(_languageCode, key);
+
+  void _handleLanguageChanged() {
+    if (!mounted) return;
+    setState(() {
+      _languageCode = AppLanguageService.currentCode.value;
+    });
+  }
+
   Future<void> _loadUser() async {
-    // Try Firebase profile first
     final profile = await AuthService.getUserProfile();
     if (profile != null && mounted) {
       setState(() {
         _name = profile['name'] ?? '';
-        _email = profile['email'] ?? FirebaseAuth.instance.currentUser?.email ?? '';
+        _email =
+            profile['email'] ?? FirebaseAuth.instance.currentUser?.email ?? '';
         _state = profile['state'] ?? '';
         _country = profile['country'] ?? '';
       });
       return;
     }
-    // Fallback to Firebase user object
+
     final fbUser = FirebaseAuth.instance.currentUser;
     if (fbUser != null && mounted) {
       setState(() {
-        _name = fbUser.displayName ?? 'किसान भाई';
+        _name = fbUser.displayName ?? _t('farmerBrother');
         _email = fbUser.email ?? '';
       });
     }
@@ -50,17 +69,28 @@ class _MoreScreenState extends State<MoreScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('लॉगआउट'),
-        content: const Text('क्या आप लॉगआउट करना चाहते हैं?'),
+        title: Text(_languageCode == 'en' ? 'Logout' : 'लॉगआउट'),
+        content: Text(
+          _languageCode == 'en'
+              ? 'Do you want to log out?'
+              : 'क्या आप लॉगआउट करना चाहते हैं?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('नहीं')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(_languageCode == 'en' ? 'No' : 'नहीं'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('हाँ', style: TextStyle(color: Colors.red)),
+            child: Text(
+              _languageCode == 'en' ? 'Yes' : 'हाँ',
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
     );
+
     if (confirm == true) {
       await AuthService.logout();
       if (!mounted) return;
@@ -70,24 +100,51 @@ class _MoreScreenState extends State<MoreScreen> {
 
   Future<void> _call(String number) async {
     final uri = Uri(scheme: 'tel', path: number);
-    if (await canLaunchUrl(uri)) launchUrl(uri);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   void _showInfo(String title, String content) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title),
         content: Text(content),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('बंद करें')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(_languageCode == 'en' ? 'Close' : 'बंद करें'),
+          ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _changeLanguage(String code) async {
+    final languageName = AppLanguageService.languageName(code);
+    await AppLanguageService.setLanguage(code);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppStrings.languageChangedMessage(
+            AppLanguageService.currentCode.value,
+            languageName,
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final profileLocation = [
+      if (_state.isNotEmpty) _state,
+      if (_country.isNotEmpty) _country,
+    ].join(', ');
+
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       body: SafeArea(
@@ -95,50 +152,81 @@ class _MoreScreenState extends State<MoreScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Container(
                 color: AppTheme.white,
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 child: Row(
                   children: [
-                    const Text('अधिक', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppTheme.textDark)),
+                    Text(
+                      _t('navMore'),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.textDark,
+                      ),
+                    ),
                     const Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppTheme.accentGreen, width: 1.5),
+                        border: Border.all(
+                          color: AppTheme.accentGreen,
+                          width: 1.5,
+                        ),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Text('🌾', style: TextStyle(fontSize: 14)),
-                          SizedBox(width: 4),
-                          Text('किसान', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.primaryGreen)),
+                          const Text('🌾', style: TextStyle(fontSize: 14)),
+                          const SizedBox(width: 4),
+                          Text(
+                            _languageCode == 'en' ? 'Farmer' : 'किसान',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.primaryGreen,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // User Profile Card
               Container(
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppTheme.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: AppTheme.shadow, blurRadius: 8, offset: const Offset(0, 2))],
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppTheme.shadow,
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 56, height: 56,
-                      decoration: const BoxDecoration(color: AppTheme.primaryGreen, shape: BoxShape.circle),
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.primaryGreen,
+                        shape: BoxShape.circle,
+                      ),
                       child: Center(
                         child: Text(
                           _name.isEmpty ? '👨‍🌾' : _name[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 26, color: Colors.white, fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 26,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -147,106 +235,239 @@ class _MoreScreenState extends State<MoreScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_name.isEmpty ? 'किसान भाई' : _name,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textDark)),
-                          if (_email.isNotEmpty) Text(_email, style: const TextStyle(fontSize: 12, color: AppTheme.textMid)),
-                          if (_state.isNotEmpty || _country.isNotEmpty)
-                            Text('$_state${_state.isNotEmpty && _country.isNotEmpty ? ', ' : ''}$_country',
-                                style: const TextStyle(fontSize: 12, color: AppTheme.textMid)),
+                          Text(
+                            _name.isEmpty ? _t('farmerBrother') : _name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textDark,
+                            ),
+                          ),
+                          if (_email.isNotEmpty)
+                            Text(
+                              _email,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.textMid,
+                              ),
+                            ),
+                          if (profileLocation.isNotEmpty)
+                            Text(
+                              profileLocation,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.textMid,
+                              ),
+                            ),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: AppTheme.bgGreen, borderRadius: BorderRadius.circular(12)),
-                      child: const Text('✓ सत्यापित', style: TextStyle(fontSize: 12, color: AppTheme.primaryGreen, fontWeight: FontWeight.w600)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.bgGreen,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _languageCode == 'en' ? 'Verified' : 'सत्यापित',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-
-              // Quick Links
-              _sectionHeader('त्वरित लिंक'),
-              Container(
-                color: AppTheme.white,
-                child: Column(children: [
-                  _tile('📞', 'किसान हेल्पलाइन (15100)', onTap: () => _call('15100')),
-                  _divider(),
-                  _tile('⚖️', 'कानूनी सहायता (DLSA)', onTap: () => _call('15100')),
-                  _divider(),
-                  _tile('🏦', 'बैंक हेल्पलाइन (1800-180-1111)', onTap: () => _call('18001801111')),
-                  _divider(),
-                  _tile('🌾', 'PM-Kisan Helpline (155261)', onTap: () => _call('155261')),
-                ]),
-              ),
-
-              const SizedBox(height: 12),
-
-              // My Services
-              _sectionHeader('मेरी सेवाएं'),
-              Container(
-                color: AppTheme.white,
-                child: Column(children: [
-                  _tile('📋', 'सरकारी योजनाएं', trailing: '15 योजनाएं',
-                      onTap: () => _showInfo('योजनाएं', 'PM-KISAN, PM Fasal Bima, RKVY और 12 अन्य योजनाएं आपके लिए उपलब्ध हैं।')),
-                  _divider(),
-                  _tile('❓', 'आम सवाल (FAQ)', onTap: () => _showInfo('FAQ',
-                      'Q: भूमि विवाद में क्या करें?\nA: नजदीकी DLSA में संपर्क करें।\n\nQ: PM-KISAN के पैसे नहीं आए?\nA: 155261 पर कॉल करें।')),
-                  _divider(),
-                  _tile('📖', 'किसान अधिकार गाइड', onTap: () => _showInfo('किसान अधिकार',
-                      '1. न्यूनतम समर्थन मूल्य (MSP) पर फसल बेचने का अधिकार\n2. बीमा क्लेम का अधिकार\n3. मुफ्त कानूनी सहायता का अधिकार\n4. भूमि रिकॉर्ड देखने का अधिकार')),
-                ]),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Language
-              _sectionHeader('भाषा'),
+              _sectionHeader(_t('quickLinks')),
               Container(
                 color: AppTheme.white,
                 child: Column(
                   children: [
-                    for (final lang in [
-                      {'name': 'हिंदी', 'code': 'hi'},
-                      {'name': 'English', 'code': 'en'},
-                      {'name': 'मराठी', 'code': 'mr'},
-                      {'name': 'ਪੰਜਾਬੀ', 'code': 'pa'},
-                    ]) ...[
-                      ListTile(
-                        title: Text(lang['name']!),
-                        trailing: const Icon(Icons.chevron_right, color: AppTheme.primaryGreen),
-                        onTap: () async {
-                          await StorageService.setLang(lang['code']!);
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('भाषा बदल दी गई: ${lang['name']}')),
-                          );
-                        },
+                    _tile(
+                      '📞',
+                      _languageCode == 'en'
+                          ? 'Farmer Helpline (15100)'
+                          : 'किसान हेल्पलाइन (15100)',
+                      onTap: () => _call('15100'),
+                    ),
+                    _divider(),
+                    _tile(
+                      '⚖️',
+                      _languageCode == 'en'
+                          ? 'Legal Help (DLSA)'
+                          : 'कानूनी सहायता (DLSA)',
+                      onTap: () => _call('15100'),
+                    ),
+                    _divider(),
+                    _tile(
+                      '🏦',
+                      _languageCode == 'en'
+                          ? 'Bank Helpline (1800-180-1111)'
+                          : 'बैंक हेल्पलाइन (1800-180-1111)',
+                      onTap: () => _call('18001801111'),
+                    ),
+                    _divider(),
+                    _tile(
+                      '🌾',
+                      _languageCode == 'en'
+                          ? 'PM-Kisan Helpline (155261)'
+                          : 'PM-Kisan Helpline (155261)',
+                      onTap: () => _call('155261'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              _sectionHeader(_t('myServices')),
+              Container(
+                color: AppTheme.white,
+                child: Column(
+                  children: [
+                    _tile(
+                      '📋',
+                      _languageCode == 'en'
+                          ? 'Government Schemes'
+                          : 'सरकारी योजनाएँ',
+                      trailing:
+                          _languageCode == 'en' ? '15 schemes' : '15 योजनाएँ',
+                      onTap: () => _showInfo(
+                        _languageCode == 'en' ? 'Schemes' : 'योजनाएँ',
+                        _languageCode == 'en'
+                            ? 'PM-KISAN, PM Fasal Bima, RKVY and other schemes are available for you.'
+                            : 'PM-KISAN, PM Fasal Bima, RKVY और अन्य योजनाएँ आपके लिए उपलब्ध हैं।',
                       ),
-                      if (lang != {'name': 'ਪੰਜਾਬੀ', 'code': 'pa'}) _divider(),
+                    ),
+                    _divider(),
+                    _tile(
+                      '❓',
+                      _languageCode == 'en' ? 'FAQ' : 'आम सवाल (FAQ)',
+                      onTap: () => _showInfo(
+                        _languageCode == 'en' ? 'FAQ' : 'FAQ',
+                        _languageCode == 'en'
+                            ? 'For land disputes contact your nearest DLSA. For PM-KISAN payment issues call 155261.'
+                            : 'भूमि विवाद में नज़दीकी DLSA से संपर्क करें। PM-KISAN भुगतान समस्या के लिए 155261 पर कॉल करें।',
+                      ),
+                    ),
+                    _divider(),
+                    _tile(
+                      '📖',
+                      _languageCode == 'en'
+                          ? 'Farmer Rights Guide'
+                          : 'किसान अधिकार गाइड',
+                      onTap: () => _showInfo(
+                        _languageCode == 'en'
+                            ? 'Farmer Rights'
+                            : 'किसान अधिकार',
+                        _languageCode == 'en'
+                            ? 'You have the right to access support schemes, crop insurance claims, legal aid, and land records.'
+                            : 'आपको समर्थन योजनाओं, बीमा क्लेम, कानूनी सहायता और भूमि रिकॉर्ड देखने का अधिकार है।',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              _sectionHeader(_t('language')),
+              Container(
+                color: AppTheme.white,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _t('selectedLanguage'),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textMid,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            AppLanguageService.languageName(_languageCode),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.primaryGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    for (var i = 0;
+                        i < AppLanguageService.supportedLanguages.length;
+                        i++) ...[
+                      ListTile(
+                        title:
+                            Text(AppLanguageService.supportedLanguages[i].name),
+                        trailing:
+                            AppLanguageService.supportedLanguages[i].code ==
+                                    _languageCode
+                                ? const Icon(
+                                    Icons.check_circle,
+                                    color: AppTheme.primaryGreen,
+                                  )
+                                : const Icon(
+                                    Icons.chevron_right,
+                                    color: AppTheme.primaryGreen,
+                                  ),
+                        onTap: () => _changeLanguage(
+                          AppLanguageService.supportedLanguages[i].code,
+                        ),
+                      ),
+                      if (i != AppLanguageService.supportedLanguages.length - 1)
+                        _divider(),
                     ],
                   ],
                 ),
               ),
-
               const SizedBox(height: 12),
-
-              // App Info
-              _sectionHeader('ऐप जानकारी'),
+              _sectionHeader(_t('appInfo')),
               Container(
                 color: AppTheme.white,
-                child: Column(children: [
-                  _tile('⭐', 'ऐप रेट करें', onTap: () => _showInfo('धन्यवाद!', 'आपका समर्थन हमें बेहतर बनाने में मदद करता है।')),
-                  _divider(),
-                  _tile('📱', 'ऐप संस्करण', trailing: 'v1.0.0'),
-                  _divider(),
-                  _tile('🔒', 'गोपनीयता नीति', onTap: () => _showInfo('गोपनीयता नीति', 'आपका डेटा सुरक्षित है। हम कोई भी व्यक्तिगत जानकारी तीसरे पक्ष को नहीं देते।')),
-                ]),
+                child: Column(
+                  children: [
+                    _tile(
+                      '⭐',
+                      _languageCode == 'en' ? 'Rate App' : 'ऐप रेट करें',
+                      onTap: () => _showInfo(
+                        _languageCode == 'en' ? 'Thank you!' : 'धन्यवाद!',
+                        _languageCode == 'en'
+                            ? 'Your support helps us improve the app.'
+                            : 'आपका समर्थन हमें ऐप बेहतर बनाने में मदद करता है।',
+                      ),
+                    ),
+                    _divider(),
+                    _tile('📱',
+                        _languageCode == 'en' ? 'App Version' : 'ऐप संस्करण',
+                        trailing: 'v1.0.0+2'),
+                    _divider(),
+                    _tile(
+                      '🔒',
+                      _languageCode == 'en'
+                          ? 'Privacy Policy'
+                          : 'गोपनीयता नीति',
+                      onTap: () => _showInfo(
+                        _languageCode == 'en'
+                            ? 'Privacy Policy'
+                            : 'गोपनीयता नीति',
+                        _languageCode == 'en'
+                            ? 'Your data stays protected. We do not share your personal information with third parties.'
+                            : 'आपका डेटा सुरक्षित है। हम आपकी व्यक्तिगत जानकारी किसी तीसरे पक्ष को साझा नहीं करते।',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-
               const SizedBox(height: 20),
-
-              // Logout
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SizedBox(
@@ -255,10 +476,19 @@ class _MoreScreenState extends State<MoreScreen> {
                   child: OutlinedButton.icon(
                     onPressed: _logout,
                     icon: const Icon(Icons.logout, color: Colors.red),
-                    label: const Text('लॉगआउट', style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.w600)),
+                    label: Text(
+                      _t('logout'),
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.red),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -272,19 +502,42 @@ class _MoreScreenState extends State<MoreScreen> {
   }
 
   Widget _sectionHeader(String title) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
-    child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMid)),
-  );
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textMid,
+          ),
+        ),
+      );
 
-  Widget _divider() => const Divider(height: 1, indent: 56, endIndent: 0, color: AppTheme.divider);
+  Widget _divider() => const Divider(
+        height: 1,
+        indent: 56,
+        color: AppTheme.divider,
+      );
 
-  Widget _tile(String emoji, String title, {String? trailing, VoidCallback? onTap}) {
+  Widget _tile(
+    String emoji,
+    String title, {
+    String? trailing,
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Text(emoji, style: const TextStyle(fontSize: 22)),
-      title: Text(title, style: const TextStyle(fontSize: 14, color: AppTheme.textDark)),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 14, color: AppTheme.textDark),
+      ),
       trailing: trailing != null
-          ? Text(trailing, style: const TextStyle(fontSize: 12, color: AppTheme.textMid))
-          : const Icon(Icons.chevron_right, color: AppTheme.textLight, size: 20),
+          ? Text(
+              trailing,
+              style: const TextStyle(fontSize: 12, color: AppTheme.textMid),
+            )
+          : const Icon(Icons.chevron_right,
+              color: AppTheme.textLight, size: 20),
       onTap: onTap,
     );
   }

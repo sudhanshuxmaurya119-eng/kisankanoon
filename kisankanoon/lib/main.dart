@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kisankanoon/firebase_options.dart';
+import 'package:kisankanoon/services/app_language_service.dart';
 import 'package:kisankanoon/theme/app_theme.dart';
 import 'package:kisankanoon/screens/splash_screen.dart';
 import 'package:kisankanoon/screens/login_screen.dart';
@@ -23,6 +24,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await AppLanguageService.load();
 
   runApp(const KisanKanoonApp());
 }

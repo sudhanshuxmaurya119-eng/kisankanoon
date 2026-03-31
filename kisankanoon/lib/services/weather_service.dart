@@ -3,24 +3,40 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
+import 'app_strings.dart';
+
 class WeatherService {
   static const double _fallbackLat = 28.6139;
   static const double _fallbackLon = 77.2090;
-  static const String _fallbackLabel = 'डिफ़ॉल्ट स्थान';
 
-  static Future<Map<String, dynamic>?> getWeatherForCurrentLocation() async {
-    final location = await _resolveLocation();
+  static Future<Map<String, dynamic>?> getWeatherForCurrentLocation({
+    String languageCode = 'hi',
+  }) async {
+    final location = await _resolveLocation(languageCode: languageCode);
     final weather = await getWeather(
       lat: location.latitude,
       lon: location.longitude,
+      languageCode: languageCode,
     );
     if (weather == null) {
       return null;
     }
 
+    String locationLabel = location.label;
+    if (!location.isFallback) {
+      final resolvedLabel = await _reverseGeocodeLabel(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        languageCode: languageCode,
+      );
+      if (resolvedLabel != null && resolvedLabel.isNotEmpty) {
+        locationLabel = resolvedLabel;
+      }
+    }
+
     return {
       ...weather,
-      'locationLabel': location.label,
+      'locationLabel': locationLabel,
       'isFallback': location.isFallback,
     };
   }
@@ -28,6 +44,7 @@ class WeatherService {
   static Future<Map<String, dynamic>?> getWeather({
     required double lat,
     required double lon,
+    String languageCode = 'hi',
   }) async {
     try {
       final url = Uri.parse(
@@ -48,7 +65,7 @@ class WeatherService {
         'windspeed': (current['windspeed_10m'] as num).toDouble(),
         'humidity': current['relativehumidity_2m'],
         'code': weatherCode,
-        'description': _weatherDesc(weatherCode),
+        'description': AppStrings.weatherDescription(languageCode, weatherCode),
         'emoji': _weatherEmoji(weatherCode),
       };
     } catch (_) {
@@ -56,14 +73,16 @@ class WeatherService {
     }
   }
 
-  static Future<_ResolvedLocation> _resolveLocation() async {
+  static Future<_ResolvedLocation> _resolveLocation({
+    required String languageCode,
+  }) async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        return const _ResolvedLocation(
+        return _ResolvedLocation(
           latitude: _fallbackLat,
           longitude: _fallbackLon,
-          label: 'लोकेशन बंद है',
+          label: AppStrings.t(languageCode, 'locationOff'),
           isFallback: true,
         );
       }
@@ -75,10 +94,10 @@ class WeatherService {
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        return const _ResolvedLocation(
+        return _ResolvedLocation(
           latitude: _fallbackLat,
           longitude: _fallbackLon,
-          label: 'लोकेशन अनुमति नहीं मिली',
+          label: AppStrings.t(languageCode, 'locationPermissionDenied'),
           isFallback: true,
         );
       }
@@ -92,7 +111,7 @@ class WeatherService {
       return _ResolvedLocation(
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
-        label: 'आपकी लोकेशन',
+        label: AppStrings.t(languageCode, 'yourLocation'),
         isFallback: false,
       );
     } catch (_) {
@@ -101,28 +120,83 @@ class WeatherService {
         return _ResolvedLocation(
           latitude: lastKnownPosition.latitude,
           longitude: lastKnownPosition.longitude,
-          label: 'पिछली लोकेशन',
+          label: AppStrings.t(languageCode, 'lastKnownLocation'),
           isFallback: false,
         );
       }
 
-      return const _ResolvedLocation(
+      return _ResolvedLocation(
         latitude: _fallbackLat,
         longitude: _fallbackLon,
-        label: _fallbackLabel,
+        label: AppStrings.t(languageCode, 'defaultLocation'),
         isFallback: true,
       );
     }
   }
 
-  static String _weatherDesc(int code) {
-    if (code == 0) return 'साफ आसमान';
-    if (code <= 3) return 'आंशिक बादल';
-    if (code <= 48) return 'धुंध';
-    if (code <= 67) return 'बारिश';
-    if (code <= 77) return 'बर्फबारी';
-    if (code <= 82) return 'भारी बारिश';
-    return 'तूफ़ान';
+  static Future<String?> _reverseGeocodeLabel({
+    required double latitude,
+    required double longitude,
+    required String languageCode,
+  }) async {
+    try {
+      final uri = Uri.https(
+        'nominatim.openstreetmap.org',
+        '/reverse',
+        {
+          'format': 'jsonv2',
+          'lat': latitude.toString(),
+          'lon': longitude.toString(),
+          'zoom': '10',
+          'addressdetails': '1',
+          'accept-language': languageCode,
+        },
+      );
+
+      final response = await http.get(
+        uri,
+        headers: const {
+          'Accept': 'application/json',
+          'User-Agent': 'KisanKanoonApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+      if (response.statusCode != 200) return null;
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final address = data['address'] as Map<String, dynamic>?;
+      if (address == null) return null;
+
+      final locality = _firstNonEmpty(<dynamic>[
+        address['city'],
+        address['town'],
+        address['village'],
+        address['municipality'],
+        address['county'],
+        address['state_district'],
+        address['suburb'],
+      ]);
+      final state = _firstNonEmpty(<dynamic>[
+        address['state'],
+        address['region'],
+      ]);
+
+      if (locality != null && state != null && locality != state) {
+        return '$locality, $state';
+      }
+      return locality ?? state;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String? _firstNonEmpty(List<dynamic> values) {
+    for (final value in values) {
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty) {
+        return text;
+      }
+    }
+    return null;
   }
 
   static String _weatherEmoji(int code) {

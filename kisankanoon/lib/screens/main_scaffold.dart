@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+
+import '../services/app_language_service.dart';
+import '../services/app_strings.dart';
 import '../theme/app_theme.dart';
-import 'home_screen.dart';
-import 'scan_screen.dart';
 import 'documents_screen.dart';
-import 'schemes_screen.dart';
+import 'home_screen.dart';
 import 'more_screen.dart';
+import 'scan_screen.dart';
+import 'schemes_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -40,36 +43,41 @@ class _MainScaffoldState extends State<MainScaffold> {
         decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: AppTheme.divider, width: 0.5)),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (i) => setState(() => _selectedIndex = i),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'होम',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt_outlined),
-              activeIcon: Icon(Icons.camera_alt),
-              label: 'स्कैन',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.folder_outlined),
-              activeIcon: Icon(Icons.folder),
-              label: 'दस्तावेज़',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_outlined),
-              activeIcon: Icon(Icons.account_balance),
-              label: 'योजनाएं',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_outlined),
-              activeIcon: Icon(Icons.menu),
-              label: 'अधिक',
-            ),
-          ],
+        child: ValueListenableBuilder<String>(
+          valueListenable: AppLanguageService.currentCode,
+          builder: (context, languageCode, _) {
+            return BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: (index) => setState(() => _selectedIndex = index),
+              items: [
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.home_outlined),
+                  activeIcon: const Icon(Icons.home),
+                  label: AppStrings.t(languageCode, 'navHome'),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  activeIcon: const Icon(Icons.camera_alt),
+                  label: AppStrings.t(languageCode, 'navScan'),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.folder_outlined),
+                  activeIcon: const Icon(Icons.folder),
+                  label: AppStrings.t(languageCode, 'navDocuments'),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.account_balance_outlined),
+                  activeIcon: const Icon(Icons.account_balance),
+                  label: AppStrings.t(languageCode, 'navSchemes'),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.menu_outlined),
+                  activeIcon: const Icon(Icons.menu),
+                  label: AppStrings.t(languageCode, 'navMore'),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

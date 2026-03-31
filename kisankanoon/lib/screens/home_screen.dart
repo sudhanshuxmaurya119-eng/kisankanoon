@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/user_model.dart';
+import '../services/app_language_service.dart';
+import '../services/app_strings.dart';
 import '../services/auth_service.dart';
-import '../services/storage_service.dart';
 import '../services/weather_service.dart';
 import '../theme/app_theme.dart';
 
@@ -21,11 +22,29 @@ class _HomeScreenState extends State<HomeScreen> {
   UserModel? _user;
   Map<String, dynamic>? _weather;
   bool _weatherLoading = true;
+  String _languageCode = AppLanguageService.currentCode.value;
 
   @override
   void initState() {
     super.initState();
+    AppLanguageService.currentCode.addListener(_handleLanguageChanged);
     _loadUser();
+    _loadWeather();
+  }
+
+  @override
+  void dispose() {
+    AppLanguageService.currentCode.removeListener(_handleLanguageChanged);
+    super.dispose();
+  }
+
+  String _t(String key) => AppStrings.t(_languageCode, key);
+
+  void _handleLanguageChanged() {
+    if (!mounted) return;
+    setState(() {
+      _languageCode = AppLanguageService.currentCode.value;
+    });
     _loadWeather();
   }
 
@@ -34,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted && profile != null) {
       setState(
         () => _user = UserModel(
-          name: (profile['name'] ?? 'किसान भाई').toString(),
+          name: (profile['name'] ?? _t('farmerBrother')).toString(),
           mobile: (profile['mobile'] ?? '').toString(),
           state: (profile['state'] ?? '').toString(),
           joined: DateTime.now().year.toString(),
@@ -47,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted && firebaseUser != null) {
       setState(
         () => _user = UserModel(
-          name: firebaseUser.displayName ?? 'किसान भाई',
+          name: firebaseUser.displayName ?? _t('farmerBrother'),
           mobile: '',
           state: '',
           joined: DateTime.now().year.toString(),
@@ -61,7 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _weatherLoading = true);
     }
 
-    final weather = await WeatherService.getWeatherForCurrentLocation();
+    final weather = await WeatherService.getWeatherForCurrentLocation(
+      languageCode: _languageCode,
+    );
     if (!mounted) return;
 
     setState(() {
@@ -71,8 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (showError && weather == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('मौसम जानकारी अभी उपलब्ध नहीं है।'),
+        SnackBar(
+          content: Text(_t('weatherUnavailable')),
           backgroundColor: Colors.red,
         ),
       );
@@ -81,7 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openWhatsAppUpdates() async {
     final message = Uri.encodeComponent(
-      'नमस्ते! मुझे KisanKanoon के WhatsApp अपडेट चाहिए।',
+      _languageCode == 'en'
+          ? 'Hello! I want KisanKanoon WhatsApp updates.'
+          : 'नमस्ते! मुझे KisanKanoon के WhatsApp अपडेट चाहिए।',
     );
     final uri = Uri.parse('https://wa.me/?text=$message');
     final launched = await launchUrl(
@@ -104,12 +127,12 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted || _weather == null) return;
 
     _showInfoDialog(
-      'आज का मौसम',
-      '${_weather?['locationLabel'] ?? 'आपकी लोकेशन'}\n'
-          '${_weather?['description'] ?? '--'}\n'
-          'तापमान: ${_weather?['temp']?.toStringAsFixed(0) ?? '--'}°C\n'
-          'नमी: ${_weather?['humidity'] ?? '--'}%\n'
-          'हवा: ${_weather?['windspeed']?.toStringAsFixed(0) ?? '--'} km/h',
+      _t('todayWeather'),
+      '${_weather?['locationLabel'] ?? _t('yourLocation')}\n'
+      '${_weather?['description'] ?? '--'}\n'
+      '${_t('temperature')}: ${_weather?['temp']?.toStringAsFixed(0) ?? '--'}°C\n'
+      '${_t('humidity')}: ${_weather?['humidity'] ?? '--'}%\n'
+      '${_t('wind')}: ${_weather?['windspeed']?.toStringAsFixed(0) ?? '--'} km/h',
     );
   }
 
@@ -119,6 +142,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _greeting {
     final hour = DateTime.now().hour;
+    if (_languageCode == 'en') {
+      if (hour < 12) return 'Good morning';
+      if (hour < 17) return 'Hello';
+      return 'Good evening';
+    }
+
     if (hour < 12) return 'सुप्रभात';
     if (hour < 17) return 'नमस्ते';
     return 'शुभ संध्या';
@@ -129,12 +158,14 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-        content:
-            Text(content, style: const TextStyle(fontSize: 14, height: 1.6)),
+        content: Text(
+          content,
+          style: const TextStyle(fontSize: 14, height: 1.6),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('ठीक है'),
+            child: Text(_t('ok')),
           ),
         ],
       ),
@@ -142,14 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showLangDialog() {
-    final languages = [
-      {'code': 'hi', 'name': 'हिंदी'},
-      {'code': 'mr', 'name': 'मराठी'},
-      {'code': 'pa', 'name': 'ਪੰਜਾਬੀ'},
-      {'code': 'te', 'name': 'తెలుగు'},
-      {'code': 'bn', 'name': 'বাংলা'},
-    ];
-
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -167,23 +190,48 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(
-              'भाषा चुनें',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              _t('chooseLanguage'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
-          ...languages.map(
+          ...AppLanguageService.supportedLanguages.map(
             (language) => ListTile(
-              title: Text(language['name']!),
-              trailing: const Icon(
-                Icons.chevron_right,
-                color: AppTheme.primaryGreen,
-              ),
+              title: Text(language.name),
+              subtitle: language.code == _languageCode
+                  ? Text(
+                      _t('selectedLanguage'),
+                      style: const TextStyle(
+                        color: AppTheme.primaryGreen,
+                        fontSize: 12,
+                      ),
+                    )
+                  : null,
+              trailing: language.code == _languageCode
+                  ? const Icon(
+                      Icons.check_circle,
+                      color: AppTheme.primaryGreen,
+                    )
+                  : const Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.primaryGreen,
+                    ),
               onTap: () async {
-                await StorageService.setLang(language['code']!);
+                await AppLanguageService.setLanguage(language.code);
                 if (ctx.mounted) Navigator.pop(ctx);
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppStrings.languageChangedMessage(
+                        AppLanguageService.currentCode.value,
+                        language.name,
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -195,14 +243,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<_FeatureItem> _featureItems() {
     return [
-      const _FeatureItem(emoji: '📷', label: 'स्कैन करें', tab: 1),
-      const _FeatureItem(emoji: '🏛️', label: 'योजनाएँ', tab: 3),
-      const _FeatureItem(emoji: '📁', label: 'मेरे दस्तावेज़', tab: 2),
-      const _FeatureItem(emoji: '💬', label: 'WhatsApp', action: 'whatsapp'),
-      const _FeatureItem(emoji: '☀️', label: 'मौसम', action: 'weather'),
-      const _FeatureItem(emoji: '📰', label: 'समाचार', action: 'news'),
-      const _FeatureItem(emoji: '🌐', label: 'भाषा', action: 'lang'),
-      const _FeatureItem(emoji: '📞', label: 'हेल्पलाइन', action: 'helpline'),
+      _FeatureItem(emoji: '📷', label: _t('scanDoc'), tab: 1),
+      _FeatureItem(emoji: '🏛️', label: _t('navSchemes'), tab: 3),
+      _FeatureItem(emoji: '📁', label: _t('myDocuments'), tab: 2),
+      _FeatureItem(emoji: '💬', label: _t('whatsapp'), action: 'whatsapp'),
+      _FeatureItem(emoji: '☀️', label: _t('weather'), action: 'weather'),
+      _FeatureItem(emoji: '📰', label: _t('news'), action: 'news'),
+      _FeatureItem(emoji: '🌐', label: _t('language'), action: 'lang'),
+      _FeatureItem(emoji: '📞', label: _t('helpline'), action: 'helpline'),
     ];
   }
 
@@ -221,10 +269,10 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case 'news':
         _showInfoDialog(
-          'किसान समाचार',
-          '• PM-KISAN: अगली किस्त का अपडेट जल्द आएगा।\n'
-              '• मौसम विभाग के अनुसार अगले कुछ दिनों में स्थानीय बदलाव संभव हैं।\n'
-              '• फसल और दस्तावेज़ दोनों का रिकॉर्ड ऐप में सुरक्षित रखें।',
+          _t('farmerNews'),
+          _languageCode == 'en'
+              ? 'PM-KISAN updates, weather changes, and your saved documents can all be tracked here.'
+              : 'PM-KISAN अपडेट, मौसम बदलाव और आपके सेव किए गए दस्तावेज़ यहां एक साथ देखे जा सकते हैं।',
         );
         break;
       case 'lang':
@@ -265,16 +313,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'आज का मौसम',
-                          style: TextStyle(
+                        Text(
+                          _t('todayWeather'),
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.primaryGreen,
                           ),
                         ),
                         Text(
-                          '${_weather?['locationLabel'] ?? 'आपकी लोकेशन'} | ${_weather?['description'] ?? 'साफ आसमान'} | नमी: ${_weather?['humidity'] ?? '--'}%',
+                          '${_weather?['locationLabel'] ?? _t('yourLocation')} | ${_weather?['description'] ?? AppStrings.weatherDescription(_languageCode, 0)} | ${_t('humidity')}: ${_weather?['humidity'] ?? '--'}%',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.textMid,
@@ -300,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 18,
                           color: AppTheme.primaryGreen,
                         ),
-                        tooltip: 'Refresh weather',
+                        tooltip: _t('refreshWeather'),
                       ),
                     ],
                   ),
@@ -329,10 +377,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const Text('💬', style: TextStyle(fontSize: 24)),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
-              'WhatsApp अपडेट पाएं',
-              style: TextStyle(
+              _t('whatsappUpdates'),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.textDark,
@@ -346,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text('चालू करें', style: TextStyle(fontSize: 12)),
+            child: Text(_t('enable'), style: const TextStyle(fontSize: 12)),
           ),
         ],
       ),
@@ -360,9 +408,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'सेवाएँ',
-            style: TextStyle(
+          Text(
+            _t('services'),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -393,6 +441,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSuggestionCard() {
     final stateName =
         _user?.state.isNotEmpty == true ? _user!.state : 'आपके राज्य';
+    final content = _languageCode == 'en'
+        ? 'Since you are in $stateName, keep your documents safe, track weather updates, and follow government schemes from one place.'
+        : 'चूंकि आप $stateName में हैं, आपके लिए दस्तावेज़ सुरक्षित रखना, मौसम अपडेट देखना और सरकारी योजनाओं की जानकारी एक ही जगह उपलब्ध है।';
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -420,9 +472,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Text('✨', style: TextStyle(fontSize: 14)),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'स्मार्ट सुझाव',
-                style: TextStyle(
+              Text(
+                _t('smartSuggestion'),
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFFE65100),
@@ -432,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'चूंकि आप $stateName में हैं, आपके लिए दस्तावेज़ सुरक्षित रखना, मौसम अपडेट देखना और सरकारी योजनाओं की जानकारी एक ही जगह उपलब्ध है।',
+            content,
             style: const TextStyle(
               fontSize: 13,
               color: AppTheme.textMid,
@@ -448,34 +500,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       color: AppTheme.white,
       padding: const EdgeInsets.all(16),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'किसान समाचार',
-            style: TextStyle(
+            _t('farmerNews'),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _NewsCard(
             emoji: '🏛️',
-            title: 'PM-KISAN और अन्य योजनाओं के अपडेट देखें',
-            tag: 'सरकारी योजनाएँ',
+            title: _languageCode == 'en'
+                ? 'Check PM-KISAN and other scheme updates'
+                : 'PM-KISAN और अन्य योजनाओं के अपडेट देखें',
+            tag: _t('navSchemes'),
           ),
-          Divider(height: 1, color: AppTheme.divider),
+          const Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '🌦️',
-            title: 'मौसम कार्ड अब आपकी लोकेशन से अपडेट होता है',
-            tag: 'मौसम',
+            title: _languageCode == 'en'
+                ? 'Weather card now updates from your real location'
+                : 'मौसम कार्ड अब आपकी लोकेशन से अपडेट होता है',
+            tag: _t('weather'),
           ),
-          Divider(height: 1, color: AppTheme.divider),
+          const Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '📂',
-            title: 'स्कैन और अपलोड किए गए दस्तावेज़ अब फ़ोल्डर में सेव होंगे',
-            tag: 'दस्तावेज़',
+            title: _languageCode == 'en'
+                ? 'Scanned and uploaded documents are saved in your folder'
+                : 'स्कैन और अपलोड किए गए दस्तावेज़ अब फ़ोल्डर में सेव होंगे',
+            tag: _t('myDocuments'),
           ),
         ],
       ),
@@ -491,9 +549,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Trusted by lakhs of\nfarmers!',
-            style: TextStyle(
+          Text(
+            _t('trustedByFarmers'),
+            style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w900,
               color: Colors.black26,
@@ -501,9 +559,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Farm smartly with KisanKanoon',
-            style: TextStyle(
+          Text(
+            _t('farmSmartly'),
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.black38,
               fontWeight: FontWeight.w500,
@@ -517,7 +575,10 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(30),
               boxShadow: const [
                 BoxShadow(
-                    color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
               ],
             ),
             child: Row(
@@ -580,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$_greeting 🙏 ${_user?.name ?? 'किसान भाई'}',
+                        '$_greeting 🙏 ${_user?.name ?? _t('farmerBrother')}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -717,7 +778,8 @@ class _NewsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 22))),
+              child: Text(emoji, style: const TextStyle(fontSize: 22)),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -734,8 +796,10 @@ class _NewsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.bgGreen,
                     borderRadius: BorderRadius.circular(4),
@@ -752,8 +816,11 @@ class _NewsCard extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right,
-              color: AppTheme.primaryGreen, size: 20),
+          const Icon(
+            Icons.chevron_right,
+            color: AppTheme.primaryGreen,
+            size: 20,
+          ),
         ],
       ),
     );
