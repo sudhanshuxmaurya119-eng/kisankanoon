@@ -97,10 +97,6 @@ jobs:
             echo "$keystore_note"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Get Flutter packages
-        run: shorebird flutter pub get
-        working-directory: kisankanoon
-
       - name: Shorebird Release
         id: shorebird-release
         uses: shorebirdtech/shorebird-release@v1

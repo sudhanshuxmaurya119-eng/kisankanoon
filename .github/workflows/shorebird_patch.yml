@@ -148,11 +148,6 @@ jobs:
             echo "$keystore_note"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Get Flutter packages
-        if: steps.patch-safety.outputs.safe == 'true'
-        run: shorebird flutter pub get
-        working-directory: kisankanoon
-
       - name: Resolve target release version
         if: steps.patch-safety.outputs.safe == 'true'
         id: patch-version
