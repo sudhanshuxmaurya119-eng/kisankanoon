@@ -1,85 +1,166 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DocumentService {
-  static final _db = FirebaseFirestore.instance;
-  static String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+  static const _docsKeyPrefix = 'kk_docs';
+  static final StreamController<List<Map<String, dynamic>>>
+      _documentsController =
+      StreamController<List<Map<String, dynamic>>>.broadcast();
 
-  /// Save scanned document (image stays local, metadata goes to Firestore)
+  static String get _docsKey {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    return uid == null ? _docsKeyPrefix : '${_docsKeyPrefix}_$uid';
+  }
+
   static Future<Map<String, dynamic>?> uploadDocument({
     required File imageFile,
     required String docName,
     required String docType,
+    String summary = '',
   }) async {
-    if (_uid == null) return null;
     try {
-      // Save image path locally (file stays on device)
-      final localPath = imageFile.path;
-
-      final docData = {
+      final savedImage = await _copyImageToManagedFolder(imageFile);
+      final createdAt = DateTime.now();
+      final document = <String, dynamic>{
+        'id': createdAt.microsecondsSinceEpoch.toString(),
         'name': docName,
+        'title': docName,
         'type': docType,
-        'localPath': localPath,   // local file path
-        'imageUrl': '',           // no cloud storage
-        'storagePath': '',
-        'createdAt': FieldValue.serverTimestamp(),
-        'uid': _uid,
+        'summary': summary,
+        'localPath': savedImage.path,
+        'imagePath': savedImage.path,
+        'storagePath': savedImage.path,
+        'createdAt': createdAt.toIso8601String(),
       };
 
-      final docRef = await _db
-          .collection('users')
-          .doc(_uid)
-          .collection('documents')
-          .add(docData);
-
-      return {'id': docRef.id, ...docData};
-    } catch (e) {
+      final documents = await getDocuments();
+      documents.insert(0, document);
+      await _saveDocuments(documents);
+      return document;
+    } catch (_) {
       return null;
     }
   }
 
-  /// Real-time stream of documents from Firestore
-  static Stream<List<Map<String, dynamic>>> getDocumentsStream() {
-    if (_uid == null) return Stream.value([]);
-    return _db
-        .collection('users')
-        .doc(_uid)
-        .collection('documents')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((d) => {'id': d.id, ...d.data()})
-            .toList());
+  static Stream<List<Map<String, dynamic>>> getDocumentsStream() async* {
+    yield await getDocuments();
+    yield* _documentsController.stream;
   }
 
-  /// Get all documents once
   static Future<List<Map<String, dynamic>>> getDocuments() async {
-    if (_uid == null) return [];
-    try {
-      final snap = await _db
-          .collection('users')
-          .doc(_uid)
-          .collection('documents')
-          .orderBy('createdAt', descending: true)
-          .get();
-      return snap.docs.map((d) => {'id': d.id, ...d.data()}).toList();
-    } catch (_) {
+    final prefs = await SharedPreferences.getInstance();
+    var raw = prefs.getString(_docsKey);
+    if ((raw == null || raw.isEmpty) && _docsKey != _docsKeyPrefix) {
+      raw = prefs.getString(_docsKeyPrefix);
+      if (raw != null && raw.isNotEmpty) {
+        await prefs.setString(_docsKey, raw);
+      }
+    }
+    if (raw == null || raw.isEmpty) {
       return [];
+    }
+
+    final decoded = jsonDecode(raw) as List<dynamic>;
+    final documents = decoded
+        .whereType<Map>()
+        .map((item) => _normalizeDocument(Map<String, dynamic>.from(item)))
+        .toList();
+    documents.sort(_compareByCreatedAtDesc);
+    return documents;
+  }
+
+  static Future<void> deleteDocument(String docId, [String? storedPath]) async {
+    final documents = await getDocuments();
+    Map<String, dynamic>? deletedDocument;
+    documents.removeWhere((doc) {
+      final matches = doc['id'] == docId;
+      if (matches) {
+        deletedDocument = doc;
+      }
+      return matches;
+    });
+    await _saveDocuments(documents);
+
+    final filePath = (storedPath != null && storedPath.isNotEmpty)
+        ? storedPath
+        : (deletedDocument?['localPath'] ?? deletedDocument?['imagePath'] ?? '')
+            .toString();
+    if (filePath.isEmpty) {
+      return;
+    }
+
+    final file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
     }
   }
 
-  /// Delete document metadata from Firestore (local file stays)
-  static Future<void> deleteDocument(String docId, [String? unused]) async {
-    if (_uid == null) return;
-    try {
-      await _db
-          .collection('users')
-          .doc(_uid)
-          .collection('documents')
-          .doc(docId)
-          .delete();
-    } catch (_) {}
+  static Future<void> _saveDocuments(
+      List<Map<String, dynamic>> documents) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_docsKey, jsonEncode(documents));
+    if (!_documentsController.isClosed) {
+      _documentsController
+          .add(List<Map<String, dynamic>>.unmodifiable(documents));
+    }
+  }
+
+  static Map<String, dynamic> _normalizeDocument(Map<String, dynamic> raw) {
+    final localPath =
+        (raw['localPath'] ?? raw['imagePath'] ?? raw['storagePath'] ?? '')
+            .toString();
+    final name = (raw['name'] ?? raw['title'] ?? 'Document').toString();
+    return <String, dynamic>{
+      'id': (raw['id'] ?? DateTime.now().microsecondsSinceEpoch.toString())
+          .toString(),
+      'name': name,
+      'title': (raw['title'] ?? name).toString(),
+      'type': (raw['type'] ?? 'Document').toString(),
+      'summary': (raw['summary'] ?? '').toString(),
+      'localPath': localPath,
+      'imagePath': (raw['imagePath'] ?? localPath).toString(),
+      'storagePath': (raw['storagePath'] ?? localPath).toString(),
+      'createdAt':
+          (raw['createdAt'] ?? DateTime.now().toIso8601String()).toString(),
+    };
+  }
+
+  static int _compareByCreatedAtDesc(
+    Map<String, dynamic> first,
+    Map<String, dynamic> second,
+  ) {
+    final firstDate = DateTime.tryParse(first['createdAt']?.toString() ?? '');
+    final secondDate = DateTime.tryParse(second['createdAt']?.toString() ?? '');
+    final firstValue = firstDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+    final secondValue = secondDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+    return secondValue.compareTo(firstValue);
+  }
+
+  static Future<File> _copyImageToManagedFolder(File sourceFile) async {
+    final rootDirectory = await getApplicationDocumentsDirectory();
+    final documentsDirectory = Directory(
+      '${rootDirectory.path}${Platform.pathSeparator}saved_documents',
+    );
+    if (!await documentsDirectory.exists()) {
+      await documentsDirectory.create(recursive: true);
+    }
+
+    final extension = _fileExtension(sourceFile.path);
+    final targetPath =
+        '${documentsDirectory.path}${Platform.pathSeparator}doc_${DateTime.now().microsecondsSinceEpoch}$extension';
+    return sourceFile.copy(targetPath);
+  }
+
+  static String _fileExtension(String path) {
+    final dotIndex = path.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == path.length - 1) {
+      return '.jpg';
+    }
+    return path.substring(dotIndex);
   }
 }

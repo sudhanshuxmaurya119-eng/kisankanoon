@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   static final _auth = FirebaseAuth.instance;
@@ -33,7 +34,7 @@ class AuthService {
       });
       return null; // success
     } on FirebaseAuthException catch (e) {
-      return _friendlyError(e.code);
+      return _friendlyError(e.code, fallbackMessage: e.message);
     } catch (e) {
       final msg = e.toString();
       return 'त्रुटि: ${msg.length > 100 ? msg.substring(0, 100) : msg}';
@@ -52,7 +53,7 @@ class AuthService {
       );
       return null; // success
     } on FirebaseAuthException catch (e) {
-      return _friendlyError(e.code);
+      return _friendlyError(e.code, fallbackMessage: e.message);
     } catch (e) {
       return 'कुछ गलत हुआ। पुनः प्रयास करें।';
     }
@@ -99,17 +100,23 @@ class AuthService {
 
   /// Send password reset email
   static Future<String?> sendPasswordReset(String email) async {
+    final normalizedEmail = email.trim();
+    if (normalizedEmail.isEmpty) {
+      return 'Please enter your email address.';
+    }
+
     try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
+      await _auth.sendPasswordResetEmail(email: normalizedEmail);
       return null; // success
     } on FirebaseAuthException catch (e) {
-      return _friendlyError(e.code);
+      debugPrint('Password reset failed [${e.code}]: ${e.message}');
+      return _friendlyError(e.code, fallbackMessage: e.message);
     } catch (_) {
       return 'ईमेल भेजने में समस्या हुई।';
     }
   }
 
-  static String _friendlyError(String code) {
+  static String _friendlyError(String code, {String? fallbackMessage}) {
     switch (code) {
       case 'user-not-found':
       case 'invalid-credential':
@@ -126,6 +133,10 @@ class AuthService {
         return 'इंटरनेट कनेक्शन जांचें।';
       case 'too-many-requests':
         return 'बहुत अधिक प्रयास। कुछ देर बाद कोशिश करें।';
+      case 'missing-email':
+        return 'Please enter your email address.';
+      case 'internal-error':
+        return 'Firebase could not process this request. Please check your setup and try again.';
       default:
         return 'कुछ गलत हुआ। कृपया पुनः प्रयास करें।';
     }

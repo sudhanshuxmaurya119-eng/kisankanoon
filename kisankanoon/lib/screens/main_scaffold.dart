@@ -16,20 +16,25 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    ScanScreen(),
-    DocumentsScreen(),
-    SchemesScreen(),
-    MoreScreen(),
-  ];
+  void _changeTab(int index) {
+    if (!mounted) return;
+    setState(() => _selectedIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      HomeScreen(onChangeTab: _changeTab),
+      const ScanScreen(),
+      const DocumentsScreen(),
+      const SchemesScreen(),
+      const MoreScreen(),
+    ];
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _screens,
+        children: screens,
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(

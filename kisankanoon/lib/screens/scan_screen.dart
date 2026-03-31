@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import '../theme/app_theme.dart';
-import '../models/document_model.dart';
+
+import '../services/document_service.dart';
 import '../services/storage_service.dart';
+import '../theme/app_theme.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -16,50 +18,78 @@ class _ScanScreenState extends State<ScanScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _pickedImage;
   bool _analyzing = false;
+  bool _saving = false;
   String? _result;
 
   Future<void> _pickImage(ImageSource source) async {
-    final img = await _picker.pickImage(
+    final image = await _picker.pickImage(
       source: source,
       imageQuality: 80,
       maxWidth: 1080,
     );
-    if (img == null) return;
+    if (image == null) return;
+
     setState(() {
-      _pickedImage = img;
+      _pickedImage = image;
       _analyzing = true;
       _result = null;
     });
-    // Simulate document analysis
+
     await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
     setState(() {
       _analyzing = false;
-      _result = 'यह एक भूमि रजिस्ट्री दस्तावेज़ है।\n\nमुख्य विवरण:\n• खसरा संख्या: 452/3\n• क्षेत्र: 2.5 बीघा\n• मालिक: रामलाल वर्मा\n• जिला: वाराणसी, उत्तर प्रदेश\n\nयह दस्तावेज़ वैध है। किसी भी प्रश्न के लिए 15100 पर कॉल करें।';
+      _result =
+          'यह एक भूमि रजिस्ट्री दस्तावेज़ है।\n\nमुख्य विवरण:\n• खसरा संख्या: 452/3\n• क्षेत्र: 2.5 बीघा\n• मालिक: रामलाल वर्मा\n• जिला: वाराणसी, उत्तर प्रदेश\n\nयह दस्तावेज़ वैध है। किसी भी प्रश्न के लिए 15100 पर कॉल करें।';
     });
     await StorageService.incrementScanCount();
   }
 
   Future<void> _saveDocument() async {
-    if (_pickedImage == null || _result == null) return;
-    final doc = DocumentModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'स्कैन किया दस्तावेज़',
-      type: 'भूमि रजिस्ट्री',
-      imagePath: _pickedImage!.path,
+    if (_pickedImage == null || _result == null || _saving) return;
+
+    setState(() => _saving = true);
+    final savedDocument = await DocumentService.uploadDocument(
+      imageFile: File(_pickedImage!.path),
+      docName: 'स्कैन किया दस्तावेज़',
+      docType: 'भूमि रजिस्ट्री',
       summary: _result!,
-      createdAt: DateTime.now(),
     );
-    await StorageService.saveDoc(doc);
+
     if (!mounted) return;
+    setState(() => _saving = false);
+
+    if (savedDocument == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('दस्तावेज़ सेव नहीं हुआ। कृपया पुनः प्रयास करें।'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('दस्तावेज़ सुरक्षित हो गया!'),
+        content: Text(
+            'दस्तावेज़ सुरक्षित हो गया और दस्तावेज़ फ़ोल्डर में दिखाई देगा।'),
         backgroundColor: AppTheme.primaryGreen,
       ),
     );
+
     setState(() {
       _pickedImage = null;
       _result = null;
+    });
+  }
+
+  void _resetScan() {
+    setState(() {
+      _pickedImage = null;
+      _result = null;
+      _analyzing = false;
+      _saving = false;
     });
   }
 
@@ -77,7 +107,6 @@ class _ScanScreenState extends State<ScanScreen> {
           child: Column(
             children: [
               if (_pickedImage == null) ...[
-                // Scan area
                 Container(
                   width: double.infinity,
                   height: 240,
@@ -90,13 +119,13 @@ class _ScanScreenState extends State<ScanScreen> {
                       strokeAlign: BorderSide.strokeAlignInside,
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text('📄', style: TextStyle(fontSize: 60)),
                       SizedBox(height: 16),
                       Text(
-                        'कागज़ की फोटो लें',
+                        'कागज़ की फ़ोटो लें',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -130,13 +159,17 @@ class _ScanScreenState extends State<ScanScreen> {
                         height: 52,
                         child: OutlinedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: const Icon(Icons.photo_library, color: AppTheme.primaryGreen),
+                          icon: const Icon(
+                            Icons.photo_library,
+                            color: AppTheme.primaryGreen,
+                          ),
                           label: const Text(
                             'गैलरी',
                             style: TextStyle(color: AppTheme.primaryGreen),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppTheme.primaryGreen),
+                            side:
+                                const BorderSide(color: AppTheme.primaryGreen),
                           ),
                         ),
                       ),
@@ -144,7 +177,6 @@ class _ScanScreenState extends State<ScanScreen> {
                   ],
                 ),
               ] else ...[
-                // Image preview
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.file(
@@ -162,8 +194,8 @@ class _ScanScreenState extends State<ScanScreen> {
                       color: AppTheme.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Column(
-                      children: const [
+                    child: const Column(
+                      children: [
                         CircularProgressIndicator(color: AppTheme.primaryGreen),
                         SizedBox(height: 16),
                         Text(
@@ -188,9 +220,13 @@ class _ScanScreenState extends State<ScanScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.check_circle, color: AppTheme.primaryGreen, size: 20),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: AppTheme.primaryGreen,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               'विश्लेषण पूरा',
@@ -221,9 +257,19 @@ class _ScanScreenState extends State<ScanScreen> {
                         child: SizedBox(
                           height: 52,
                           child: ElevatedButton.icon(
-                            onPressed: _saveDocument,
-                            icon: const Icon(Icons.save),
-                            label: const Text('सुरक्षित करें'),
+                            onPressed: _saving ? null : _saveDocument,
+                            icon: _saving
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.save),
+                            label: Text(
+                                _saving ? 'सेव हो रहा है...' : 'सुरक्षित करें'),
                           ),
                         ),
                       ),
@@ -232,12 +278,10 @@ class _ScanScreenState extends State<ScanScreen> {
                         child: SizedBox(
                           height: 52,
                           child: OutlinedButton(
-                            onPressed: () => setState(() {
-                              _pickedImage = null;
-                              _result = null;
-                            }),
+                            onPressed: _saving ? null : _resetScan,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppTheme.primaryGreen),
+                              side: const BorderSide(
+                                  color: AppTheme.primaryGreen),
                             ),
                             child: const Text(
                               'नया स्कैन',
@@ -250,10 +294,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   ),
                 ],
               ],
-
               const SizedBox(height: 24),
-
-              // Supported documents
               Container(
                 decoration: BoxDecoration(
                   color: AppTheme.white,
@@ -273,12 +314,30 @@ class _ScanScreenState extends State<ScanScreen> {
                         ),
                       ),
                     ),
-                    ...['📄 खसरा / खतौनी', '🪪 Aadhaar कार्ड', '🏦 बैंक पर्ची', '📋 भूमि रजिस्ट्री', '🏛️ सरकारी नोटिस', '⚖️ अदालती कागज़']
-                        .map((item) => ListTile(
-                      dense: true,
-                      title: Text(item, style: const TextStyle(fontSize: 13, color: AppTheme.textDark)),
-                      trailing: const Icon(Icons.check, color: AppTheme.accentGreen, size: 16),
-                    )),
+                    ...[
+                      '📄 खसरा / खतौनी',
+                      '🪪 Aadhaar कार्ड',
+                      '🏦 बैंक पर्ची',
+                      '📋 भूमि रजिस्ट्री',
+                      '🏛️ सरकारी नोटिस',
+                      '⚖️ अदालती कागज़',
+                    ].map(
+                      (item) => ListTile(
+                        dense: true,
+                        title: Text(
+                          item,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.check,
+                          color: AppTheme.accentGreen,
+                          size: 16,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                   ],
                 ),

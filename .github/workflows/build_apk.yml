@@ -38,14 +38,14 @@ jobs:
         working-directory: kisankanoon
 
       - name: Build APK
-        run: flutter build apk --debug
+        run: flutter build apk --release
         working-directory: kisankanoon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: KisanKanoon-APK
-          path: kisankanoon/build/app/outputs/flutter-apk/app-debug.apk
+          path: kisankanoon/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 90
 
       - name: Create GitHub Release
@@ -54,12 +54,12 @@ jobs:
           tag_name: v${{ github.run_number }}
           name: "KisanKanoon v${{ github.run_number }}"
           body: |
-            ## 📲 KisanKanoon - किसान का साथी
+            ## KisanKanoon - Farmer companion
             **Download the APK below and install on your Android phone.**
 
             Build: #${{ github.run_number }}
             Commit: ${{ github.event.head_commit.message }}
-          files: kisankanoon/build/app/outputs/flutter-apk/app-debug.apk
+          files: kisankanoon/build/app/outputs/flutter-apk/app-release.apk
           draft: false
           prerelease: false
         env:

@@ -1,11 +1,33 @@
 import 'dart:convert';
+
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
-  // Free Open-Meteo API — no key needed
+  static const double _fallbackLat = 28.6139;
+  static const double _fallbackLon = 77.2090;
+  static const String _fallbackLabel = 'डिफ़ॉल्ट स्थान';
+
+  static Future<Map<String, dynamic>?> getWeatherForCurrentLocation() async {
+    final location = await _resolveLocation();
+    final weather = await getWeather(
+      lat: location.latitude,
+      lon: location.longitude,
+    );
+    if (weather == null) {
+      return null;
+    }
+
+    return {
+      ...weather,
+      'locationLabel': location.label,
+      'isFallback': location.isFallback,
+    };
+  }
+
   static Future<Map<String, dynamic>?> getWeather({
-    double lat = 28.6139, // Default: Delhi
-    double lon = 77.2090,
+    required double lat,
+    required double lon,
   }) async {
     try {
       final url = Uri.parse(
@@ -14,20 +36,82 @@ class WeatherService {
         '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m'
         '&timezone=Asia/Kolkata',
       );
-      final resp = await http.get(url).timeout(const Duration(seconds: 8));
-      if (resp.statusCode != 200) return null;
-      final data = json.decode(resp.body);
+      final response = await http.get(url).timeout(const Duration(seconds: 8));
+      if (response.statusCode != 200) return null;
+
+      final data = json.decode(response.body) as Map<String, dynamic>;
       final current = data['current'] as Map<String, dynamic>;
+      final weatherCode = (current['weathercode'] as num).toInt();
+
       return {
-        'temp': current['temperature_2m'],
-        'windspeed': current['windspeed_10m'],
+        'temp': (current['temperature_2m'] as num).toDouble(),
+        'windspeed': (current['windspeed_10m'] as num).toDouble(),
         'humidity': current['relativehumidity_2m'],
-        'code': current['weathercode'],
-        'description': _weatherDesc(current['weathercode'] as int),
-        'emoji': _weatherEmoji(current['weathercode'] as int),
+        'code': weatherCode,
+        'description': _weatherDesc(weatherCode),
+        'emoji': _weatherEmoji(weatherCode),
       };
     } catch (_) {
       return null;
+    }
+  }
+
+  static Future<_ResolvedLocation> _resolveLocation() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return const _ResolvedLocation(
+          latitude: _fallbackLat,
+          longitude: _fallbackLon,
+          label: 'लोकेशन बंद है',
+          isFallback: true,
+        );
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return const _ResolvedLocation(
+          latitude: _fallbackLat,
+          longitude: _fallbackLon,
+          label: 'लोकेशन अनुमति नहीं मिली',
+          isFallback: true,
+        );
+      }
+
+      final currentPosition = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      ).timeout(const Duration(seconds: 10));
+
+      return _ResolvedLocation(
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude,
+        label: 'आपकी लोकेशन',
+        isFallback: false,
+      );
+    } catch (_) {
+      final lastKnownPosition = await Geolocator.getLastKnownPosition();
+      if (lastKnownPosition != null) {
+        return _ResolvedLocation(
+          latitude: lastKnownPosition.latitude,
+          longitude: lastKnownPosition.longitude,
+          label: 'पिछली लोकेशन',
+          isFallback: false,
+        );
+      }
+
+      return const _ResolvedLocation(
+        latitude: _fallbackLat,
+        longitude: _fallbackLon,
+        label: _fallbackLabel,
+        isFallback: true,
+      );
     }
   }
 
@@ -50,4 +134,18 @@ class WeatherService {
     if (code <= 82) return '⛈️';
     return '🌪️';
   }
+}
+
+class _ResolvedLocation {
+  final double latitude;
+  final double longitude;
+  final String label;
+  final bool isFallback;
+
+  const _ResolvedLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.label,
+    required this.isFallback,
+  });
 }
