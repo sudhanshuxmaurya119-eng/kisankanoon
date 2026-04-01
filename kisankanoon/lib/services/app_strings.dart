@@ -290,8 +290,162 @@ class AppStrings {
     },
   };
 
+  static const Map<String, Map<String, String>> _extraStrings = {
+    'hi': {
+      'scanDocumentTitle': 'दस्तावेज़ स्कैन करें',
+      'scanOrUploadDocument': 'दस्तावेज़ स्कैन या अपलोड करें',
+      'reviewAndAddDetails':
+          'स्कैन या अपलोड के बाद दस्तावेज़ की जानकारी खुद भरें।',
+      'camera': 'कैमरा',
+      'uploadImage': 'फोटो अपलोड करें',
+      'uploadPdfDocument': 'PDF / दस्तावेज़ अपलोड करें',
+      'selectedFile': 'चयनित फ़ाइल',
+      'pickDocumentFailed': 'दस्तावेज़ चुना नहीं जा सका। फिर से कोशिश करें।',
+      'documentDetails': 'दस्तावेज़ विवरण',
+      'onlyEnteredDetailsSaved':
+          'सिर्फ वही जानकारी सेव होगी जो आप यहां भरेंगे।',
+      'documentName': 'दस्तावेज़ का नाम',
+      'documentNameHint': 'उदाहरण: जमीन रजिस्ट्री 2026',
+      'documentType': 'दस्तावेज़ प्रकार',
+      'selectDocumentType': 'दस्तावेज़ प्रकार चुनें',
+      'documentIdNumber': 'दस्तावेज़ आईडी / नंबर',
+      'documentIdHint': 'उदाहरण: 452/3 या ABCD1234',
+      'notesLabel': 'नोट्स',
+      'notesHint': 'दस्तावेज़ से जुड़ी अतिरिक्त जानकारी लिखें',
+      'saveDocument': 'दस्तावेज़ सुरक्षित करें',
+      'saving': 'सेव हो रहा है...',
+      'newScan': 'नया स्कैन',
+      'firebaseSyncNote':
+          'सेव करने पर फ़ाइल आपके डिवाइस में रहेगी और Firestore खाते में सिंक करने की कोशिश होगी।',
+      'supportedDocuments': 'समर्थित दस्तावेज़',
+      'pleaseEnterDocumentName': 'सेव करने से पहले दस्तावेज़ का नाम लिखें।',
+      'pleaseChooseDocumentType': 'सेव करने से पहले दस्तावेज़ का प्रकार चुनें।',
+      'documentSavedSynced': 'दस्तावेज़ सेव हो गया और Firebase से सिंक हो गया।',
+      'documentSavedMetadataOnly':
+          'दस्तावेज़ सेव हो गया। Firebase में विवरण सिंक हो गया, लेकिन फ़ाइल बड़ी होने के कारण केवल इस डिवाइस में रखी गई है।',
+      'documentSavedPending':
+          'दस्तावेज़ इस डिवाइस में सेव हो गया, Firebase सिंक बाकी है।',
+      'documentSavedSyncFailedPrefix':
+          'दस्तावेज़ इस डिवाइस में सेव हो गया, लेकिन Firebase सिंक नहीं हो सका: ',
+      'documentSaveFailed': 'दस्तावेज़ सेव नहीं हो सका। फिर से कोशिश करें।',
+      'deviceAndFirestore': 'डिवाइस + Firestore',
+      'noDocumentsYet': 'अभी कोई दस्तावेज़ नहीं है',
+      'documentsEmptyHint':
+          'स्कैन या अपलोड किया गया दस्तावेज़ यहां अपने आप दिखेगा।',
+      'firebaseSynced': 'Firebase सिंक हो गया',
+      'firebaseSyncPending': 'Firebase सिंक बाकी',
+      'deleteDocumentQuestion': 'दस्तावेज़ हटाएं?',
+      'deleteDocumentWarning':
+          'यह दस्तावेज़ आपके फ़ोल्डर और Firebase डेटा से हट जाएगा।',
+      'cancel': 'रद्द करें',
+      'delete': 'हटाएं',
+      'deleteFailed':
+          'दस्तावेज़ Firebase से हटाया नहीं जा सका। फिर से कोशिश करें।',
+      'notAdded': 'नहीं जोड़ा गया',
+      'firebaseStatus': 'Firebase स्थिति',
+      'syncedSuccessfully': 'सफलतापूर्वक सिंक',
+      'notSyncedYet': 'अभी सिंक नहीं हुआ',
+      'accountId': 'अकाउंट आईडी',
+      'syncMessage': 'सिंक संदेश',
+      'fileType': 'फ़ाइल प्रकार',
+      'savedAt': 'सेव समय',
+      'justNow': 'अभी',
+      'documentWord': 'दस्तावेज़',
+      'generalDocument': 'सामान्य दस्तावेज़',
+      'landRecord': 'जमीन रिकॉर्ड',
+      'aadhaarCard': 'आधार कार्ड',
+      'bankPassbook': 'बैंक पासबुक',
+      'registryPaper': 'रजिस्ट्री पेपर',
+      'governmentNotice': 'सरकारी नोटिस',
+      'courtDocument': 'कोर्ट दस्तावेज़',
+      'other': 'अन्य',
+      'pdfDocument': 'PDF / दस्तावेज़',
+      'fileKeptOnDevice':
+          'फ़ाइल बड़ी होने के कारण केवल इस डिवाइस में रखी गई है।',
+    },
+    'en': {
+      'scanDocumentTitle': 'Scan Document',
+      'scanOrUploadDocument': 'Scan or upload your document',
+      'reviewAndAddDetails':
+          'After scan or upload, add the document details yourself.',
+      'camera': 'Camera',
+      'uploadImage': 'Upload image',
+      'uploadPdfDocument': 'Upload PDF / document',
+      'selectedFile': 'Selected file',
+      'pickDocumentFailed':
+          'The document could not be selected. Please try again.',
+      'documentDetails': 'Document details',
+      'onlyEnteredDetailsSaved':
+          'Only the details you enter here will be stored with this document.',
+      'documentName': 'Document name',
+      'documentNameHint': 'Example: Land registry 2026',
+      'documentType': 'Document type',
+      'selectDocumentType': 'Select document type',
+      'documentIdNumber': 'Document ID / number',
+      'documentIdHint': 'Example: 452/3 or ABCD1234',
+      'notesLabel': 'Notes',
+      'notesHint': 'Add any extra detail about this document',
+      'saveDocument': 'Save document',
+      'saving': 'Saving...',
+      'newScan': 'New scan',
+      'firebaseSyncNote':
+          'When you save, the file stays on your device and also tries to sync with your Firestore account.',
+      'supportedDocuments': 'Supported documents',
+      'pleaseEnterDocumentName': 'Please enter a document name before saving.',
+      'pleaseChooseDocumentType':
+          'Please choose the document type before saving.',
+      'documentSavedSynced':
+          'Document saved successfully and synced to Firebase.',
+      'documentSavedMetadataOnly':
+          'Document saved successfully. Firebase synced the details, but the file stays only on this device because it is too large for free sync.',
+      'documentSavedPending':
+          'Document saved on this device, but Firebase sync is still pending.',
+      'documentSavedSyncFailedPrefix':
+          'Document saved on this device, but Firebase sync failed: ',
+      'documentSaveFailed': 'Document could not be saved. Please try again.',
+      'deviceAndFirestore': 'Device + Firestore',
+      'noDocumentsYet': 'No documents yet',
+      'documentsEmptyHint':
+          'A scanned or uploaded document will appear here automatically.',
+      'firebaseSynced': 'Firebase synced',
+      'firebaseSyncPending': 'Firebase sync pending',
+      'deleteDocumentQuestion': 'Delete document?',
+      'deleteDocumentWarning':
+          'This will remove the document from your folder and Firebase data.',
+      'cancel': 'Cancel',
+      'delete': 'Delete',
+      'deleteFailed':
+          'The document could not be deleted from Firebase. Please try again.',
+      'notAdded': 'Not added',
+      'firebaseStatus': 'Firebase status',
+      'syncedSuccessfully': 'Synced successfully',
+      'notSyncedYet': 'Not synced yet',
+      'accountId': 'Account ID',
+      'syncMessage': 'Sync message',
+      'fileType': 'File type',
+      'savedAt': 'Saved at',
+      'justNow': 'Just now',
+      'documentWord': 'Document',
+      'generalDocument': 'General document',
+      'landRecord': 'Land Record',
+      'aadhaarCard': 'Aadhaar Card',
+      'bankPassbook': 'Bank Passbook',
+      'registryPaper': 'Registry Paper',
+      'governmentNotice': 'Government Notice',
+      'courtDocument': 'Court Document',
+      'other': 'Other',
+      'pdfDocument': 'PDF / document',
+      'fileKeptOnDevice':
+          'The file stays only on this device because it is too large for free sync.',
+    },
+  };
+
   static String t(String languageCode, String key) {
-    return _strings[languageCode]?[key] ?? _strings['hi']?[key] ?? key;
+    return _extraStrings[languageCode]?[key] ??
+        _strings[languageCode]?[key] ??
+        _extraStrings['hi']?[key] ??
+        _strings['hi']?[key] ??
+        key;
   }
 
   static String weatherDescription(String languageCode, int code) {

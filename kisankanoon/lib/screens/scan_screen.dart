@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../services/app_language_service.dart';
+import '../services/app_strings.dart';
 import '../services/document_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
@@ -15,16 +18,14 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  static const String _typePlaceholder = 'Select document type';
-  static const List<String> _documentTypes = <String>[
-    _typePlaceholder,
-    'Land Record',
-    'Aadhaar Card',
-    'Bank Passbook',
-    'Registry Paper',
-    'Government Notice',
-    'Court Document',
-    'Other',
+  static const List<String> _documentTypeKeys = <String>[
+    'landRecord',
+    'aadhaarCard',
+    'bankPassbook',
+    'registryPaper',
+    'governmentNotice',
+    'courtDocument',
+    'other',
   ];
 
   final ImagePicker _picker = ImagePicker();
@@ -32,58 +33,120 @@ class _ScanScreenState extends State<ScanScreen> {
   final TextEditingController _docNumberCtrl = TextEditingController();
   final TextEditingController _notesCtrl = TextEditingController();
 
-  XFile? _pickedImage;
+  File? _selectedFile;
+  String _selectedFileName = '';
+  String _selectedFileKind = 'image';
   bool _saving = false;
-  String _selectedDocType = _typePlaceholder;
+  String? _selectedDocTypeKey;
+  String _languageCode = AppLanguageService.currentCode.value;
+
+  String get _translationCode => _languageCode == 'en' ? 'en' : 'hi';
+
+  @override
+  void initState() {
+    super.initState();
+    AppLanguageService.currentCode.addListener(_handleLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    AppLanguageService.currentCode.removeListener(_handleLanguageChanged);
+    _docNameCtrl.dispose();
+    _docNumberCtrl.dispose();
+    _notesCtrl.dispose();
+    super.dispose();
+  }
+
+  void _handleLanguageChanged() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _languageCode = AppLanguageService.currentCode.value;
+    });
+  }
+
+  String _t(String key) => AppStrings.t(_translationCode, key);
 
   Future<void> _pickImage(ImageSource source) async {
     final image = await _picker.pickImage(
       source: source,
-      imageQuality: 50,
-      maxWidth: 960,
+      imageQuality: 60,
+      maxWidth: 1280,
     );
     if (image == null) {
       return;
     }
 
-    setState(() {
-      _pickedImage = image;
-      _docNameCtrl.clear();
-      _docNumberCtrl.clear();
-      _notesCtrl.clear();
-      _selectedDocType = _typePlaceholder;
-    });
-
+    _setSelectedFile(
+      file: File(image.path),
+      fileName: image.name.isEmpty ? _fileNameFromPath(image.path) : image.name,
+    );
     await StorageService.incrementScanCount();
   }
 
+  Future<void> _pickDocumentFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const <String>['pdf', 'doc', 'docx', 'txt', 'rtf'],
+    );
+
+    if (result == null || result.files.isEmpty) {
+      return;
+    }
+
+    final pickedFile = result.files.single;
+    final path = pickedFile.path;
+    if (path == null || path.isEmpty) {
+      _showMessage(_t('pickDocumentFailed'), Colors.red);
+      return;
+    }
+
+    _setSelectedFile(
+      file: File(path),
+      fileName:
+          pickedFile.name.isEmpty ? _fileNameFromPath(path) : pickedFile.name,
+    );
+    await StorageService.incrementScanCount();
+  }
+
+  void _setSelectedFile({
+    required File file,
+    required String fileName,
+  }) {
+    setState(() {
+      _selectedFile = file;
+      _selectedFileName = fileName;
+      _selectedFileKind = _fileKindFromName(fileName);
+      _selectedDocTypeKey = null;
+      _saving = false;
+    });
+    _docNameCtrl.clear();
+    _docNumberCtrl.clear();
+    _notesCtrl.clear();
+  }
+
   Future<void> _saveDocument() async {
-    if (_pickedImage == null || _saving) {
+    if (_selectedFile == null || _saving) {
       return;
     }
 
     final docName = _docNameCtrl.text.trim();
     if (docName.isEmpty) {
-      _showMessage(
-        'Please enter a document name before saving.',
-        Colors.orange,
-      );
+      _showMessage(_t('pleaseEnterDocumentName'), Colors.orange);
       return;
     }
 
-    if (_selectedDocType == _typePlaceholder) {
-      _showMessage(
-        'Please choose the document type yourself before saving.',
-        Colors.orange,
-      );
+    if (_selectedDocTypeKey == null) {
+      _showMessage(_t('pleaseChooseDocumentType'), Colors.orange);
       return;
     }
 
     setState(() => _saving = true);
     final savedDocument = await DocumentService.uploadDocument(
-      imageFile: File(_pickedImage!.path),
+      sourceFile: _selectedFile!,
       docName: docName,
-      docType: _selectedDocType,
+      docType: _t(_selectedDocTypeKey!),
       documentNumber: _docNumberCtrl.text.trim(),
       notes: _notesCtrl.text.trim(),
       summary: '',
@@ -96,28 +159,33 @@ class _ScanScreenState extends State<ScanScreen> {
     setState(() => _saving = false);
 
     if (savedDocument == null) {
-      _showMessage(
-        'Document could not be saved. Please try again.',
-        Colors.red,
-      );
+      _showMessage(_t('documentSaveFailed'), Colors.red);
       return;
     }
 
     final syncedToFirebase = savedDocument['syncedToFirebase'] == true;
+    final cloudFileAvailable = savedDocument['cloudFileAvailable'] == true;
     final syncError = (savedDocument['syncError'] ?? '').toString().trim();
-    final ownerId = (savedDocument['ownerId'] ?? '').toString().trim();
 
-    _showMessage(
-      syncedToFirebase
-          ? 'Document saved in your folder and synced to Firebase account ${_shortId(ownerId)}.'
-          : syncError.isEmpty
-              ? 'Document saved on this device, but Firebase sync is still pending.'
-              : 'Document saved on this device, but Firebase sync failed: $syncError',
-      syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
-      duration: const Duration(seconds: 5),
-    );
+    late final String message;
+    late final Color color;
 
-    _resetScan();
+    if (syncedToFirebase && cloudFileAvailable) {
+      message = _t('documentSavedSynced');
+      color = AppTheme.primaryGreen;
+    } else if (syncedToFirebase) {
+      message = _t('documentSavedMetadataOnly');
+      color = AppTheme.primaryGreen;
+    } else if (syncError.isEmpty) {
+      message = _t('documentSavedPending');
+      color = Colors.orange;
+    } else {
+      message = '${_t('documentSavedSyncFailedPrefix')}$syncError';
+      color = Colors.orange;
+    }
+
+    _showMessage(message, color, duration: const Duration(seconds: 5));
+    _resetSelection();
   }
 
   void _showMessage(
@@ -125,6 +193,10 @@ class _ScanScreenState extends State<ScanScreen> {
     Color backgroundColor, {
     Duration duration = const Duration(seconds: 3),
   }) {
+    if (!mounted) {
+      return;
+    }
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -136,30 +208,63 @@ class _ScanScreenState extends State<ScanScreen> {
       );
   }
 
-  void _resetScan() {
+  void _resetSelection() {
     setState(() {
-      _pickedImage = null;
+      _selectedFile = null;
+      _selectedFileName = '';
+      _selectedFileKind = 'image';
+      _selectedDocTypeKey = null;
       _saving = false;
-      _selectedDocType = _typePlaceholder;
     });
     _docNameCtrl.clear();
     _docNumberCtrl.clear();
     _notesCtrl.clear();
   }
 
-  String _shortId(String value) {
-    if (value.length <= 8) {
-      return value;
+  String _fileKindFromName(String fileName) {
+    final lowerName = fileName.toLowerCase();
+    if (lowerName.endsWith('.jpg') ||
+        lowerName.endsWith('.jpeg') ||
+        lowerName.endsWith('.png') ||
+        lowerName.endsWith('.webp') ||
+        lowerName.endsWith('.bmp') ||
+        lowerName.endsWith('.gif') ||
+        lowerName.endsWith('.heic') ||
+        lowerName.endsWith('.heif')) {
+      return 'image';
     }
-    return '${value.substring(0, 4)}...${value.substring(value.length - 4)}';
+    if (lowerName.endsWith('.pdf')) {
+      return 'pdf';
+    }
+    return 'document';
   }
 
-  @override
-  void dispose() {
-    _docNameCtrl.dispose();
-    _docNumberCtrl.dispose();
-    _notesCtrl.dispose();
-    super.dispose();
+  String _fileNameFromPath(String path) {
+    final normalizedPath = path.replaceAll('\\', '/');
+    final slashIndex = normalizedPath.lastIndexOf('/');
+    if (slashIndex == -1 || slashIndex == normalizedPath.length - 1) {
+      return normalizedPath;
+    }
+    return normalizedPath.substring(slashIndex + 1);
+  }
+
+  String _fileExtension(String fileName) {
+    final dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == fileName.length - 1) {
+      return '';
+    }
+    return fileName.substring(dotIndex + 1).toUpperCase();
+  }
+
+  IconData _fileIcon() {
+    switch (_selectedFileKind) {
+      case 'pdf':
+        return Icons.picture_as_pdf_outlined;
+      case 'document':
+        return Icons.description_outlined;
+      default:
+        return Icons.insert_drive_file_outlined;
+    }
   }
 
   @override
@@ -167,7 +272,7 @@ class _ScanScreenState extends State<ScanScreen> {
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
-        title: const Text('Scan Document'),
+        title: Text(_t('scanDocumentTitle')),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -175,7 +280,7 @@ class _ScanScreenState extends State<ScanScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              if (_pickedImage == null) ...[
+              if (_selectedFile == null) ...[
                 _introCard(),
                 const SizedBox(height: 20),
                 Row(
@@ -186,7 +291,7 @@ class _ScanScreenState extends State<ScanScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.camera),
                           icon: const Icon(Icons.camera_alt),
-                          label: const Text('Camera'),
+                          label: Text(_t('camera')),
                         ),
                       ),
                     ),
@@ -197,12 +302,13 @@ class _ScanScreenState extends State<ScanScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(
-                            Icons.upload_file,
+                            Icons.photo_library_outlined,
                             color: AppTheme.primaryGreen,
                           ),
-                          label: const Text(
-                            'Upload',
-                            style: TextStyle(color: AppTheme.primaryGreen),
+                          label: Text(
+                            _t('uploadImage'),
+                            style:
+                                const TextStyle(color: AppTheme.primaryGreen),
                           ),
                           style: OutlinedButton.styleFrom(
                             side:
@@ -213,18 +319,37 @@ class _ScanScreenState extends State<ScanScreen> {
                     ),
                   ],
                 ),
-              ] else ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.file(
-                    File(_pickedImage!.path),
-                    width: double.infinity,
-                    height: 220,
-                    fit: BoxFit.cover,
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: _pickDocumentFile,
+                    icon: const Icon(
+                      Icons.upload_file_outlined,
+                      color: AppTheme.primaryGreen,
+                    ),
+                    label: Text(
+                      _t('uploadPdfDocument'),
+                      style: const TextStyle(color: AppTheme.primaryGreen),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppTheme.primaryGreen),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                _captureNoticeCard(),
+              ] else ...[
+                _selectedFileKind == 'image'
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          _selectedFile!,
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : _filePreviewCard(),
                 const SizedBox(height: 16),
                 _detailsCard(),
                 const SizedBox(height: 16),
@@ -246,7 +371,7 @@ class _ScanScreenState extends State<ScanScreen> {
                                 )
                               : const Icon(Icons.save),
                           label: Text(
-                            _saving ? 'Saving...' : 'Save document',
+                            _saving ? _t('saving') : _t('saveDocument'),
                           ),
                         ),
                       ),
@@ -256,15 +381,16 @@ class _ScanScreenState extends State<ScanScreen> {
                       child: SizedBox(
                         height: 52,
                         child: OutlinedButton(
-                          onPressed: _saving ? null : _resetScan,
+                          onPressed: _saving ? null : _resetSelection,
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                               color: AppTheme.primaryGreen,
                             ),
                           ),
-                          child: const Text(
-                            'New scan',
-                            style: TextStyle(color: AppTheme.primaryGreen),
+                          child: Text(
+                            _t('newScan'),
+                            style:
+                                const TextStyle(color: AppTheme.primaryGreen),
                           ),
                         ),
                       ),
@@ -294,26 +420,26 @@ class _ScanScreenState extends State<ScanScreen> {
           strokeAlign: BorderSide.strokeAlignInside,
         ),
       ),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('📄', style: TextStyle(fontSize: 60)),
-          SizedBox(height: 16),
+          const Text('📄', style: TextStyle(fontSize: 60)),
+          const SizedBox(height: 16),
           Text(
-            'Scan or upload your document',
-            style: TextStyle(
+            _t('scanOrUploadDocument'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'After scan, review the image and add the document details yourself before saving it to your folder.',
+              _t('reviewAndAddDetails'),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: AppTheme.textMid),
+              style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
             ),
           ),
         ],
@@ -321,43 +447,79 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  Widget _captureNoticeCard() {
+  Widget _filePreviewCard() {
+    final extension = _fileExtension(_selectedFileName);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.check_circle,
-                color: AppTheme.primaryGreen,
-                size: 20,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Add details yourself',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: AppTheme.bgGreen,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  _fileIcon(),
+                  size: 30,
                   color: AppTheme.primaryGreen,
                 ),
               ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _t('selectedFile'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textMid,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _selectedFileName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppTheme.textDark,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (extension.isNotEmpty)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgGreen,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    extension,
+                    style: const TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
             ],
-          ),
-          SizedBox(height: 12),
-          Text(
-            'This scan is ready to save. The app will not guess document details, so please enter the name, type, ID, and notes yourself.',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textDark,
-              height: 1.5,
-            ),
           ),
         ],
       ),
@@ -375,58 +537,85 @@ class _ScanScreenState extends State<ScanScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Document details',
-            style: TextStyle(
+          Text(
+            _t('documentDetails'),
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Only the details you enter here will be stored with this document in your account.',
-            style: TextStyle(fontSize: 13, color: AppTheme.textMid),
+          Text(
+            _t('onlyEnteredDetailsSaved'),
+            style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
           ),
+          if (_selectedFileName.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.bgGreen,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(_fileIcon(), size: 18, color: AppTheme.primaryGreen),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectedFileName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.primaryGreen,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           TextField(
             controller: _docNameCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Document name',
-              hintText: 'Example: Land registry 2026',
-              prefixIcon: Icon(Icons.description_outlined),
+            decoration: InputDecoration(
+              labelText: _t('documentName'),
+              hintText: _t('documentNameHint'),
+              prefixIcon: const Icon(Icons.description_outlined),
             ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            key: ValueKey<String>(_selectedDocType),
-            initialValue: _selectedDocType,
-            decoration: const InputDecoration(
-              labelText: 'Document type',
-              prefixIcon: Icon(Icons.category_outlined),
+            key: ValueKey<String?>(_selectedDocTypeKey),
+            initialValue: _selectedDocTypeKey,
+            decoration: InputDecoration(
+              labelText: _t('documentType'),
+              prefixIcon: const Icon(Icons.category_outlined),
             ),
-            items: _documentTypes
+            hint: Text(_t('selectDocumentType')),
+            items: _documentTypeKeys
                 .map(
-                  (type) => DropdownMenuItem<String>(
-                    value: type,
-                    child: Text(type),
+                  (typeKey) => DropdownMenuItem<String>(
+                    value: typeKey,
+                    child: Text(_t(typeKey)),
                   ),
                 )
                 .toList(),
             onChanged: (value) {
-              if (value == null) {
-                return;
-              }
-              setState(() => _selectedDocType = value);
+              setState(() => _selectedDocTypeKey = value);
             },
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _docNumberCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Document ID / number',
-              hintText: 'Example: 452/3 or ABCD1234',
-              prefixIcon: Icon(Icons.badge_outlined),
+            decoration: InputDecoration(
+              labelText: _t('documentIdNumber'),
+              hintText: _t('documentIdHint'),
+              prefixIcon: const Icon(Icons.badge_outlined),
             ),
           ),
           const SizedBox(height: 12),
@@ -434,10 +623,10 @@ class _ScanScreenState extends State<ScanScreen> {
             controller: _notesCtrl,
             minLines: 3,
             maxLines: 5,
-            decoration: const InputDecoration(
-              labelText: 'Notes',
-              hintText: 'Add any extra detail about this document',
-              prefixIcon: Icon(Icons.note_alt_outlined),
+            decoration: InputDecoration(
+              labelText: _t('notesLabel'),
+              hintText: _t('notesHint'),
+              prefixIcon: const Icon(Icons.note_alt_outlined),
               alignLabelWithHint: true,
             ),
           ),
@@ -449,9 +638,9 @@ class _ScanScreenState extends State<ScanScreen> {
               color: AppTheme.bgGreen,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
-              'When you save, the image stays in your device folder and also tries to sync to Firestore under your signed-in account.',
-              style: TextStyle(
+            child: Text(
+              _t('firebaseSyncNote'),
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppTheme.primaryGreen,
                 fontWeight: FontWeight.w600,
@@ -464,13 +653,14 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Widget _supportedDocumentsCard() {
-    const supportedItems = <String>[
-      'Khasra / Khatauni',
-      'Aadhaar card',
-      'Bank passbook',
-      'Land registry paper',
-      'Government notice',
-      'Court paper',
+    final supportedItems = <String>[
+      _t('landRecord'),
+      _t('aadhaarCard'),
+      _t('bankPassbook'),
+      _t('registryPaper'),
+      _t('governmentNotice'),
+      _t('courtDocument'),
+      _t('pdfDocument'),
     ];
 
     return Container(
@@ -481,11 +671,11 @@ class _ScanScreenState extends State<ScanScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Supported documents',
-              style: TextStyle(
+              _t('supportedDocuments'),
+              style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.textDark,

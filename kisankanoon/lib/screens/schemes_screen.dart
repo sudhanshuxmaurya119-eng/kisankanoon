@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../services/app_language_service.dart';
 import '../theme/app_theme.dart';
 
 class SchemesScreen extends StatefulWidget {
@@ -10,136 +12,265 @@ class SchemesScreen extends StatefulWidget {
 
 class _SchemesScreenState extends State<SchemesScreen> {
   String _searchQuery = '';
+  String _languageCode = AppLanguageService.currentCode.value;
 
-  final List<Map<String, dynamic>> _schemes = [
+  static const List<Map<String, String>> _schemes = [
     {
-      'name': 'PM-KISAN',
-      'full': 'प्रधानमंत्री किसान सम्मान निधि',
+      'nameHi': 'पीएम-किसान',
+      'nameEn': 'PM-KISAN',
+      'fullHi': 'प्रधानमंत्री किसान सम्मान निधि',
+      'fullEn': 'Pradhan Mantri Kisan Samman Nidhi',
       'emoji': '💰',
-      'amount': '₹6,000/वर्ष',
-      'desc': 'छोटे और सीमान्त किसानों को प्रति वर्ष ₹6,000 तीन किस्तों में दिए जाते हैं।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '₹6,000/वर्ष',
+      'amountEn': '₹6,000/year',
+      'descHi':
+          'छोटे और सीमांत किसानों को प्रति वर्ष ₹6,000 तीन किस्तों में दिए जाते हैं।',
+      'descEn':
+          'Small and marginal farmers receive ₹6,000 per year in three installments.',
+      'tagHi': 'केंद्र सरकार',
+      'tagEn': 'Central',
     },
     {
-      'name': 'फसल बीमा',
-      'full': 'प्रधानमंत्री फसल बीमा योजना (PMFBY)',
+      'nameHi': 'फसल बीमा',
+      'nameEn': 'Crop Insurance',
+      'fullHi': 'प्रधानमंत्री फसल बीमा योजना (PMFBY)',
+      'fullEn': 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
       'emoji': '🌾',
-      'amount': 'प्रीमियम 2%',
-      'desc': 'किसानों की फसल को प्राकृतिक आपदाओं से बचाने के लिए बीमा कवर।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': 'प्रीमियम 2%',
+      'amountEn': '2% premium',
+      'descHi':
+          'प्राकृतिक आपदाओं, बारिश या नुकसान के समय फसल सुरक्षा के लिए बीमा कवर।',
+      'descEn':
+          'Insurance cover to protect crops against natural disasters, rain, and damage.',
+      'tagHi': 'केंद्र सरकार',
+      'tagEn': 'Central',
     },
     {
-      'name': 'किसान क्रेडिट कार्ड',
-      'full': 'Kisan Credit Card (KCC)',
+      'nameHi': 'किसान क्रेडिट कार्ड',
+      'nameEn': 'Kisan Credit Card',
+      'fullHi': 'किसान क्रेडिट कार्ड (KCC)',
+      'fullEn': 'Kisan Credit Card (KCC)',
       'emoji': '💳',
-      'amount': '₹3 लाख तक',
-      'desc': 'कम ब्याज दर पर कृषि ऋण। 4% ब्याज दर पर ₹3 लाख तक का ऋण।',
-      'tag': 'बैंक',
+      'amountHi': '₹3 लाख तक',
+      'amountEn': 'Up to ₹3 lakh',
+      'descHi':
+          'कम ब्याज दर पर कृषि ऋण। समय पर भुगतान पर ब्याज में अतिरिक्त राहत मिलती है।',
+      'descEn':
+          'Low-interest farm credit with additional interest relief for timely repayment.',
+      'tagHi': 'बैंक',
+      'tagEn': 'Bank',
     },
     {
-      'name': 'PM Kisan Maan Dhan',
-      'full': 'प्रधानमंत्री किसान मान-धन योजना',
+      'nameHi': 'किसान मान-धन',
+      'nameEn': 'Kisan Maan Dhan',
+      'fullHi': 'प्रधानमंत्री किसान मान-धन योजना',
+      'fullEn': 'Pradhan Mantri Kisan Maan Dhan Yojana',
       'emoji': '👴',
-      'amount': '₹3,000/माह',
-      'desc': '60 वर्ष की आयु के बाद ₹3,000 मासिक पेंशन।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '₹3,000/माह',
+      'amountEn': '₹3,000/month',
+      'descHi': '60 वर्ष की आयु के बाद योग्य किसानों को मासिक पेंशन सहायता।',
+      'descEn':
+          'Monthly pension support for eligible farmers after the age of 60.',
+      'tagHi': 'केंद्र सरकार',
+      'tagEn': 'Pension',
     },
     {
-      'name': 'सॉयल हेल्थ कार्ड',
-      'full': 'Soil Health Card Scheme',
+      'nameHi': 'सॉइल हेल्थ कार्ड',
+      'nameEn': 'Soil Health Card',
+      'fullHi': 'सॉइल हेल्थ कार्ड योजना',
+      'fullEn': 'Soil Health Card Scheme',
       'emoji': '🌱',
-      'amount': 'मुफ़्त',
-      'desc': 'मिट्टी की जांच और उर्वरक सिफारिश कार्ड मुफ़्त में।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': 'मुफ़्त',
+      'amountEn': 'Free',
+      'descHi':
+          'मिट्टी की जांच के आधार पर उर्वरक और पोषण संबंधी सही सलाह दी जाती है।',
+      'descEn':
+          'Provides fertilizer and nutrient guidance based on soil testing.',
+      'tagHi': 'मुफ़्त सेवा',
+      'tagEn': 'Free service',
     },
     {
-      'name': 'PM Kusum',
-      'full': 'Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan',
+      'nameHi': 'पीएम-कुसुम',
+      'nameEn': 'PM Kusum',
+      'fullHi': 'प्रधानमंत्री किसान ऊर्जा सुरक्षा एवं उत्थान महाभियान',
+      'fullEn': 'Pradhan Mantri Kisan Urja Suraksha Evam Utthaan Mahabhiyan',
       'emoji': '☀️',
-      'amount': '90% सब्सिडी',
-      'desc': 'सोलर पंप पर 90% तक की सब्सिडी। सिंचाई के लिए सोलर ऊर्जा।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '90% सब्सिडी तक',
+      'amountEn': 'Up to 90% subsidy',
+      'descHi':
+          'सोलर पंप और कृषि ऊर्जा समाधान के लिए वित्तीय सहायता उपलब्ध है।',
+      'descEn':
+          'Financial support for solar pumps and clean energy solutions for farming.',
+      'tagHi': 'सोलर',
+      'tagEn': 'Solar',
     },
     {
-      'name': 'National Agriculture Market',
-      'full': 'e-NAM (एकीकृत बाज़ार)',
+      'nameHi': 'ई-नाम',
+      'nameEn': 'e-NAM',
+      'fullHi': 'राष्ट्रीय कृषि बाजार',
+      'fullEn': 'National Agriculture Market',
       'emoji': '🏪',
-      'amount': 'मुफ़्त पंजीकरण',
-      'desc': 'किसान ऑनलाइन मंडी में अपनी फसल बेच सकते हैं।',
-      'tag': 'डिजिटल',
+      'amountHi': 'मुफ़्त पंजीकरण',
+      'amountEn': 'Free registration',
+      'descHi':
+          'किसान ऑनलाइन मंडी प्लेटफॉर्म पर अपनी फसल बेहतर दाम में बेच सकते हैं।',
+      'descEn':
+          'Farmers can sell produce on the online mandi platform for better price discovery.',
+      'tagHi': 'डिजिटल',
+      'tagEn': 'Digital',
     },
     {
-      'name': 'एग्री इन्फ्रास्ट्रक्चर',
-      'full': 'Agriculture Infrastructure Fund',
+      'nameHi': 'एग्री इन्फ्रास्ट्रक्चर',
+      'nameEn': 'Agri Infrastructure',
+      'fullHi': 'एग्रीकल्चर इन्फ्रास्ट्रक्चर फंड',
+      'fullEn': 'Agriculture Infrastructure Fund',
       'emoji': '🏭',
-      'amount': '₹1 करोड़ तक',
-      'desc': 'कोल्ड स्टोरेज और प्रसंस्करण के लिए ऋण पर ब्याज छूट।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '₹1 करोड़ तक',
+      'amountEn': 'Up to ₹1 crore',
+      'descHi':
+          'कोल्ड स्टोरेज, वेयरहाउस और कृषि प्रसंस्करण इकाइयों के लिए सहायता।',
+      'descEn':
+          'Support for cold storage, warehousing, and farm processing infrastructure.',
+      'tagHi': 'इन्फ्रा',
+      'tagEn': 'Infra',
     },
     {
-      'name': 'RKVY',
-      'full': 'राष्ट्रीय कृषि विकास योजना',
+      'nameHi': 'आरकेवीवाई',
+      'nameEn': 'RKVY',
+      'fullHi': 'राष्ट्रीय कृषि विकास योजना',
+      'fullEn': 'Rashtriya Krishi Vikas Yojana',
       'emoji': '📈',
-      'amount': 'अनुदान',
-      'desc': 'कृषि और संबद्ध क्षेत्रों में समग्र विकास के लिए राज्यों को अनुदान।',
-      'tag': 'राज्य + केंद्र',
+      'amountHi': 'अनुदान',
+      'amountEn': 'Grant support',
+      'descHi':
+          'कृषि और संबंधित क्षेत्रों के विकास के लिए राज्यों और किसानों को सहायता।',
+      'descEn':
+          'Supports states and farmers in agriculture and allied sector development.',
+      'tagHi': 'राज्य + केंद्र',
+      'tagEn': 'State + Central',
     },
     {
-      'name': 'Paramparagat Krishi',
-      'full': 'Paramparagat Krishi Vikas Yojana (PKVY)',
+      'nameHi': 'परंपरागत कृषि',
+      'nameEn': 'Organic Farming',
+      'fullHi': 'परंपरागत कृषि विकास योजना (PKVY)',
+      'fullEn': 'Paramparagat Krishi Vikas Yojana (PKVY)',
       'emoji': '🌿',
-      'amount': '₹50,000/हेक्टेयर',
-      'desc': 'जैविक खेती को बढ़ावा देने के लिए किसानों को प्रति हेक्टेयर सहायता।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '₹50,000/हेक्टेयर',
+      'amountEn': '₹50,000/hectare',
+      'descHi':
+          'जैविक खेती को बढ़ावा देने के लिए किसानों को समूह आधारित सहायता मिलती है।',
+      'descEn':
+          'Group-based support is provided to encourage organic farming practices.',
+      'tagHi': 'ऑर्गेनिक',
+      'tagEn': 'Organic',
     },
     {
-      'name': 'मधुमक्खी पालन',
-      'full': 'National Bee Keeping & Honey Mission',
+      'nameHi': 'मधुमक्खी पालन',
+      'nameEn': 'Bee Keeping',
+      'fullHi': 'नेशनल बी कीपिंग एंड हनी मिशन',
+      'fullEn': 'National Bee Keeping and Honey Mission',
       'emoji': '🐝',
-      'amount': '75% सब्सिडी',
-      'desc': 'मधुमक्खी पालन उपकरण पर 75% तक की सब्सिडी।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '75% सब्सिडी तक',
+      'amountEn': 'Up to 75% subsidy',
+      'descHi':
+          'मधुमक्खी पालन, शहद उत्पादन और संबंधित उपकरणों पर सहायता मिलती है।',
+      'descEn':
+          'Support is available for bee keeping, honey production, and related equipment.',
+      'tagHi': 'उद्यम',
+      'tagEn': 'Enterprise',
     },
     {
-      'name': 'मत्स्य संपदा योजना',
-      'full': 'Pradhan Mantri Matsya Sampada Yojana',
+      'nameHi': 'मत्स्य संपदा',
+      'nameEn': 'Matsya Sampada',
+      'fullHi': 'प्रधानमंत्री मत्स्य संपदा योजना',
+      'fullEn': 'Pradhan Mantri Matsya Sampada Yojana',
       'emoji': '🐟',
-      'amount': '₹20,050 करोड़',
-      'desc': 'मत्स्य पालन क्षेत्र के विकास के लिए सहायता और अनुदान।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': '₹20,050 करोड़',
+      'amountEn': '₹20,050 crore',
+      'descHi':
+          'मत्स्य पालन और जलीय कृषि क्षेत्र के विकास के लिए वित्तीय सहायता।',
+      'descEn':
+          'Financial support for fisheries and aquaculture sector development.',
+      'tagHi': 'मत्स्य',
+      'tagEn': 'Fisheries',
     },
     {
-      'name': 'पशुधन विकास',
-      'full': 'Rashtriya Gokul Mission',
+      'nameHi': 'पशुधन विकास',
+      'nameEn': 'Livestock Development',
+      'fullHi': 'राष्ट्रीय गोकुल मिशन',
+      'fullEn': 'Rashtriya Gokul Mission',
       'emoji': '🐄',
-      'amount': 'सब्सिडी',
-      'desc': 'देशी नस्ल के गोवंश संरक्षण और विकास के लिए सहायता।',
-      'tag': 'केंद्र सरकार',
+      'amountHi': 'सब्सिडी',
+      'amountEn': 'Subsidy',
+      'descHi':
+          'देशी नस्ल सुधार, दुग्ध उत्पादन और पशुपालन विकास के लिए सहायता।',
+      'descEn':
+          'Support for indigenous breed improvement, dairy production, and livestock growth.',
+      'tagHi': 'पशुपालन',
+      'tagEn': 'Livestock',
     },
     {
-      'name': 'DBT Agriculture',
-      'full': 'Direct Benefit Transfer for Agriculture',
-      'emoji': '🏦',
-      'amount': 'सीधा भुगतान',
-      'desc': 'सभी सब्सिडी और लाभ सीधे बैंक खाते में।',
-      'tag': 'केंद्र सरकार',
-    },
-    {
-      'name': 'DLSA क़ानूनी मदद',
-      'full': 'District Legal Services Authority',
+      'nameHi': 'डीएलएसए कानूनी मदद',
+      'nameEn': 'DLSA Legal Help',
+      'fullHi': 'जिला विधिक सेवा प्राधिकरण',
+      'fullEn': 'District Legal Services Authority',
       'emoji': '⚖️',
-      'amount': 'मुफ़्त',
-      'desc': 'ज़मीन विवाद, ऋण समस्या के लिए मुफ़्त क़ानूनी सहायता। 15100 पर कॉल करें।',
-      'tag': 'क़ानूनी',
+      'amountHi': 'मुफ़्त',
+      'amountEn': 'Free',
+      'descHi':
+          'जमीन विवाद, ऋण समस्या और कानूनी मामलों के लिए मुफ्त सहायता। 15100 पर कॉल करें।',
+      'descEn':
+          'Free legal support for land disputes, loan issues, and related matters. Call 15100.',
+      'tagHi': 'कानूनी',
+      'tagEn': 'Legal',
     },
   ];
 
-  List<Map<String, dynamic>> get _filtered {
-    if (_searchQuery.isEmpty) return _schemes;
-    return _schemes.where((s) =>
-      s['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()) ||
-      s['full'].toString().toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+  bool get _isEnglish => _languageCode == 'en';
+
+  @override
+  void initState() {
+    super.initState();
+    AppLanguageService.currentCode.addListener(_handleLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    AppLanguageService.currentCode.removeListener(_handleLanguageChanged);
+    super.dispose();
+  }
+
+  void _handleLanguageChanged() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _languageCode = AppLanguageService.currentCode.value;
+    });
+  }
+
+  String _screenText(String english, String hindi) {
+    return _isEnglish ? english : hindi;
+  }
+
+  String _schemeText(Map<String, String> scheme, String prefix) {
+    return _isEnglish ? scheme['${prefix}En']! : scheme['${prefix}Hi']!;
+  }
+
+  List<Map<String, String>> get _filteredSchemes {
+    final query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) {
+      return _schemes;
+    }
+
+    return _schemes.where((scheme) {
+      final name = _schemeText(scheme, 'name').toLowerCase();
+      final full = _schemeText(scheme, 'full').toLowerCase();
+      final desc = _schemeText(scheme, 'desc').toLowerCase();
+      return name.contains(query) ||
+          full.contains(query) ||
+          desc.contains(query);
+    }).toList();
   }
 
   @override
@@ -147,24 +278,31 @@ class _SchemesScreenState extends State<SchemesScreen> {
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
-        title: const Text('सरकारी योजनाएं'),
+        title: Text(
+          _screenText('Government Schemes', 'सरकारी योजनाएं'),
+        ),
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: TextField(
-              onChanged: (v) => setState(() => _searchQuery = v),
+              onChanged: (value) => setState(() => _searchQuery = value),
               decoration: InputDecoration(
-                hintText: 'योजना खोजें...',
-                prefixIcon: const Icon(Icons.search, color: AppTheme.primaryGreen),
+                hintText: _screenText(
+                  'Search schemes...',
+                  'योजनाएं खोजें...',
+                ),
+                prefixIcon:
+                    const Icon(Icons.search, color: AppTheme.primaryGreen),
                 filled: true,
                 fillColor: AppTheme.bgLight,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               ),
             ),
           ),
@@ -172,22 +310,22 @@ class _SchemesScreenState extends State<SchemesScreen> {
       ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: _filtered.length,
+        itemCount: _filteredSchemes.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
-          final s = _filtered[index];
+          final scheme = _filteredSchemes[index];
           return GestureDetector(
-            onTap: () => _showDetail(s),
+            onTap: () => _showDetail(scheme),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppTheme.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: AppTheme.shadow,
                     blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -200,7 +338,12 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       color: AppTheme.bgGreen,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Center(child: Text(s['emoji'], style: const TextStyle(fontSize: 26))),
+                    child: Center(
+                      child: Text(
+                        scheme['emoji']!,
+                        style: const TextStyle(fontSize: 26),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -208,7 +351,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          s['name'],
+                          _schemeText(scheme, 'name'),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -217,8 +360,11 @@ class _SchemesScreenState extends State<SchemesScreen> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          s['full'],
-                          style: const TextStyle(fontSize: 11, color: AppTheme.textMid),
+                          _schemeText(scheme, 'full'),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.textMid,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -226,13 +372,16 @@ class _SchemesScreenState extends State<SchemesScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppTheme.bgGreen,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                s['amount'],
+                                _schemeText(scheme, 'amount'),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   color: AppTheme.primaryGreen,
@@ -242,13 +391,16 @@ class _SchemesScreenState extends State<SchemesScreen> {
                             ),
                             const SizedBox(width: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFF3E0),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                s['tag'],
+                                _schemeText(scheme, 'tag'),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   color: Color(0xFFE65100),
@@ -261,7 +413,10 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: AppTheme.primaryGreen),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: AppTheme.primaryGreen,
+                  ),
                 ],
               ),
             ),
@@ -271,27 +426,28 @@ class _SchemesScreenState extends State<SchemesScreen> {
     );
   }
 
-  void _showDetail(Map<String, dynamic> scheme) {
-    showModalBottomSheet(
+  void _showDetail(Map<String, String> scheme) {
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
+        initialChildSize: 0.55,
         maxChildSize: 0.9,
         minChildSize: 0.4,
         expand: false,
-        builder: (_, ctrl) => SingleChildScrollView(
-          controller: ctrl,
+        builder: (_, controller) => SingleChildScrollView(
+          controller: controller,
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
-                  width: 40, height: 4,
+                  width: 40,
+                  height: 4,
                   decoration: BoxDecoration(
                     color: AppTheme.divider,
                     borderRadius: BorderRadius.circular(2),
@@ -299,11 +455,20 @@ class _SchemesScreenState extends State<SchemesScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Center(child: Text(scheme['emoji'], style: const TextStyle(fontSize: 52))),
+              Center(
+                child: Text(
+                  scheme['emoji']!,
+                  style: const TextStyle(fontSize: 52),
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
-                scheme['full'],
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textDark),
+                _schemeText(scheme, 'full'),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textDark,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -318,8 +483,21 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       ),
                       child: Column(
                         children: [
-                          Text(scheme['amount'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.primaryGreen)),
-                          const Text('लाभ', style: TextStyle(fontSize: 11, color: AppTheme.textMid)),
+                          Text(
+                            _schemeText(scheme, 'amount'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.primaryGreen,
+                            ),
+                          ),
+                          Text(
+                            _screenText('Benefit', 'लाभ'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textMid,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -334,8 +512,21 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       ),
                       child: Column(
                         children: [
-                          Text(scheme['tag'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFFE65100))),
-                          const Text('श्रेणी', style: TextStyle(fontSize: 11, color: AppTheme.textMid)),
+                          Text(
+                            _schemeText(scheme, 'tag'),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFE65100),
+                            ),
+                          ),
+                          Text(
+                            _screenText('Category', 'श्रेणी'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textMid,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -343,16 +534,32 @@ class _SchemesScreenState extends State<SchemesScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('विवरण', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.textDark)),
+              Text(
+                _screenText('Details', 'विवरण'),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textDark,
+                ),
+              ),
               const SizedBox(height: 8),
-              Text(scheme['desc'], style: const TextStyle(fontSize: 14, color: AppTheme.textMid, height: 1.7)),
+              Text(
+                _schemeText(scheme, 'desc'),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textMid,
+                  height: 1.7,
+                ),
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {},
-                  child: const Text('अभी आवेदन करें'),
+                  child: Text(
+                    _screenText('Apply now', 'अभी आवेदन करें'),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

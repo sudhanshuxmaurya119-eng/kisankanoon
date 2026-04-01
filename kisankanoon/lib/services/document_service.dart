@@ -8,8 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DocumentService {
-  static const _docsKeyPrefix = 'kk_docs';
-  static const int _maxFirebaseImageBytes = 700 * 1024;
+  static const String _docsKeyPrefix = 'kk_docs';
+  static const int _maxFirebaseFileBytes = 700 * 1024;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final StreamController<List<Map<String, dynamic>>>
       _documentsController =
@@ -27,7 +27,7 @@ class DocumentService {
   }
 
   static Future<Map<String, dynamic>?> uploadDocument({
-    required File imageFile,
+    required File sourceFile,
     required String docName,
     required String docType,
     String summary = '',
@@ -35,22 +35,33 @@ class DocumentService {
     String notes = '',
   }) async {
     try {
-      final savedImage = await _copyImageToManagedFolder(imageFile);
+      final originalFileName = _fileNameFromPath(sourceFile.path);
+      final originalExtension = _fileExtension(sourceFile.path);
+      final fileKind = _fileKindFromExtension(originalExtension);
+      final savedFile = await _copyFileToManagedFolder(sourceFile);
       final createdAt = DateTime.now();
       final documentId = createdAt.microsecondsSinceEpoch.toString();
       final currentUser = FirebaseAuth.instance.currentUser;
+      final defaultName = docName.trim().isEmpty ? 'Document' : docName.trim();
 
       Map<String, dynamic> document = _normalizeDocument(<String, dynamic>{
         'id': documentId,
-        'name': docName.trim().isEmpty ? 'Document' : docName.trim(),
-        'title': docName.trim().isEmpty ? 'Document' : docName.trim(),
+        'name': defaultName,
+        'title': defaultName,
         'type': docType.trim().isEmpty ? 'General Document' : docType.trim(),
         'summary': summary.trim(),
         'documentNumber': documentNumber.trim(),
         'notes': notes.trim(),
-        'localPath': savedImage.path,
-        'imagePath': savedImage.path,
+        'localPath': savedFile.path,
+        'imagePath': savedFile.path,
+        'fileName': originalFileName.isEmpty
+            ? '$defaultName${originalExtension.isEmpty ? '.jpg' : originalExtension}'
+            : originalFileName,
+        'fileExtension': originalExtension,
+        'fileKind': fileKind,
+        'fileBase64': '',
         'imageBase64': '',
+        'cloudFileAvailable': false,
         'ownerId': currentUser?.uid ?? '',
         'createdAt': createdAt.toIso8601String(),
         'syncedToFirebase': false,
@@ -62,7 +73,7 @@ class DocumentService {
       if (currentUser != null) {
         document = await _syncDocumentToFirebase(
           uid: currentUser.uid,
-          sourceFile: savedImage,
+          sourceFile: savedFile,
           localDocument: document,
         );
       }
@@ -93,7 +104,8 @@ class DocumentService {
       return localDocuments;
     }
 
-    final syncedLocalDocuments = await _syncPendingDocuments(uid, localDocuments);
+    final syncedLocalDocuments =
+        await _syncPendingDocuments(uid, localDocuments);
 
     try {
       final snapshot = await _documentsCollection(uid)
@@ -176,17 +188,8 @@ class DocumentService {
     });
 
     try {
-      final encodedImage = await _encodeImageForFirestore(sourceFile);
-      if (encodedImage == null) {
-        return _normalizeDocument(<String, dynamic>{
-          ...normalizedDocument,
-          'ownerId': uid,
-          'syncedToFirebase': false,
-          'syncError':
-              'Image is too large for free Firebase sync. Please scan a clearer single page or use the camera option again.',
-        });
-      }
-
+      final encodedFile = await _encodeFileForFirestore(sourceFile);
+      final cloudFileAvailable = encodedFile != null;
       final documentId = normalizedDocument['id'].toString();
       await _documentsCollection(uid).doc(documentId).set(
         <String, dynamic>{
@@ -198,7 +201,14 @@ class DocumentService {
           'summary': normalizedDocument['summary'],
           'documentNumber': normalizedDocument['documentNumber'],
           'notes': normalizedDocument['notes'],
-          'imageBase64': encodedImage,
+          'fileName': normalizedDocument['fileName'],
+          'fileExtension': normalizedDocument['fileExtension'],
+          'fileKind': normalizedDocument['fileKind'],
+          'fileBase64': encodedFile ?? '',
+          'imageBase64': normalizedDocument['fileKind'] == 'image'
+              ? (encodedFile ?? '')
+              : '',
+          'cloudFileAvailable': cloudFileAvailable,
           'createdAt': Timestamp.fromDate(
             _parseCreatedAt(normalizedDocument['createdAt']) ?? DateTime.now(),
           ),
@@ -210,7 +220,11 @@ class DocumentService {
       return _normalizeDocument(<String, dynamic>{
         ...normalizedDocument,
         'ownerId': uid,
-        'imageBase64': encodedImage,
+        'fileBase64': encodedFile ?? '',
+        'imageBase64': normalizedDocument['fileKind'] == 'image'
+            ? (encodedFile ?? '')
+            : '',
+        'cloudFileAvailable': cloudFileAvailable,
         'syncedToFirebase': true,
         'syncError': '',
       });
@@ -251,8 +265,8 @@ class DocumentService {
         continue;
       }
 
-      final localPath = (document['localPath'] ?? document['imagePath'] ?? '')
-          .toString();
+      final localPath =
+          (document['localPath'] ?? document['imagePath'] ?? '').toString();
       if (localPath.isEmpty) {
         syncedDocuments.add(
           _normalizeDocument(<String, dynamic>{
@@ -343,6 +357,16 @@ class DocumentService {
       }
     }
 
+    final fileBase64 =
+        (raw['fileBase64'] ?? raw['imageBase64'] ?? '').toString();
+    final cachedLocalPath =
+        (cachedDocument?['localPath'] ?? cachedDocument?['imagePath'] ?? '')
+            .toString();
+    final cachedFileName = (cachedDocument?['fileName'] ?? '').toString();
+    final cachedExtension = (cachedDocument?['fileExtension'] ?? '').toString();
+    final resolvedExtension =
+        (raw['fileExtension'] ?? cachedExtension).toString().trim();
+
     return _normalizeDocument(<String, dynamic>{
       'id': documentId,
       'name': raw['name'],
@@ -351,15 +375,20 @@ class DocumentService {
       'summary': raw['summary'],
       'documentNumber': raw['documentNumber'],
       'notes': raw['notes'],
+      'fileName': raw['fileName'] ?? cachedFileName,
+      'fileExtension': resolvedExtension,
+      'fileKind': raw['fileKind'] ?? _fileKindFromExtension(resolvedExtension),
+      'fileBase64': fileBase64,
       'imageBase64': raw['imageBase64'] ?? '',
-      'localPath': cachedDocument?['localPath'] ?? '',
-      'imagePath':
-          cachedDocument?['imagePath'] ?? cachedDocument?['localPath'] ?? '',
+      'localPath': cachedLocalPath,
+      'imagePath': cachedLocalPath,
       'downloadUrl': raw['downloadUrl'] ?? '',
       'ownerId':
           (raw['ownerId'] ?? FirebaseAuth.instance.currentUser?.uid ?? '')
               .toString(),
       'createdAt': _timestampToIsoString(raw['createdAt']),
+      'cloudFileAvailable':
+          raw['cloudFileAvailable'] == true || fileBase64.isNotEmpty,
       'syncedToFirebase': true,
       'syncError': '',
     });
@@ -393,12 +422,24 @@ class DocumentService {
         if ((existing['imagePath'] ?? '').toString().isEmpty &&
             (normalized['imagePath'] ?? '').toString().isNotEmpty)
           'imagePath': normalized['imagePath'],
+        if ((existing['fileBase64'] ?? '').toString().isEmpty &&
+            (normalized['fileBase64'] ?? '').toString().isNotEmpty)
+          'fileBase64': normalized['fileBase64'],
         if ((existing['imageBase64'] ?? '').toString().isEmpty &&
             (normalized['imageBase64'] ?? '').toString().isNotEmpty)
           'imageBase64': normalized['imageBase64'],
         if ((existing['notes'] ?? '').toString().isEmpty &&
             (normalized['notes'] ?? '').toString().isNotEmpty)
           'notes': normalized['notes'],
+        if ((existing['fileName'] ?? '').toString().isEmpty &&
+            (normalized['fileName'] ?? '').toString().isNotEmpty)
+          'fileName': normalized['fileName'],
+        if ((existing['fileExtension'] ?? '').toString().isEmpty &&
+            (normalized['fileExtension'] ?? '').toString().isNotEmpty)
+          'fileExtension': normalized['fileExtension'],
+        if (existing['cloudFileAvailable'] != true &&
+            normalized['cloudFileAvailable'] == true)
+          'cloudFileAvailable': true,
       });
     }
 
@@ -411,6 +452,21 @@ class DocumentService {
     final localPath = (raw['localPath'] ?? raw['imagePath'] ?? '').toString();
     final name = (raw['name'] ?? raw['title'] ?? 'Document').toString();
     final createdAt = _timestampToIsoString(raw['createdAt']);
+    final fallbackFileName =
+        localPath.isEmpty ? name : _fileNameFromPath(localPath);
+    final fileName = (raw['fileName'] ?? fallbackFileName).toString();
+    final rawExtension = (raw['fileExtension'] ?? '').toString().trim();
+    final fileExtension = rawExtension.isEmpty
+        ? _fileExtension(fileName)
+        : rawExtension.toLowerCase();
+    final rawKind = (raw['fileKind'] ?? '').toString().trim();
+    final fileKind =
+        rawKind.isEmpty ? _fileKindFromExtension(fileExtension) : rawKind;
+    final fileBase64 =
+        (raw['fileBase64'] ?? raw['imageBase64'] ?? '').toString();
+    final imageBase64 =
+        (raw['imageBase64'] ?? (fileKind == 'image' ? fileBase64 : ''))
+            .toString();
 
     return <String, dynamic>{
       'id': (raw['id'] ?? DateTime.now().microsecondsSinceEpoch.toString())
@@ -423,10 +479,16 @@ class DocumentService {
       'notes': (raw['notes'] ?? '').toString(),
       'localPath': localPath,
       'imagePath': (raw['imagePath'] ?? localPath).toString(),
-      'imageBase64': (raw['imageBase64'] ?? '').toString(),
+      'fileName': fileName,
+      'fileExtension': fileExtension,
+      'fileKind': fileKind,
+      'fileBase64': fileBase64,
+      'imageBase64': imageBase64,
       'downloadUrl': (raw['downloadUrl'] ?? '').toString(),
       'ownerId': (raw['ownerId'] ?? '').toString(),
       'createdAt': createdAt,
+      'cloudFileAvailable':
+          raw['cloudFileAvailable'] == true || fileBase64.isNotEmpty,
       'syncedToFirebase': raw['syncedToFirebase'] == true,
       'syncError': (raw['syncError'] ?? '').toString(),
     };
@@ -477,21 +539,21 @@ class DocumentService {
       case 'unauthenticated':
         return 'Please log in again before saving this document to Firebase.';
       case 'resource-exhausted':
-        return 'Firebase could not store this image right now. Please try again.';
+        return 'Firebase could not store this file right now. Please try again.';
       default:
         return error.message ?? error.code;
     }
   }
 
-  static Future<String?> _encodeImageForFirestore(File sourceFile) async {
+  static Future<String?> _encodeFileForFirestore(File sourceFile) async {
     final bytes = await sourceFile.readAsBytes();
-    if (bytes.length > _maxFirebaseImageBytes) {
+    if (bytes.length > _maxFirebaseFileBytes) {
       return null;
     }
     return base64Encode(bytes);
   }
 
-  static Future<File> _copyImageToManagedFolder(File sourceFile) async {
+  static Future<File> _copyFileToManagedFolder(File sourceFile) async {
     final rootDirectory = await getApplicationDocumentsDirectory();
     final documentsDirectory = Directory(
       '${rootDirectory.path}${Platform.pathSeparator}saved_documents',
@@ -506,11 +568,46 @@ class DocumentService {
     return sourceFile.copy(targetPath);
   }
 
-  static String _fileExtension(String path) {
-    final dotIndex = path.lastIndexOf('.');
-    if (dotIndex == -1 || dotIndex == path.length - 1) {
-      return '.jpg';
+  static String _fileNameFromPath(String path) {
+    if (path.isEmpty) {
+      return '';
     }
-    return path.substring(dotIndex).toLowerCase();
+    final normalizedPath = path.replaceAll('\\', '/');
+    final slashIndex = normalizedPath.lastIndexOf('/');
+    if (slashIndex == -1 || slashIndex == normalizedPath.length - 1) {
+      return normalizedPath;
+    }
+    return normalizedPath.substring(slashIndex + 1);
+  }
+
+  static String _fileExtension(String path) {
+    final fileName = _fileNameFromPath(path);
+    final dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == fileName.length - 1) {
+      return '';
+    }
+    return fileName.substring(dotIndex).toLowerCase();
+  }
+
+  static String _fileKindFromExtension(String extension) {
+    const imageExtensions = <String>{
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.webp',
+      '.bmp',
+      '.gif',
+      '.heic',
+      '.heif',
+    };
+
+    final normalizedExtension = extension.toLowerCase();
+    if (imageExtensions.contains(normalizedExtension)) {
+      return 'image';
+    }
+    if (normalizedExtension == '.pdf') {
+      return 'pdf';
+    }
+    return 'document';
   }
 }
