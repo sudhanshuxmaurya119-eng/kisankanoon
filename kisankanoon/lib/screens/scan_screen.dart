@@ -15,7 +15,9 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
+  static const String _typePlaceholder = 'Select document type';
   static const List<String> _documentTypes = <String>[
+    _typePlaceholder,
     'Land Record',
     'Aadhaar Card',
     'Bank Passbook',
@@ -31,10 +33,8 @@ class _ScanScreenState extends State<ScanScreen> {
   final TextEditingController _notesCtrl = TextEditingController();
 
   XFile? _pickedImage;
-  bool _analyzing = false;
   bool _saving = false;
-  String? _result;
-  String _selectedDocType = _documentTypes.first;
+  String _selectedDocType = _typePlaceholder;
 
   Future<void> _pickImage(ImageSource source) async {
     final image = await _picker.pickImage(
@@ -48,49 +48,45 @@ class _ScanScreenState extends State<ScanScreen> {
 
     setState(() {
       _pickedImage = image;
-      _analyzing = true;
-      _result = null;
-      _docNameCtrl.text =
-          source == ImageSource.camera ? 'Scanned document' : 'Uploaded document';
+      _docNameCtrl.clear();
       _docNumberCtrl.clear();
       _notesCtrl.clear();
-      _selectedDocType = _documentTypes.first;
-    });
-
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _analyzing = false;
-      _result =
-          'Detected as a land-related document.\n\nMain details found:\n'
-          '• Khasra number: 452/3\n'
-          '• Area: 2.5 bigha\n'
-          '• Owner: Ramlal Verma\n'
-          '• District: Varanasi, Uttar Pradesh\n\n'
-          'Please review the image and fill the document details before saving.';
+      _selectedDocType = _typePlaceholder;
     });
 
     await StorageService.incrementScanCount();
   }
 
   Future<void> _saveDocument() async {
-    if (_pickedImage == null || _result == null || _saving) {
+    if (_pickedImage == null || _saving) {
+      return;
+    }
+
+    final docName = _docNameCtrl.text.trim();
+    if (docName.isEmpty) {
+      _showMessage(
+        'Please enter a document name before saving.',
+        Colors.orange,
+      );
+      return;
+    }
+
+    if (_selectedDocType == _typePlaceholder) {
+      _showMessage(
+        'Please choose the document type yourself before saving.',
+        Colors.orange,
+      );
       return;
     }
 
     setState(() => _saving = true);
     final savedDocument = await DocumentService.uploadDocument(
       imageFile: File(_pickedImage!.path),
-      docName: _docNameCtrl.text.trim().isEmpty
-          ? 'Scanned document'
-          : _docNameCtrl.text.trim(),
+      docName: docName,
       docType: _selectedDocType,
       documentNumber: _docNumberCtrl.text.trim(),
       notes: _notesCtrl.text.trim(),
-      summary: _result!,
+      summary: '',
     );
 
     if (!mounted) {
@@ -100,11 +96,9 @@ class _ScanScreenState extends State<ScanScreen> {
     setState(() => _saving = false);
 
     if (savedDocument == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Document could not be saved. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
+      _showMessage(
+        'Document could not be saved. Please try again.',
+        Colors.red,
       );
       return;
     }
@@ -113,33 +107,40 @@ class _ScanScreenState extends State<ScanScreen> {
     final syncError = (savedDocument['syncError'] ?? '').toString().trim();
     final ownerId = (savedDocument['ownerId'] ?? '').toString().trim();
 
+    _showMessage(
+      syncedToFirebase
+          ? 'Document saved in your folder and synced to Firebase account ${_shortId(ownerId)}.'
+          : syncError.isEmpty
+              ? 'Document saved on this device, but Firebase sync is still pending.'
+              : 'Document saved on this device, but Firebase sync failed: $syncError',
+      syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
+      duration: const Duration(seconds: 5),
+    );
+
+    _resetScan();
+  }
+
+  void _showMessage(
+    String message,
+    Color backgroundColor, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(
-            syncedToFirebase
-                ? 'Document saved in your folder and synced to Firebase account ${_shortId(ownerId)}.'
-                : syncError.isEmpty
-                    ? 'Document saved on this device, but Firebase sync is still pending.'
-                    : 'Document saved on this device, but Firebase sync failed: $syncError',
-          ),
-          backgroundColor:
-              syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
-          duration: const Duration(seconds: 5),
+          content: Text(message),
+          backgroundColor: backgroundColor,
+          duration: duration,
         ),
       );
-
-    _resetScan();
   }
 
   void _resetScan() {
     setState(() {
       _pickedImage = null;
-      _result = null;
-      _analyzing = false;
       _saving = false;
-      _selectedDocType = _documentTypes.first;
+      _selectedDocType = _typePlaceholder;
     });
     _docNameCtrl.clear();
     _docNumberCtrl.clear();
@@ -223,57 +224,53 @@ class _ScanScreenState extends State<ScanScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (_analyzing)
-                  _loadingCard()
-                else if (_result != null) ...[
-                  _analysisCard(),
-                  const SizedBox(height: 16),
-                  _detailsCard(),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 52,
-                          child: ElevatedButton.icon(
-                            onPressed: _saving ? null : _saveDocument,
-                            icon: _saving
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Icon(Icons.save),
-                            label: Text(
-                              _saving ? 'Saving...' : 'Save document',
-                            ),
+                _captureNoticeCard(),
+                const SizedBox(height: 16),
+                _detailsCard(),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: ElevatedButton.icon(
+                          onPressed: _saving ? null : _saveDocument,
+                          icon: _saving
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.save),
+                          label: Text(
+                            _saving ? 'Saving...' : 'Save document',
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: SizedBox(
-                          height: 52,
-                          child: OutlinedButton(
-                            onPressed: _saving ? null : _resetScan,
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                color: AppTheme.primaryGreen,
-                              ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: OutlinedButton(
+                          onPressed: _saving ? null : _resetScan,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: AppTheme.primaryGreen,
                             ),
-                            child: const Text(
-                              'New scan',
-                              style: TextStyle(color: AppTheme.primaryGreen),
-                            ),
+                          ),
+                          child: const Text(
+                            'New scan',
+                            style: TextStyle(color: AppTheme.primaryGreen),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ],
               const SizedBox(height: 24),
               _supportedDocumentsCard(),
@@ -300,7 +297,11 @@ class _ScanScreenState extends State<ScanScreen> {
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('📄', style: TextStyle(fontSize: 60)),
+          Icon(
+            Icons.insert_drive_file_outlined,
+            size: 60,
+            color: AppTheme.primaryGreen,
+          ),
           SizedBox(height: 16),
           Text(
             'Scan or upload your document',
@@ -311,33 +312,12 @@ class _ScanScreenState extends State<ScanScreen> {
             ),
           ),
           SizedBox(height: 8),
-          Text(
-            'After scan, fill document details and save it to your folder.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: AppTheme.textMid),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _loadingCard() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Column(
-        children: [
-          CircularProgressIndicator(color: AppTheme.primaryGreen),
-          SizedBox(height: 16),
-          Text(
-            'Reading document...',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textDark,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'After scan, review the image and add the document details yourself before saving it to your folder.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: AppTheme.textMid),
             ),
           ),
         ],
@@ -345,7 +325,7 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  Widget _analysisCard() {
+  Widget _captureNoticeCard() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -353,19 +333,19 @@ class _ScanScreenState extends State<ScanScreen> {
         color: AppTheme.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(
-                Icons.check_circle,
+                Icons.edit_note,
                 color: AppTheme.primaryGreen,
                 size: 20,
               ),
               SizedBox(width: 8),
               Text(
-                'Analysis complete',
+                'Add details yourself',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -374,13 +354,13 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
-            _result!,
-            style: const TextStyle(
+            'This scan is ready to save. The app will not guess document details, so please enter the name, type, ID, and notes yourself.',
+            style: TextStyle(
               fontSize: 14,
               color: AppTheme.textDark,
-              height: 1.7,
+              height: 1.5,
             ),
           ),
         ],
@@ -409,7 +389,7 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Fill these details before saving. They will be stored with this document in your account.',
+            'Only the details you enter here will be stored with this document in your account.',
             style: TextStyle(fontSize: 13, color: AppTheme.textMid),
           ),
           const SizedBox(height: 16),
