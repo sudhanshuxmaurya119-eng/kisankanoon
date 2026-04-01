@@ -1,7 +1,7 @@
 name: kisankanoon
 description: "KisanKanoon - Farmer legal aid app"
 publish_to: 'none'
-version: 1.0.2+4
+version: 1.0.3+5
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -21,6 +21,7 @@ dependencies:
   geolocator: ^14.0.2
   path_provider: ^2.1.5
   file_picker: ^10.3.10
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_test:

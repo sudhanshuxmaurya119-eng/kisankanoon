@@ -3,7 +3,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
+import 'scan_screen.dart';
 import '../services/app_language_service.dart';
 import '../services/app_strings.dart';
 import '../services/document_service.dart';
@@ -44,6 +47,29 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   String _t(String key) => AppStrings.t(_translationCode, key);
 
+  bool get _isEnglish => _translationCode == 'en';
+
+  String get _addDocumentLabel =>
+      _isEnglish ? 'Add document' : 'दस्तावेज़ जोड़ें';
+
+  String get _openFileLabel => _isEnglish ? 'Open file' : 'फ़ाइल खोलें';
+
+  String get _openFileFailedMessage =>
+      _isEnglish ? 'This file could not be opened.' : 'यह फ़ाइल नहीं खुल सकी।';
+
+  String get _fileUnavailableMessage => _isEnglish
+      ? 'This file is not available on this device right now.'
+      : 'यह फ़ाइल अभी इस डिवाइस पर उपलब्ध नहीं है।';
+
+  Future<void> _openAddDocumentScreen() async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ScanScreen()));
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,33 +80,54 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           children: [
             Container(
               color: AppTheme.white,
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+              child: Column(
                 children: [
-                  Text(
-                    _t('myDocuments'),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textDark,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        _t('myDocuments'),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                      const Spacer(),
+                      ElevatedButton.icon(
+                        onPressed: _openAddDocumentScreen,
+                        icon: const Icon(Icons.add, size: 18),
+                        label: Text(_addDocumentLabel),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          minimumSize: Size.zero,
+                        ),
+                      ),
+                    ],
                   ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.bgGreen,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      _t('deviceAndFirestore'),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.primaryGreen,
-                        fontWeight: FontWeight.w600,
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.bgGreen,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _t('deviceAndFirestore'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -142,6 +189,12 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
             ),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton.icon(
+            onPressed: _openAddDocumentScreen,
+            icon: const Icon(Icons.add),
+            label: Text(_addDocumentLabel),
           ),
         ],
       ),
@@ -357,6 +410,25 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 height: 220,
                 child: _previewBody(document),
               ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openStoredDocument(document),
+                  icon: const Icon(
+                    Icons.open_in_new,
+                    color: AppTheme.primaryGreen,
+                  ),
+                  label: Text(
+                    _openFileLabel,
+                    style: const TextStyle(color: AppTheme.primaryGreen),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppTheme.primaryGreen),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               _detailRow(
                 _t('documentIdNumber'),
@@ -416,6 +488,91 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openStoredDocument(Map<String, dynamic> document) async {
+    final file = await _resolveDocumentFile(document);
+    if (!mounted) {
+      return;
+    }
+
+    if (file == null || !await file.exists()) {
+      _showMessage(_fileUnavailableMessage, Colors.orange);
+      return;
+    }
+
+    final result = await OpenFilex.open(file.path);
+    if (!mounted) {
+      return;
+    }
+
+    if (result.type != ResultType.done) {
+      final detail = result.message.trim();
+      final message = detail.isEmpty
+          ? _openFileFailedMessage
+          : '$_openFileFailedMessage ($detail)';
+      _showMessage(message, Colors.red);
+    }
+  }
+
+  Future<File?> _resolveDocumentFile(Map<String, dynamic> document) async {
+    final localPath = (document['localPath'] ?? document['imagePath'] ?? '')
+        .toString()
+        .trim();
+    if (localPath.isNotEmpty) {
+      final localFile = File(localPath);
+      if (await localFile.exists()) {
+        return localFile;
+      }
+    }
+
+    final fileBytes = _decodeFileBytes(document);
+    if (fileBytes == null) {
+      return null;
+    }
+
+    final tempDirectory = await getTemporaryDirectory();
+    final fileName = _resolvedFileName(document);
+    final tempFile = File('${tempDirectory.path}/$fileName');
+    await tempFile.writeAsBytes(fileBytes, flush: true);
+    return tempFile;
+  }
+
+  String _resolvedFileName(Map<String, dynamic> document) {
+    final rawFileName =
+        (document['fileName'] ?? document['name'] ?? _t('documentWord'))
+            .toString()
+            .trim();
+    final safeFileName = rawFileName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+    if (safeFileName.contains('.')) {
+      return safeFileName;
+    }
+
+    final extension = (document['fileExtension'] ?? '').toString().trim();
+    if (extension.isEmpty) {
+      return safeFileName;
+    }
+    return '$safeFileName$extension';
+  }
+
+  void _showMessage(
+    String message,
+    Color backgroundColor, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: backgroundColor,
+          duration: duration,
+        ),
+      );
   }
 
   Widget _detailRow(
@@ -593,6 +750,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   }
 
   Uint8List? _decodeImageBytes(Map<String, dynamic> document) {
+    if ((document['fileKind'] ?? 'document').toString() != 'image') {
+      return null;
+    }
+    return _decodeFileBytes(document);
+  }
+
+  Uint8List? _decodeFileBytes(Map<String, dynamic> document) {
     final imageBase64 =
         (document['fileBase64'] ?? document['imageBase64'] ?? '')
             .toString()
