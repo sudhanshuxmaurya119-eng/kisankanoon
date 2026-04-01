@@ -39,8 +39,8 @@ class _ScanScreenState extends State<ScanScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final image = await _picker.pickImage(
       source: source,
-      imageQuality: 80,
-      maxWidth: 1080,
+      imageQuality: 50,
+      maxWidth: 960,
     );
     if (image == null) {
       return;
@@ -474,7 +474,7 @@ class _ScanScreenState extends State<ScanScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Text(
-              'When you save, the image stays in your device folder and also tries to sync to Firebase under your signed-in account.',
+              'When you save, the image stays in your device folder and also tries to sync to Firestore under your signed-in account.',
               style: TextStyle(
                 fontSize: 12,
                 color: AppTheme.primaryGreen,

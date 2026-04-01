@@ -4,14 +4,13 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DocumentService {
   static const _docsKeyPrefix = 'kk_docs';
+  static const int _maxFirebaseImageBytes = 700 * 1024;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final FirebaseStorage _storage = FirebaseStorage.instance;
   static final StreamController<List<Map<String, dynamic>>>
       _documentsController =
       StreamController<List<Map<String, dynamic>>>.broadcast();
@@ -51,8 +50,7 @@ class DocumentService {
         'notes': notes.trim(),
         'localPath': savedImage.path,
         'imagePath': savedImage.path,
-        'storagePath': '',
-        'downloadUrl': '',
+        'imageBase64': '',
         'ownerId': currentUser?.uid ?? '',
         'createdAt': createdAt.toIso8601String(),
         'syncedToFirebase': false,
@@ -95,10 +93,7 @@ class DocumentService {
       return localDocuments;
     }
 
-    final syncedLocalDocuments = await _syncPendingDocuments(
-      uid,
-      localDocuments,
-    );
+    final syncedLocalDocuments = await _syncPendingDocuments(uid, localDocuments);
 
     try {
       final snapshot = await _documentsCollection(uid)
@@ -142,30 +137,13 @@ class DocumentService {
     }
 
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && deletedDocument != null) {
-      final isSynced = deletedDocument['syncedToFirebase'] == true;
-      if (isSynced) {
-        try {
-          final cloudPath = (deletedDocument['storagePath'] ?? '').toString();
-          final downloadUrl = (deletedDocument['downloadUrl'] ?? '').toString();
-          if (cloudPath.startsWith('users/')) {
-            await _storage.ref().child(cloudPath).delete();
-          } else if (downloadUrl.isNotEmpty) {
-            await _storage.refFromURL(downloadUrl).delete();
-          }
-        } on FirebaseException catch (error) {
-          if (error.code != 'object-not-found') {
-            return false;
-          }
-        } catch (_) {
-          return false;
-        }
-
-        try {
-          await _documentsCollection(currentUser.uid).doc(docId).delete();
-        } catch (_) {
-          return false;
-        }
+    if (currentUser != null &&
+        deletedDocument != null &&
+        deletedDocument['syncedToFirebase'] == true) {
+      try {
+        await _documentsCollection(currentUser.uid).doc(docId).delete();
+      } catch (_) {
+        return false;
       }
     }
 
@@ -198,18 +176,18 @@ class DocumentService {
     });
 
     try {
+      final encodedImage = await _encodeImageForFirestore(sourceFile);
+      if (encodedImage == null) {
+        return _normalizeDocument(<String, dynamic>{
+          ...normalizedDocument,
+          'ownerId': uid,
+          'syncedToFirebase': false,
+          'syncError':
+              'Image is too large for free Firebase sync. Please scan a clearer single page or use the camera option again.',
+        });
+      }
+
       final documentId = normalizedDocument['id'].toString();
-      final extension = _fileExtension(sourceFile.path);
-      final cloudPath = 'users/$uid/documents/$documentId$extension';
-
-      await _storage.ref().child(cloudPath).putFile(
-            sourceFile,
-            SettableMetadata(
-              contentType: _contentTypeForExtension(extension),
-            ),
-          );
-      final downloadUrl = await _storage.ref().child(cloudPath).getDownloadURL();
-
       await _documentsCollection(uid).doc(documentId).set(
         <String, dynamic>{
           'id': documentId,
@@ -220,8 +198,7 @@ class DocumentService {
           'summary': normalizedDocument['summary'],
           'documentNumber': normalizedDocument['documentNumber'],
           'notes': normalizedDocument['notes'],
-          'storagePath': cloudPath,
-          'downloadUrl': downloadUrl,
+          'imageBase64': encodedImage,
           'createdAt': Timestamp.fromDate(
             _parseCreatedAt(normalizedDocument['createdAt']) ?? DateTime.now(),
           ),
@@ -233,8 +210,7 @@ class DocumentService {
       return _normalizeDocument(<String, dynamic>{
         ...normalizedDocument,
         'ownerId': uid,
-        'storagePath': cloudPath,
-        'downloadUrl': downloadUrl,
+        'imageBase64': encodedImage,
         'syncedToFirebase': true,
         'syncError': '',
       });
@@ -375,11 +351,11 @@ class DocumentService {
       'summary': raw['summary'],
       'documentNumber': raw['documentNumber'],
       'notes': raw['notes'],
+      'imageBase64': raw['imageBase64'] ?? '',
       'localPath': cachedDocument?['localPath'] ?? '',
       'imagePath':
           cachedDocument?['imagePath'] ?? cachedDocument?['localPath'] ?? '',
-      'storagePath': raw['storagePath'],
-      'downloadUrl': raw['downloadUrl'],
+      'downloadUrl': raw['downloadUrl'] ?? '',
       'ownerId':
           (raw['ownerId'] ?? FirebaseAuth.instance.currentUser?.uid ?? '')
               .toString(),
@@ -417,9 +393,9 @@ class DocumentService {
         if ((existing['imagePath'] ?? '').toString().isEmpty &&
             (normalized['imagePath'] ?? '').toString().isNotEmpty)
           'imagePath': normalized['imagePath'],
-        if ((existing['downloadUrl'] ?? '').toString().isEmpty &&
-            (normalized['downloadUrl'] ?? '').toString().isNotEmpty)
-          'downloadUrl': normalized['downloadUrl'],
+        if ((existing['imageBase64'] ?? '').toString().isEmpty &&
+            (normalized['imageBase64'] ?? '').toString().isNotEmpty)
+          'imageBase64': normalized['imageBase64'],
         if ((existing['notes'] ?? '').toString().isEmpty &&
             (normalized['notes'] ?? '').toString().isNotEmpty)
           'notes': normalized['notes'],
@@ -432,9 +408,7 @@ class DocumentService {
   }
 
   static Map<String, dynamic> _normalizeDocument(Map<String, dynamic> raw) {
-    final localPath =
-        (raw['localPath'] ?? raw['imagePath'] ?? raw['storagePath'] ?? '')
-            .toString();
+    final localPath = (raw['localPath'] ?? raw['imagePath'] ?? '').toString();
     final name = (raw['name'] ?? raw['title'] ?? 'Document').toString();
     final createdAt = _timestampToIsoString(raw['createdAt']);
 
@@ -449,7 +423,7 @@ class DocumentService {
       'notes': (raw['notes'] ?? '').toString(),
       'localPath': localPath,
       'imagePath': (raw['imagePath'] ?? localPath).toString(),
-      'storagePath': (raw['storagePath'] ?? '').toString(),
+      'imageBase64': (raw['imageBase64'] ?? '').toString(),
       'downloadUrl': (raw['downloadUrl'] ?? '').toString(),
       'ownerId': (raw['ownerId'] ?? '').toString(),
       'createdAt': createdAt,
@@ -499,14 +473,22 @@ class DocumentService {
   static String _firebaseErrorMessage(FirebaseException error) {
     switch (error.code) {
       case 'permission-denied':
-        return 'Firebase denied this upload. Check Firestore/Storage rules for signed-in users.';
+        return 'Firebase denied this upload. Check Firestore rules for signed-in users.';
       case 'unauthenticated':
         return 'Please log in again before saving this document to Firebase.';
-      case 'object-not-found':
-        return 'The document file could not be found in Firebase Storage.';
+      case 'resource-exhausted':
+        return 'Firebase could not store this image right now. Please try again.';
       default:
         return error.message ?? error.code;
     }
+  }
+
+  static Future<String?> _encodeImageForFirestore(File sourceFile) async {
+    final bytes = await sourceFile.readAsBytes();
+    if (bytes.length > _maxFirebaseImageBytes) {
+      return null;
+    }
+    return base64Encode(bytes);
   }
 
   static Future<File> _copyImageToManagedFolder(File sourceFile) async {
@@ -530,18 +512,5 @@ class DocumentService {
       return '.jpg';
     }
     return path.substring(dotIndex).toLowerCase();
-  }
-
-  static String _contentTypeForExtension(String extension) {
-    switch (extension) {
-      case '.png':
-        return 'image/png';
-      case '.pdf':
-        return 'application/pdf';
-      case '.webp':
-        return 'image/webp';
-      default:
-        return 'image/jpeg';
-    }
   }
 }

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -40,7 +42,7 @@ class DocumentsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      'Device + Firebase',
+                      'Device + Firestore',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.primaryGreen,
@@ -201,7 +203,7 @@ class DocumentsScreen extends StatelessWidget {
               builder: (ctx) => AlertDialog(
                 title: const Text('Delete document?'),
                 content: const Text(
-                  'This will remove the document from your folder. If it is synced, it will also be removed from Firebase.',
+                  'This will remove the document from your folder and your Firebase data.',
                 ),
                 actions: [
                   TextButton(
@@ -304,15 +306,17 @@ class DocumentsScreen extends StatelessWidget {
                 child: _previewImage(document),
               ),
               const SizedBox(height: 16),
-              _detailRow('Document ID', documentNumber.isEmpty ? 'Not added' : documentNumber),
+              _detailRow(
+                'Document ID',
+                documentNumber.isEmpty ? 'Not added' : documentNumber,
+              ),
               _detailRow(
                 'Firebase status',
                 syncedToFirebase ? 'Synced successfully' : 'Not synced yet',
                 valueColor:
                     syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
               ),
-              if (ownerId.isNotEmpty)
-                _detailRow('Account ID', _shortId(ownerId)),
+              if (ownerId.isNotEmpty) _detailRow('Account ID', _shortId(ownerId)),
               if (syncError.isNotEmpty)
                 _detailRow(
                   'Sync message',
@@ -393,7 +397,8 @@ class DocumentsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 color: valueColor ?? AppTheme.textDark,
-                fontWeight: valueColor == null ? FontWeight.w500 : FontWeight.w700,
+                fontWeight:
+                    valueColor == null ? FontWeight.w500 : FontWeight.w700,
               ),
             ),
           ),
@@ -408,7 +413,7 @@ class DocumentsScreen extends StatelessWidget {
   }) {
     final localPath =
         (document['localPath'] ?? document['imagePath'] ?? '').toString();
-    final downloadUrl = (document['downloadUrl'] ?? '').toString();
+    final imageBytes = _decodeImageBytes(document);
     final localFile = localPath.isEmpty ? null : File(localPath);
     final hasLocalFile = localFile != null && localFile.existsSync();
 
@@ -428,9 +433,9 @@ class DocumentsScreen extends StatelessWidget {
                 child: Text('📄', style: TextStyle(fontSize: 24)),
               ),
             )
-          : downloadUrl.isNotEmpty
-              ? Image.network(
-                  downloadUrl,
+          : imageBytes != null
+              ? Image.memory(
+                  imageBytes,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => const Center(
                     child: Text('📄', style: TextStyle(fontSize: 24)),
@@ -445,7 +450,7 @@ class DocumentsScreen extends StatelessWidget {
   Widget _previewImage(Map<String, dynamic> document) {
     final localPath =
         (document['localPath'] ?? document['imagePath'] ?? '').toString();
-    final downloadUrl = (document['downloadUrl'] ?? '').toString();
+    final imageBytes = _decodeImageBytes(document);
     final localFile = localPath.isEmpty ? null : File(localPath);
     final hasLocalFile = localFile != null && localFile.existsSync();
 
@@ -463,9 +468,9 @@ class DocumentsScreen extends StatelessWidget {
                 child: Text('📄', style: TextStyle(fontSize: 42)),
               ),
             )
-          : downloadUrl.isNotEmpty
-              ? Image.network(
-                  downloadUrl,
+          : imageBytes != null
+              ? Image.memory(
+                  imageBytes,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => const Center(
                     child: Text('📄', style: TextStyle(fontSize: 42)),
@@ -475,6 +480,19 @@ class DocumentsScreen extends StatelessWidget {
                   child: Text('📄', style: TextStyle(fontSize: 42)),
                 ),
     );
+  }
+
+  Uint8List? _decodeImageBytes(Map<String, dynamic> document) {
+    final imageBase64 = (document['imageBase64'] ?? '').toString().trim();
+    if (imageBase64.isEmpty) {
+      return null;
+    }
+
+    try {
+      return base64Decode(imageBase64);
+    } catch (_) {
+      return null;
+    }
   }
 
   String _shortId(String value) {
