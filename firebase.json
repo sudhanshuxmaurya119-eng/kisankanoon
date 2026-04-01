@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "rules": "kisankanoon/firestore.rules"
+  },
+  "storage": {
+    "rules": "kisankanoon/storage.rules"
+  }
+}

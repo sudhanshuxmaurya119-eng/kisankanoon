@@ -22,7 +22,7 @@ class DocumentsScreen extends StatelessWidget {
               child: Row(
                 children: [
                   const Text(
-                    'मेरे दस्तावेज़',
+                    'My Documents',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -40,7 +40,7 @@ class DocumentsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      '📁 डिवाइस फ़ोल्डर',
+                      'Device + Firebase',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.primaryGreen,
@@ -91,7 +91,7 @@ class DocumentsScreen extends StatelessWidget {
           Text('📂', style: TextStyle(fontSize: 64)),
           SizedBox(height: 16),
           Text(
-            'कोई दस्तावेज़ नहीं',
+            'No documents yet',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -100,7 +100,7 @@ class DocumentsScreen extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            'स्कैन या अपलोड करें, फिर दस्तावेज़ यहाँ अपने आप दिखाई देंगे।',
+            'Scan or upload a document and it will appear here automatically.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13, color: AppTheme.textMid),
           ),
@@ -110,11 +110,9 @@ class DocumentsScreen extends StatelessWidget {
   }
 
   Widget _documentCard(BuildContext context, Map<String, dynamic> document) {
-    final localPath =
-        (document['localPath'] ?? document['imagePath'] ?? '').toString();
-    final imageFile = localPath.isEmpty ? null : File(localPath);
-    final hasImage = imageFile != null && imageFile.existsSync();
     final summary = (document['summary'] ?? '').toString().trim();
+    final documentNumber = (document['documentNumber'] ?? '').toString().trim();
+    final syncedToFirebase = document['syncedToFirebase'] == true;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -132,26 +130,9 @@ class DocumentsScreen extends StatelessWidget {
       child: ListTile(
         onTap: () => _showPreview(context, document),
         contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: AppTheme.bgGreen,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: hasImage
-              ? Image.file(
-                  imageFile,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Center(
-                    child: Text('📄', style: TextStyle(fontSize: 24)),
-                  ),
-                )
-              : const Center(child: Text('📄', style: TextStyle(fontSize: 24))),
-        ),
+        leading: _thumbnail(document, size: 56),
         title: Text(
-          (document['name'] ?? document['title'] ?? 'दस्तावेज़').toString(),
+          (document['name'] ?? document['title'] ?? 'Document').toString(),
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
@@ -163,19 +144,46 @@ class DocumentsScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              (document['type'] ?? 'Document').toString(),
+              (document['type'] ?? 'General Document').toString(),
               style: const TextStyle(
                 fontSize: 12,
                 color: AppTheme.primaryGreen,
               ),
             ),
+            if (documentNumber.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                'ID: $documentNumber',
+                style: const TextStyle(fontSize: 11, color: AppTheme.textDark),
+              ),
+            ],
             const SizedBox(height: 4),
             Text(
               _formatCreatedAt(document['createdAt']?.toString()),
               style: const TextStyle(fontSize: 11, color: AppTheme.textMid),
             ),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: syncedToFirebase
+                    ? AppTheme.bgGreen
+                    : Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                syncedToFirebase ? 'Firebase synced' : 'Firebase sync pending',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: syncedToFirebase
+                      ? AppTheme.primaryGreen
+                      : Colors.orange.shade800,
+                ),
+              ),
+            ),
             if (summary.isNotEmpty) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 summary.split('\n').first,
                 maxLines: 2,
@@ -191,19 +199,19 @@ class DocumentsScreen extends StatelessWidget {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (ctx) => AlertDialog(
-                title: const Text('हटाएँ?'),
+                title: const Text('Delete document?'),
                 content: const Text(
-                  'यह दस्तावेज़ फ़ोल्डर और सूची दोनों से हटा दिया जाएगा।',
+                  'This will remove the document from your folder. If it is synced, it will also be removed from Firebase.',
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, false),
-                    child: const Text('नहीं'),
+                    child: const Text('Cancel'),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, true),
                     child: const Text(
-                      'हाँ',
+                      'Delete',
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
@@ -211,10 +219,29 @@ class DocumentsScreen extends StatelessWidget {
               ),
             );
 
-            if (confirm == true) {
-              await DocumentService.deleteDocument(
-                document['id'].toString(),
-                localPath,
+            if (confirm != true) {
+              return;
+            }
+
+            final localPath =
+                (document['localPath'] ?? document['imagePath'] ?? '').toString();
+            final deleted = await DocumentService.deleteDocument(
+              document['id'].toString(),
+              localPath,
+            );
+
+            if (!context.mounted) {
+              return;
+            }
+
+            if (!deleted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Document could not be deleted from Firebase. Please try again.',
+                  ),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
           },
@@ -227,11 +254,12 @@ class DocumentsScreen extends StatelessWidget {
     BuildContext context,
     Map<String, dynamic> document,
   ) async {
-    final localPath =
-        (document['localPath'] ?? document['imagePath'] ?? '').toString();
-    final imageFile = localPath.isEmpty ? null : File(localPath);
-    final hasImage = imageFile != null && imageFile.existsSync();
     final summary = (document['summary'] ?? '').toString().trim();
+    final notes = (document['notes'] ?? '').toString().trim();
+    final documentNumber = (document['documentNumber'] ?? '').toString().trim();
+    final ownerId = (document['ownerId'] ?? '').toString().trim();
+    final syncError = (document['syncError'] ?? '').toString().trim();
+    final syncedToFirebase = document['syncedToFirebase'] == true;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -242,82 +270,225 @@ class DocumentsScreen extends StatelessWidget {
       ),
       builder: (ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 42,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: AppTheme.divider,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Text(
-              (document['name'] ?? document['title'] ?? 'दस्तावेज़').toString(),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textDark,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '${(document['type'] ?? 'Document').toString()} • ${_formatCreatedAt(document['createdAt']?.toString())}',
-              style: const TextStyle(fontSize: 12, color: AppTheme.textMid),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              height: 220,
-              decoration: BoxDecoration(
-                color: AppTheme.bgGreen,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: hasImage
-                  ? Image.file(
-                      imageFile,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Center(
-                        child: Text('📄', style: TextStyle(fontSize: 42)),
-                      ),
-                    )
-                  : const Center(
-                      child: Text('📄', style: TextStyle(fontSize: 42)),
-                    ),
-            ),
-            if (summary.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Text(
-                'विश्लेषण',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textDark,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppTheme.divider,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 8),
               Text(
-                summary,
+                (document['name'] ?? document['title'] ?? 'Document').toString(),
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
                   color: AppTheme.textDark,
-                  height: 1.5,
                 ),
               ),
+              const SizedBox(height: 6),
+              Text(
+                '${(document['type'] ?? 'General Document').toString()} • ${_formatCreatedAt(document['createdAt']?.toString())}',
+                style: const TextStyle(fontSize: 12, color: AppTheme.textMid),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 220,
+                child: _previewImage(document),
+              ),
+              const SizedBox(height: 16),
+              _detailRow('Document ID', documentNumber.isEmpty ? 'Not added' : documentNumber),
+              _detailRow(
+                'Firebase status',
+                syncedToFirebase ? 'Synced successfully' : 'Not synced yet',
+                valueColor:
+                    syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
+              ),
+              if (ownerId.isNotEmpty)
+                _detailRow('Account ID', _shortId(ownerId)),
+              if (syncError.isNotEmpty)
+                _detailRow(
+                  'Sync message',
+                  syncError,
+                  valueColor: Colors.orange.shade800,
+                ),
+              if (notes.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text(
+                  'Notes',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  notes,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.textDark,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+              if (summary.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text(
+                  'Analysis',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  summary,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.textDark,
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
+  Widget _detailRow(
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textMid,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                color: valueColor ?? AppTheme.textDark,
+                fontWeight: valueColor == null ? FontWeight.w500 : FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _thumbnail(
+    Map<String, dynamic> document, {
+    required double size,
+  }) {
+    final localPath =
+        (document['localPath'] ?? document['imagePath'] ?? '').toString();
+    final downloadUrl = (document['downloadUrl'] ?? '').toString();
+    final localFile = localPath.isEmpty ? null : File(localPath);
+    final hasLocalFile = localFile != null && localFile.existsSync();
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppTheme.bgGreen,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasLocalFile
+          ? Image.file(
+              localFile,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Center(
+                child: Text('📄', style: TextStyle(fontSize: 24)),
+              ),
+            )
+          : downloadUrl.isNotEmpty
+              ? Image.network(
+                  downloadUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Center(
+                    child: Text('📄', style: TextStyle(fontSize: 24)),
+                  ),
+                )
+              : const Center(
+                  child: Text('📄', style: TextStyle(fontSize: 24)),
+                ),
+    );
+  }
+
+  Widget _previewImage(Map<String, dynamic> document) {
+    final localPath =
+        (document['localPath'] ?? document['imagePath'] ?? '').toString();
+    final downloadUrl = (document['downloadUrl'] ?? '').toString();
+    final localFile = localPath.isEmpty ? null : File(localPath);
+    final hasLocalFile = localFile != null && localFile.existsSync();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.bgGreen,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasLocalFile
+          ? Image.file(
+              localFile,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Center(
+                child: Text('📄', style: TextStyle(fontSize: 42)),
+              ),
+            )
+          : downloadUrl.isNotEmpty
+              ? Image.network(
+                  downloadUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Center(
+                    child: Text('📄', style: TextStyle(fontSize: 42)),
+                  ),
+                )
+              : const Center(
+                  child: Text('📄', style: TextStyle(fontSize: 42)),
+                ),
+    );
+  }
+
+  String _shortId(String value) {
+    if (value.length <= 10) {
+      return value;
+    }
+    return '${value.substring(0, 5)}...${value.substring(value.length - 5)}';
+  }
+
   String _formatCreatedAt(String? rawDate) {
     final date = rawDate == null ? null : DateTime.tryParse(rawDate);
-    if (date == null) return 'अभी जोड़ा गया';
+    if (date == null) {
+      return 'Just now';
+    }
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     final year = date.year.toString();

@@ -1,5 +1,5 @@
 name: kisankanoon
-description: "KisanKanoon - किसान का साथी | Farmer legal aid app"
+description: "KisanKanoon - Farmer legal aid app"
 publish_to: 'none'
 version: 1.0.0+2
 
@@ -9,19 +9,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # Firebase Backend
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
   cloud_firestore: ^5.4.4
-  # firebase_storage removed — using local image storage instead (free)
-  # Storage & State
+  firebase_storage: ^12.3.3
   shared_preferences: ^2.2.2
-  # Media
   image_picker: ^1.0.7
-  # Network & Links
   url_launcher: ^6.2.4
   http: ^1.2.1
-  # UI & Fonts
   google_fonts: ^6.1.0
   cupertino_icons: ^1.0.8
   geolocator: ^14.0.2
