@@ -297,11 +297,7 @@ class _ScanScreenState extends State<ScanScreen> {
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.insert_drive_file_outlined,
-            size: 60,
-            color: AppTheme.primaryGreen,
-          ),
+          Text('📄', style: TextStyle(fontSize: 60)),
           SizedBox(height: 16),
           Text(
             'Scan or upload your document',
@@ -339,7 +335,7 @@ class _ScanScreenState extends State<ScanScreen> {
           Row(
             children: [
               Icon(
-                Icons.edit_note,
+                Icons.check_circle,
                 color: AppTheme.primaryGreen,
                 size: 20,
               ),
