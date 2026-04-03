@@ -110,7 +110,8 @@ class _MoreScreenState extends State<MoreScreen> {
   List<_HelplineContact> get _helplineContacts => [
         _HelplineContact(
           emoji: '🌾',
-          title: _isEnglish ? 'Kisan Call Centre' : 'किसान कॉल सेंटर',
+          title:
+              _isEnglish ? 'Kisan Call Center (KCC)' : 'किसान कॉल सेंटर (KCC)',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
@@ -119,37 +120,101 @@ class _MoreScreenState extends State<MoreScreen> {
         ),
         _HelplineContact(
           emoji: '💰',
-          title: _isEnglish ? 'PM-KISAN Help Desk' : 'PM-KISAN हेल्प डेस्क',
-          numberLabel: '155261',
+          title: _isEnglish ? 'PM-KISAN Helpline' : 'PM-KISAN हेल्पलाइन',
+          numberLabel: '155261 / 1800-115-526',
           dialNumber: '155261',
           description: _isEnglish
               ? 'For installment, eKYC, beneficiary status and scheme payment issues.'
               : 'किस्त, eKYC, लाभार्थी स्थिति और योजना भुगतान समस्या के लिए।',
           extraDetail: _isEnglish
-              ? 'Alternate contact: 011-24300606'
-              : 'वैकल्पिक संपर्क: 011-24300606',
+              ? 'Tap to call the first number shown above.'
+              : 'ऊपर दिए गए पहले नंबर पर टैप करने से कॉल लगेगी।',
         ),
         _HelplineContact(
-          emoji: '⚖️',
+          emoji: '🏛️',
           title: _isEnglish
-              ? 'Free Legal Aid / DLSA Support'
-              : 'मुफ्त कानूनी सहायता / DLSA सहायता',
-          numberLabel: '15100',
-          dialNumber: '15100',
+              ? 'Agriculture Ministry Helpline'
+              : 'कृषि मंत्रालय हेल्पलाइन',
+          numberLabel: '011-23381092',
+          dialNumber: '01123381092',
           description: _isEnglish
-              ? 'For land dispute guidance, legal aid and support from legal services authorities.'
-              : 'भूमि विवाद, कानूनी सहायता और विधिक सेवा प्राधिकरण से मदद के लिए।',
+              ? 'For ministry support, agriculture guidance and complaint routing.'
+              : 'मंत्रालय सहायता, कृषि मार्गदर्शन और शिकायत मार्गदर्शन के लिए।',
         ),
         _HelplineContact(
-          emoji: '🏦',
+          emoji: '🧪',
           title: _isEnglish
-              ? 'Banking Complaint Support'
-              : 'बैंकिंग शिकायत सहायता',
-          numberLabel: '14448',
-          dialNumber: '14448',
+              ? 'Soil Health Card Helpline'
+              : 'सॉइल हेल्थ कार्ड हेल्पलाइन',
+          numberLabel: '1800-180-1551',
+          dialNumber: '18001801551',
           description: _isEnglish
-              ? 'For bank complaint guidance, account issues and grievance support.'
-              : 'बैंक शिकायत, खाते की समस्या और शिकायत सहायता के लिए।',
+              ? 'For soil health card details, nutrient advice and soil record help.'
+              : 'सॉइल हेल्थ कार्ड, पोषक तत्व सलाह और मिट्टी रिकॉर्ड सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🌦️',
+          title: _isEnglish
+              ? 'Crop Insurance (PMFBY) Helpline'
+              : 'फसल बीमा (PMFBY) हेल्पलाइन',
+          numberLabel: '1800-200-7710',
+          dialNumber: '18002007710',
+          description: _isEnglish
+              ? 'For crop insurance enrollment, claim and policy support.'
+              : 'फसल बीमा पंजीकरण, दावा और पॉलिसी सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🛒',
+          title: _isEnglish
+              ? 'National Agriculture Market (e-NAM)'
+              : 'राष्ट्रीय कृषि बाजार (e-NAM)',
+          numberLabel: '1800-270-0224',
+          dialNumber: '18002700224',
+          description: _isEnglish
+              ? 'For e-NAM registration, trading and mandi platform support.'
+              : 'e-NAM पंजीकरण, ट्रेडिंग और मंडी प्लेटफॉर्म सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🧂',
+          title: _isEnglish
+              ? 'Fertilizer Complaint Helpline'
+              : 'उर्वरक शिकायत हेल्पलाइन',
+          numberLabel: '1800-233-3322',
+          dialNumber: '18002333322',
+          description: _isEnglish
+              ? 'For fertilizer availability issues and complaint support.'
+              : 'उर्वरक उपलब्धता की समस्या और शिकायत सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🧴',
+          title: _isEnglish
+              ? 'Pesticide Complaint Helpline'
+              : 'कीटनाशक शिकायत हेल्पलाइन',
+          numberLabel: '1800-180-1551',
+          dialNumber: '18001801551',
+          description: _isEnglish
+              ? 'For pesticide complaint, usage guidance and farming support.'
+              : 'कीटनाशक शिकायत, उपयोग मार्गदर्शन और खेती सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '☁️',
+          title: _isEnglish
+              ? 'Weather Info (IMD Farmer Service)'
+              : 'मौसम जानकारी (IMD किसान सेवा)',
+          numberLabel: '1800-180-1717',
+          dialNumber: '18001801717',
+          description: _isEnglish
+              ? 'For weather information, alerts and forecast support.'
+              : 'मौसम जानकारी, अलर्ट और पूर्वानुमान सहायता के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🐄',
+          title: _isEnglish ? 'Animal Husbandry Helpline' : 'पशुपालन हेल्पलाइन',
+          numberLabel: '1962',
+          dialNumber: '1962',
+          description: _isEnglish
+              ? 'For cattle care, animal health and veterinary guidance.'
+              : 'पशु देखभाल, पशु स्वास्थ्य और पशु चिकित्सकीय मार्गदर्शन के लिए।',
         ),
       ];
 
@@ -332,8 +397,9 @@ class _MoreScreenState extends State<MoreScreen> {
                   ],
                 ),
               ),
-              _sectionHeader(
-                  _isEnglish ? 'Helpline Numbers' : 'हेल्पलाइन नंबर'),
+              _sectionHeader(_isEnglish
+                  ? 'Farmer Helpline Numbers (India)'
+                  : 'किसान हेल्पलाइन नंबर (भारत)'),
               Container(
                 color: AppTheme.white,
                 child: Column(
@@ -342,8 +408,8 @@ class _MoreScreenState extends State<MoreScreen> {
                       padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                       child: Text(
                         _isEnglish
-                            ? 'Call the number that matches your issue. The list is arranged for quick farmer support first.'
-                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। सूची को किसान सहायता के क्रम में रखा गया है।',
+                            ? 'Call the number that matches your issue. If two numbers are shown, tapping the row calls the first number.'
+                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। यदि दो नंबर दिए हों, तो पंक्ति पर टैप करने से पहला नंबर कॉल होगा।',
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppTheme.textMid,
@@ -605,7 +671,7 @@ class _MoreScreenState extends State<MoreScreen> {
         ),
       ),
       trailing: const Icon(
-        Icons.call,
+        Icons.chevron_right,
         color: AppTheme.primaryGreen,
         size: 20,
       ),
