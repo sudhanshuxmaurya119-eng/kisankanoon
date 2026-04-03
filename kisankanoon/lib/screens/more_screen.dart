@@ -402,26 +402,24 @@ class _MoreScreenState extends State<MoreScreen> {
                   : 'किसान हेल्पलाइन नंबर (भारत)'),
               Container(
                 color: AppTheme.white,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                      child: Text(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                  child: Column(
+                    children: [
+                      Text(
                         _isEnglish
-                            ? 'Call the number that matches your issue. If two numbers are shown, tapping the row calls the first number.'
-                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। यदि दो नंबर दिए हों, तो पंक्ति पर टैप करने से पहला नंबर कॉल होगा।',
+                            ? 'Call the number that matches your issue. If two numbers are shown, tapping the card calls the first number.'
+                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। यदि दो नंबर दिए हों, तो कार्ड पर टैप करने से पहला नंबर कॉल होगा।',
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppTheme.textMid,
                           height: 1.4,
                         ),
                       ),
-                    ),
-                    for (var i = 0; i < helplineContacts.length; i++) ...[
-                      _helplineTile(helplineContacts[i]),
-                      if (i != helplineContacts.length - 1) _divider(),
+                      const SizedBox(height: 14),
+                      ...helplineContacts.map(_helplineCard),
                     ],
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -621,59 +619,91 @@ class _MoreScreenState extends State<MoreScreen> {
         color: AppTheme.divider,
       );
 
-  Widget _helplineTile(_HelplineContact contact) {
-    return ListTile(
-      onTap: () => _call(contact.dialNumber),
-      leading: Text(contact.emoji, style: const TextStyle(fontSize: 22)),
-      title: Text(
-        contact.title,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: AppTheme.textDark,
-        ),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              contact.numberLabel,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.primaryGreen,
-              ),
+  Widget _helplineCard(_HelplineContact contact) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: const Color(0xFFF8FAF8),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _call(contact.dialNumber),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTheme.divider),
             ),
-            const SizedBox(height: 3),
-            Text(
-              contact.description,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppTheme.textMid,
-                height: 1.35,
-              ),
-            ),
-            if (contact.extraDetail != null) ...[
-              const SizedBox(height: 3),
-              Text(
-                contact.extraDetail!,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textLight,
-                  height: 1.3,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            contact.emoji,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              contact.title,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        contact.description,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMid,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        contact.numberLabel,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryGreen,
+                        ),
+                      ),
+                      if (contact.extraDetail != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          contact.extraDetail!,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.textLight,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ],
+                const SizedBox(width: 10),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppTheme.primaryGreen,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-      trailing: const Icon(
-        Icons.chevron_right,
-        color: AppTheme.primaryGreen,
-        size: 20,
       ),
     );
   }
