@@ -21,6 +21,8 @@ class _MoreScreenState extends State<MoreScreen> {
   String _country = '';
   String _languageCode = AppLanguageService.currentCode.value;
 
+  bool get _isEnglish => _languageCode == 'en';
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +107,52 @@ class _MoreScreenState extends State<MoreScreen> {
     }
   }
 
+  List<_HelplineContact> get _helplineContacts => [
+        _HelplineContact(
+          emoji: '🌾',
+          title: _isEnglish ? 'Kisan Call Centre' : 'किसान कॉल सेंटर',
+          numberLabel: '1800-180-1551',
+          dialNumber: '18001801551',
+          description: _isEnglish
+              ? 'For crop advice, weather, pest control, mandi and farming guidance.'
+              : 'फसल सलाह, मौसम, कीट नियंत्रण, मंडी और खेती मार्गदर्शन के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '💰',
+          title: _isEnglish ? 'PM-KISAN Help Desk' : 'PM-KISAN हेल्प डेस्क',
+          numberLabel: '155261',
+          dialNumber: '155261',
+          description: _isEnglish
+              ? 'For installment, eKYC, beneficiary status and scheme payment issues.'
+              : 'किस्त, eKYC, लाभार्थी स्थिति और योजना भुगतान समस्या के लिए।',
+          extraDetail: _isEnglish
+              ? 'Alternate contact: 011-24300606'
+              : 'वैकल्पिक संपर्क: 011-24300606',
+        ),
+        _HelplineContact(
+          emoji: '⚖️',
+          title: _isEnglish
+              ? 'Free Legal Aid / DLSA Support'
+              : 'मुफ्त कानूनी सहायता / DLSA सहायता',
+          numberLabel: '15100',
+          dialNumber: '15100',
+          description: _isEnglish
+              ? 'For land dispute guidance, legal aid and support from legal services authorities.'
+              : 'भूमि विवाद, कानूनी सहायता और विधिक सेवा प्राधिकरण से मदद के लिए।',
+        ),
+        _HelplineContact(
+          emoji: '🏦',
+          title: _isEnglish
+              ? 'Banking Complaint Support'
+              : 'बैंकिंग शिकायत सहायता',
+          numberLabel: '14448',
+          dialNumber: '14448',
+          description: _isEnglish
+              ? 'For bank complaint guidance, account issues and grievance support.'
+              : 'बैंक शिकायत, खाते की समस्या और शिकायत सहायता के लिए।',
+        ),
+      ];
+
   void _showInfo(String title, String content) {
     showDialog<void>(
       context: context,
@@ -144,6 +192,7 @@ class _MoreScreenState extends State<MoreScreen> {
       if (_state.isNotEmpty) _state,
       if (_country.isNotEmpty) _country,
     ].join(', ');
+    final helplineContacts = _helplineContacts;
 
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
@@ -283,42 +332,29 @@ class _MoreScreenState extends State<MoreScreen> {
                   ],
                 ),
               ),
-              _sectionHeader(_t('quickLinks')),
+              _sectionHeader(
+                  _isEnglish ? 'Helpline Numbers' : 'हेल्पलाइन नंबर'),
               Container(
                 color: AppTheme.white,
                 child: Column(
                   children: [
-                    _tile(
-                      '📞',
-                      _languageCode == 'en'
-                          ? 'Farmer Helpline (15100)'
-                          : 'किसान हेल्पलाइन (15100)',
-                      onTap: () => _call('15100'),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                      child: Text(
+                        _isEnglish
+                            ? 'Call the number that matches your issue. The list is arranged for quick farmer support first.'
+                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। सूची को किसान सहायता के क्रम में रखा गया है।',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.textMid,
+                          height: 1.4,
+                        ),
+                      ),
                     ),
-                    _divider(),
-                    _tile(
-                      '⚖️',
-                      _languageCode == 'en'
-                          ? 'Legal Help (DLSA)'
-                          : 'कानूनी सहायता (DLSA)',
-                      onTap: () => _call('15100'),
-                    ),
-                    _divider(),
-                    _tile(
-                      '🏦',
-                      _languageCode == 'en'
-                          ? 'Bank Helpline (1800-180-1111)'
-                          : 'बैंक हेल्पलाइन (1800-180-1111)',
-                      onTap: () => _call('18001801111'),
-                    ),
-                    _divider(),
-                    _tile(
-                      '🌾',
-                      _languageCode == 'en'
-                          ? 'PM-Kisan Helpline (155261)'
-                          : 'PM-Kisan Helpline (155261)',
-                      onTap: () => _call('155261'),
-                    ),
+                    for (var i = 0; i < helplineContacts.length; i++) ...[
+                      _helplineTile(helplineContacts[i]),
+                      if (i != helplineContacts.length - 1) _divider(),
+                    ],
                   ],
                 ),
               ),
@@ -519,6 +555,63 @@ class _MoreScreenState extends State<MoreScreen> {
         color: AppTheme.divider,
       );
 
+  Widget _helplineTile(_HelplineContact contact) {
+    return ListTile(
+      onTap: () => _call(contact.dialNumber),
+      leading: Text(contact.emoji, style: const TextStyle(fontSize: 22)),
+      title: Text(
+        contact.title,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: AppTheme.textDark,
+        ),
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              contact.numberLabel,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primaryGreen,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              contact.description,
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppTheme.textMid,
+                height: 1.35,
+              ),
+            ),
+            if (contact.extraDetail != null) ...[
+              const SizedBox(height: 3),
+              Text(
+                contact.extraDetail!,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppTheme.textLight,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      trailing: const Icon(
+        Icons.call,
+        color: AppTheme.primaryGreen,
+        size: 20,
+      ),
+    );
+  }
+
   Widget _tile(
     String emoji,
     String title, {
@@ -541,4 +634,22 @@ class _MoreScreenState extends State<MoreScreen> {
       onTap: onTap,
     );
   }
+}
+
+class _HelplineContact {
+  final String emoji;
+  final String title;
+  final String numberLabel;
+  final String dialNumber;
+  final String description;
+  final String? extraDetail;
+
+  const _HelplineContact({
+    required this.emoji,
+    required this.title,
+    required this.numberLabel,
+    required this.dialNumber,
+    required this.description,
+    this.extraDetail,
+  });
 }
