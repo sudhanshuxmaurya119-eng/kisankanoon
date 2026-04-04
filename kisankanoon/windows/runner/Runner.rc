@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.kisankanoon" "\0"
-            VALUE "FileDescription", "kisankanoon" "\0"
+            VALUE "CompanyName", "Agri-Shield" "\0"
+            VALUE "FileDescription", "Agri-Shield" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "kisankanoon" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.kisankanoon. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Agri-Shield. All rights reserved." "\0"
             VALUE "OriginalFilename", "kisankanoon.exe" "\0"
-            VALUE "ProductName", "kisankanoon" "\0"
+            VALUE "ProductName", "Agri-Shield" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

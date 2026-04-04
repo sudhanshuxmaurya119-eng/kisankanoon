@@ -1,6 +1,6 @@
-# kisankanoon
+# Agri-Shield
 
-A new Flutter project.
+Agri-Shield is a Flutter app for farmer support, legal help, documents, weather, and government service access.
 
 ## Getting Started
 

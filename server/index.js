@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'KisanKanoon API is running 🌾', version: '1.0.0' });
+  res.json({ status: 'Agri-Shield API is running 🌾', version: '1.0.0' });
 });
 
 // Routes
@@ -40,7 +40,7 @@ mongoose
   .then(() => {
     console.log('✅ Connected to MongoDB');
     app.listen(PORT, () => {
-      console.log(`🚀 KisanKanoon API running on port ${PORT}`);
+      console.log(`🚀 Agri-Shield API running on port ${PORT}`);
     });
   })
   .catch((err) => {

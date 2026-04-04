@@ -128,7 +128,7 @@ jobs:
               -keystore "$RUNNER_TEMP/release-keystore.jks" \
               -storepass android \
               -keypass android \
-              -dname "CN=KisanKanoon, OU=CI, O=KisanKanoon, L=Remote, ST=Remote, C=IN"
+              -dname "CN=Agri-Shield, OU=CI, O=Agri-Shield, L=Remote, ST=Remote, C=IN"
 
             ANDROID_KEYSTORE_PASSWORD="android"
             ANDROID_KEY_ALIAS="upload"

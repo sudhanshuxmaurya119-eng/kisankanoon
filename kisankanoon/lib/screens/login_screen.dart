@@ -242,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
               const Center(
-                child: Text('KisanKanoon',
+                child: Text('Agri-Shield',
                     style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,

@@ -27,16 +27,16 @@ void main() async {
 
   await AppLanguageService.load();
 
-  runApp(const KisanKanoonApp());
+  runApp(const AgriShieldApp());
 }
 
-class KisanKanoonApp extends StatelessWidget {
-  const KisanKanoonApp({super.key});
+class AgriShieldApp extends StatelessWidget {
+  const AgriShieldApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KisanKanoon — किसान क़ानून',
+      title: 'Agri-Shield - किसान साथी',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       initialRoute: '/',

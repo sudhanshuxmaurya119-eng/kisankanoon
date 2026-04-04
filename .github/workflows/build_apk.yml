@@ -77,7 +77,7 @@ jobs:
               -keystore "$RUNNER_TEMP/release-keystore.jks" \
               -storepass android \
               -keypass android \
-              -dname "CN=KisanKanoon, OU=CI, O=KisanKanoon, L=Remote, ST=Remote, C=IN"
+              -dname "CN=Agri-Shield, OU=CI, O=Agri-Shield, L=Remote, ST=Remote, C=IN"
 
             ANDROID_KEYSTORE_PASSWORD="android"
             ANDROID_KEY_ALIAS="upload"
@@ -109,7 +109,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: KisanKanoon-Shorebird-APK
+          name: Agri-Shield-Shorebird-APK
           path: kisankanoon/build/app/outputs/apk/release/app-release.apk
           retention-days: 90
 
@@ -117,9 +117,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: shorebird-android-${{ steps.shorebird-release.outputs.release-version }}
-          name: KisanKanoon Shorebird ${{ steps.shorebird-release.outputs.release-version }}
+          name: Agri-Shield Shorebird ${{ steps.shorebird-release.outputs.release-version }}
           body: |
-            ## KisanKanoon Shorebird base release
+            ## Agri-Shield Shorebird base release
             Install this APK once to receive future Shorebird OTA Dart patches.
 
             Release Version: ${{ steps.shorebird-release.outputs.release-version }}

@@ -1,7 +1,7 @@
 {
-  "name": "kisankanoon-server",
+  "name": "agri-shield-server",
   "version": "1.0.0",
-  "description": "KisanKanoon REST API — MongoDB + Node.js",
+  "description": "Agri-Shield REST API — MongoDB + Node.js",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -11,6 +11,6 @@
     "node": ">=18.0.0"
   },
   "keywords": ["farmer", "india", "legal", "api"],
-  "author": "KisanKanoon Team",
+  "author": "Agri-Shield Team",
   "license": "MIT"
 }

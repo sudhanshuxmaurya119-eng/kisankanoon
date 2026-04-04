@@ -1,7 +1,7 @@
 name: kisankanoon
-description: "KisanKanoon - Farmer legal aid app"
+description: "Agri-Shield - Farmer support and legal aid app"
 publish_to: 'none'
-version: 1.0.4+6
+version: 1.0.5+7
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

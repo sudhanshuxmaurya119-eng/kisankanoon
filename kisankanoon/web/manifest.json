@@ -1,11 +1,11 @@
 {
-    "name": "kisankanoon",
-    "short_name": "kisankanoon",
+    "name": "Agri-Shield",
+    "short_name": "AgriShield",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Agri-Shield - farmer support and legal assistance app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

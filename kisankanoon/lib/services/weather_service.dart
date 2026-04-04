@@ -157,7 +157,7 @@ class WeatherService {
         uri,
         headers: const {
           'Accept': 'application/json',
-          'User-Agent': 'KisanKanoonApp/1.0',
+          'User-Agent': 'AgriShieldApp/1.0',
         },
       ).timeout(const Duration(seconds: 8));
       if (response.statusCode != 200) return null;

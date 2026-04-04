@@ -103,8 +103,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openWhatsAppUpdates() async {
     final message = Uri.encodeComponent(
       _languageCode == 'en'
-          ? 'Hello! I want KisanKanoon WhatsApp updates.'
-          : 'नमस्ते! मुझे KisanKanoon के WhatsApp अपडेट चाहिए।',
+          ? 'Hello! I want Agri-Shield WhatsApp updates.'
+          : 'नमस्ते! मुझे Agri-Shield के WhatsApp अपडेट चाहिए।',
     );
     final uri = Uri.parse('https://wa.me/?text=$message');
     final launched = await launchUrl(
@@ -931,7 +931,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'KISAN.KANOON',
+                  'AGRI-SHIELD',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
@@ -986,7 +986,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const Text(
-                        'KisanKanoon',
+                        'Agri-Shield',
                         style: TextStyle(
                           fontSize: 11,
                           color: AppTheme.primaryGreen,

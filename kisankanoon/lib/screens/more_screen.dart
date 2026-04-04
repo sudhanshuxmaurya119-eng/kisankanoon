@@ -548,7 +548,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     _divider(),
                     _tile('📱',
                         _languageCode == 'en' ? 'App Version' : 'ऐप संस्करण',
-                        trailing: 'v1.0.4+6'),
+                        trailing: 'v1.0.5+7'),
                     _divider(),
                     _tile(
                       '🔒',
