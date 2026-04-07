@@ -114,119 +114,132 @@ class _MoreScreenState extends State<MoreScreen> {
     }
   }
 
+  String get _helplineSectionTitle => _isEnglish
+      ? 'Important Farmer Helpline Numbers (India)'
+      : 'महत्वपूर्ण किसान हेल्पलाइन नंबर (भारत)';
+
+  String get _helplineSectionHint => _isEnglish
+      ? 'Numbers are shown in priority order. Tap any row to call the main helpline number.'
+      : 'नंबर प्राथमिक क्रम में दिए गए हैं। किसी भी पंक्ति पर टैप करके मुख्य हेल्पलाइन नंबर पर कॉल करें।';
+
   List<_HelplineContact> get _helplineContacts => [
         _HelplineContact(
+          order: 1,
           emoji: '🌾',
-          title: _isEnglish
-              ? 'Kisan Call Center (KCC)'
-              : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥‰à¤² à¤¸à¥‡à¤‚à¤Ÿà¤° (KCC)',
+          title:
+              _isEnglish ? 'Kisan Call Center (KCC)' : 'किसान कॉल सेंटर (KCC)',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
-              ? 'For crop advice, weather, pest control, mandi and farming guidance.'
-              : 'à¤«à¤¸à¤² à¤¸à¤²à¤¾à¤¹, à¤®à¥Œà¤¸à¤®, à¤•à¥€à¤Ÿ à¤¨à¤¿à¤¯à¤‚à¤¤à¥à¤°à¤£, à¤®à¤‚à¤¡à¥€ à¤”à¤° à¤–à¥‡à¤¤à¥€ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For crop advice, mandi guidance, weather updates, and common farming questions.'
+              : 'फसल सलाह, मंडी मार्गदर्शन, मौसम अपडेट और सामान्य खेती सलाह के लिए।',
         ),
         _HelplineContact(
+          order: 2,
           emoji: '💰',
-          title: _isEnglish
-              ? 'PM-KISAN Helpline'
-              : 'PM-KISAN à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+          title: _isEnglish ? 'PM-KISAN Helpline' : 'PM-KISAN हेल्पलाइन',
           numberLabel: '155261 / 1800-115-526',
           dialNumber: '155261',
           description: _isEnglish
-              ? 'For installment, eKYC, beneficiary status and scheme payment issues.'
-              : 'à¤•à¤¿à¤¸à¥à¤¤, eKYC, à¤²à¤¾à¤­à¤¾à¤°à¥à¤¥à¥€ à¤¸à¥à¤¥à¤¿à¤¤à¤¿ à¤”à¤° à¤¯à¥‹à¤œà¤¨à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For installment status, eKYC, beneficiary correction, and PM-KISAN payment issues.'
+              : 'किस्त स्थिति, eKYC, लाभार्थी सुधार और PM-KISAN भुगतान समस्या के लिए।',
           extraDetail: _isEnglish
-              ? 'Tap to call the first number shown above.'
-              : 'à¤Šà¤ªà¤° à¤¦à¤¿à¤ à¤—à¤ à¤ªà¤¹à¤²à¥‡ à¤¨à¤‚à¤¬à¤° à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤•à¥‰à¤² à¤²à¤—à¥‡à¤—à¥€à¥¤',
+              ? 'The card dials the first number shown above.'
+              : 'इस कार्ड पर टैप करने से ऊपर दिया गया पहला नंबर डायल होगा।',
         ),
         _HelplineContact(
+          order: 3,
           emoji: '🏛️',
           title: _isEnglish
               ? 'Agriculture Ministry Helpline'
-              : 'à¤•à¥ƒà¤·à¤¿ à¤®à¤‚à¤¤à¥à¤°à¤¾à¤²à¤¯ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+              : 'कृषि मंत्रालय हेल्पलाइन',
           numberLabel: '011-23381092',
           dialNumber: '01123381092',
           description: _isEnglish
-              ? 'For ministry support, agriculture guidance and complaint routing.'
-              : 'à¤®à¤‚à¤¤à¥à¤°à¤¾à¤²à¤¯ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾, à¤•à¥ƒà¤·à¤¿ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For ministry-level agriculture support, complaint escalation, and official guidance.'
+              : 'मंत्रालय स्तर की कृषि सहायता, शिकायत आगे बढ़ाने और आधिकारिक मार्गदर्शन के लिए।',
         ),
         _HelplineContact(
+          order: 4,
           emoji: '🧪',
           title: _isEnglish
               ? 'Soil Health Card Helpline'
-              : 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+              : 'सॉइल हेल्थ कार्ड हेल्पलाइन',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
-              ? 'For soil health card details, nutrient advice and soil record help.'
-              : 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡, à¤ªà¥‹à¤·à¤• à¤¤à¤¤à¥à¤µ à¤¸à¤²à¤¾à¤¹ à¤”à¤° à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For soil health card details, nutrient suggestions, and soil record support.'
+              : 'सॉइल हेल्थ कार्ड जानकारी, पोषक तत्व सलाह और मिट्टी रिकॉर्ड सहायता के लिए।',
         ),
         _HelplineContact(
+          order: 5,
           emoji: '🌦️',
           title: _isEnglish
               ? 'Crop Insurance (PMFBY) Helpline'
-              : 'à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾ (PMFBY) à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+              : 'फसल बीमा (PMFBY) हेल्पलाइन',
           numberLabel: '1800-200-7710',
           dialNumber: '18002007710',
           description: _isEnglish
-              ? 'For crop insurance enrollment, claim and policy support.'
-              : 'à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾ à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£, à¤¦à¤¾à¤µà¤¾ à¤”à¤° à¤ªà¥‰à¤²à¤¿à¤¸à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For crop insurance enrollment, policy support, and claim-related help.'
+              : 'फसल बीमा पंजीकरण, पॉलिसी सहायता और दावा संबंधी मदद के लिए।',
         ),
         _HelplineContact(
+          order: 6,
           emoji: '🛒',
           title: _isEnglish
               ? 'National Agriculture Market (e-NAM)'
-              : 'à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤¬à¤¾à¤œà¤¾à¤° (e-NAM)',
+              : 'राष्ट्रीय कृषि बाजार (e-NAM)',
           numberLabel: '1800-270-0224',
           dialNumber: '18002700224',
           description: _isEnglish
-              ? 'For e-NAM registration, trading and mandi platform support.'
-              : 'e-NAM à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£, à¤Ÿà¥à¤°à¥‡à¤¡à¤¿à¤‚à¤— à¤”à¤° à¤®à¤‚à¤¡à¥€ à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¥‰à¤°à¥à¤® à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For e-NAM registration, online trading, and mandi platform support.'
+              : 'e-NAM पंजीकरण, ऑनलाइन ट्रेडिंग और मंडी प्लेटफॉर्म सहायता के लिए।',
         ),
         _HelplineContact(
+          order: 7,
           emoji: '🧂',
           title: _isEnglish
               ? 'Fertilizer Complaint Helpline'
-              : 'à¤‰à¤°à¥à¤µà¤°à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+              : 'उर्वरक शिकायत हेल्पलाइन',
           numberLabel: '1800-233-3322',
           dialNumber: '18002333322',
           description: _isEnglish
-              ? 'For fertilizer availability issues and complaint support.'
-              : 'à¤‰à¤°à¥à¤µà¤°à¤• à¤‰à¤ªà¤²à¤¬à¥à¤§à¤¤à¤¾ à¤•à¥€ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤”à¤° à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For fertilizer availability problems, supply complaints, and related support.'
+              : 'उर्वरक उपलब्धता समस्या, सप्लाई शिकायत और संबंधित सहायता के लिए।',
         ),
         _HelplineContact(
+          order: 8,
           emoji: '🧴',
           title: _isEnglish
               ? 'Pesticide Complaint Helpline'
-              : 'à¤•à¥€à¤Ÿà¤¨à¤¾à¤¶à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+              : 'कीटनाशक शिकायत हेल्पलाइन',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
-              ? 'For pesticide complaint, usage guidance and farming support.'
-              : 'à¤•à¥€à¤Ÿà¤¨à¤¾à¤¶à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤, à¤‰à¤ªà¤¯à¥‹à¤— à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤–à¥‡à¤¤à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For pesticide complaints, safe usage guidance, and farming support.'
+              : 'कीटनाशक शिकायत, सुरक्षित उपयोग मार्गदर्शन और खेती सहायता के लिए।',
         ),
         _HelplineContact(
+          order: 9,
           emoji: '☁️',
           title: _isEnglish
               ? 'Weather Info (IMD Farmer Service)'
-              : 'à¤®à¥Œà¤¸à¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ (IMD à¤•à¤¿à¤¸à¤¾à¤¨ à¤¸à¥‡à¤µà¤¾)',
+              : 'मौसम जानकारी (IMD किसान सेवा)',
           numberLabel: '1800-180-1717',
           dialNumber: '18001801717',
           description: _isEnglish
-              ? 'For weather information, alerts and forecast support.'
-              : 'à¤®à¥Œà¤¸à¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€, à¤…à¤²à¤°à¥à¤Ÿ à¤”à¤° à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For weather information, alerts, and forecast support for farmers.'
+              : 'किसानों के लिए मौसम जानकारी, अलर्ट और पूर्वानुमान सहायता के लिए।',
         ),
         _HelplineContact(
+          order: 10,
           emoji: '🐄',
-          title: _isEnglish
-              ? 'Animal Husbandry Helpline'
-              : 'à¤ªà¤¶à¥à¤ªà¤¾à¤²à¤¨ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
+          title: _isEnglish ? 'Animal Husbandry Helpline' : 'पशुपालन हेल्पलाइन',
           numberLabel: '1962',
           dialNumber: '1962',
           description: _isEnglish
-              ? 'For cattle care, animal health and veterinary guidance.'
-              : 'à¤ªà¤¶à¥ à¤¦à¥‡à¤–à¤­à¤¾à¤², à¤ªà¤¶à¥ à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤”à¤° à¤ªà¤¶à¥ à¤šà¤¿à¤•à¤¿à¤¤à¥à¤¸à¤•à¥€à¤¯ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
+              ? 'For cattle care, animal health, vaccination, and veterinary guidance.'
+              : 'पशु देखभाल, पशु स्वास्थ्य, टीकाकरण और पशु चिकित्सा मार्गदर्शन के लिए।',
         ),
       ];
 
@@ -414,19 +427,16 @@ class _MoreScreenState extends State<MoreScreen> {
                   ],
                 ),
               ),
-              _sectionHeader(_isEnglish
-                  ? 'Farmer Helpline Numbers (India)'
-                  : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨ à¤¨à¤‚à¤¬à¤° (à¤­à¤¾à¤°à¤¤)'),
+              _sectionHeader(_helplineSectionTitle),
               Container(
                 color: AppTheme.white,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isEnglish
-                            ? 'Call the number that matches your issue. If two numbers are shown, tapping the card calls the first number.'
-                            : 'à¤…à¤ªà¤¨à¥€ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤¸à¤¹à¥€ à¤¨à¤‚à¤¬à¤° à¤ªà¤° à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚à¥¤ à¤¯à¤¦à¤¿ à¤¦à¥‹ à¤¨à¤‚à¤¬à¤° à¤¦à¤¿à¤ à¤¹à¥‹à¤‚, à¤¤à¥‹ à¤•à¤¾à¤°à¥à¤¡ à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¤¾ à¤¨à¤‚à¤¬à¤° à¤•à¥‰à¤² à¤¹à¥‹à¤—à¤¾à¥¤',
+                        _helplineSectionHint,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppTheme.textMid,
@@ -690,10 +700,12 @@ class _MoreScreenState extends State<MoreScreen> {
       );
 
   Widget _helplineCard(_HelplineContact contact) {
+    final orderLabel = contact.order.toString().padLeft(2, '0');
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: const Color(0xFFF8FAF8),
+        color: AppTheme.surfaceVariant(context),
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
@@ -702,37 +714,61 @@ class _MoreScreenState extends State<MoreScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
+              color: AppTheme.surfaceVariant(context),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppTheme.divider),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgGreen,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        orderLabel,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primaryGreen,
+                        ),
+                      ),
+                      Text(
+                        contact.emoji,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            contact.emoji,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              contact.title,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textDark,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        contact.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.textDark,
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
+                      Text(
+                        contact.numberLabel,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
                       Text(
                         contact.description,
                         style: TextStyle(
@@ -741,17 +777,8 @@ class _MoreScreenState extends State<MoreScreen> {
                           height: 1.45,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        contact.numberLabel,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.primaryGreen,
-                        ),
-                      ),
                       if (contact.extraDetail != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
                           contact.extraDetail!,
                           style: TextStyle(
@@ -765,10 +792,18 @@ class _MoreScreenState extends State<MoreScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppTheme.primaryGreen,
-                  size: 20,
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgGreen,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.call,
+                    color: AppTheme.primaryGreen,
+                    size: 18,
+                  ),
                 ),
               ],
             ),
@@ -802,6 +837,7 @@ class _MoreScreenState extends State<MoreScreen> {
 }
 
 class _HelplineContact {
+  final int order;
   final String emoji;
   final String title;
   final String numberLabel;
@@ -810,6 +846,7 @@ class _HelplineContact {
   final String? extraDetail;
 
   const _HelplineContact({
+    required this.order,
     required this.emoji,
     required this.title,
     required this.numberLabel,
