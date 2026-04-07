@@ -799,10 +799,11 @@ class _MoreScreenState extends State<MoreScreen> {
                     color: AppTheme.bgGreen,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.call,
-                    color: AppTheme.primaryGreen,
-                    size: 18,
+                  child: const Center(
+                    child: Text(
+                      '📞',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ),
               ],
