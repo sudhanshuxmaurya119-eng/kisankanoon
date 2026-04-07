@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../services/app_language_service.dart';
 import '../theme/app_theme.dart';
@@ -16,9 +16,10 @@ class _SchemesScreenState extends State<SchemesScreen> {
 
   static const List<Map<String, String>> _schemes = [
     {
-      'nameHi': 'पीएम-किसान',
+      'nameHi': 'à¤ªà¥€à¤à¤®-à¤•à¤¿à¤¸à¤¾à¤¨',
       'nameEn': 'PM-KISAN',
-      'fullHi': 'प्रधानमंत्री किसान सम्मान निधि',
+      'fullHi':
+          'à¤ªà¥à¤°à¤§à¤¾à¤¨à¤®à¤‚à¤¤à¥à¤°à¥€ à¤•à¤¿à¤¸à¤¾à¤¨ à¤¸à¤®à¥à¤®à¤¾à¤¨ à¤¨à¤¿à¤§à¤¿',
       'fullEn': 'Pradhan Mantri Kisan Samman Nidhi',
       'emoji': '💰',
       'amountHi': '₹6,000/वर्ष',
@@ -27,201 +28,212 @@ class _SchemesScreenState extends State<SchemesScreen> {
           'छोटे और सीमांत किसानों को प्रति वर्ष ₹6,000 तीन किस्तों में दिए जाते हैं।',
       'descEn':
           'Small and marginal farmers receive ₹6,000 per year in three installments.',
-      'tagHi': 'केंद्र सरकार',
+      'tagHi': 'à¤•à¥‡à¤‚à¤¦à¥à¤° à¤¸à¤°à¤•à¤¾à¤°',
       'tagEn': 'Central',
     },
     {
-      'nameHi': 'फसल बीमा',
+      'nameHi': 'à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾',
       'nameEn': 'Crop Insurance',
-      'fullHi': 'प्रधानमंत्री फसल बीमा योजना (PMFBY)',
+      'fullHi':
+          'à¤ªà¥à¤°à¤§à¤¾à¤¨à¤®à¤‚à¤¤à¥à¤°à¥€ à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾ à¤¯à¥‹à¤œà¤¨à¤¾ (PMFBY)',
       'fullEn': 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
       'emoji': '🌾',
-      'amountHi': 'प्रीमियम 2%',
+      'amountHi': 'à¤ªà¥à¤°à¥€à¤®à¤¿à¤¯à¤® 2%',
       'amountEn': '2% premium',
       'descHi':
-          'प्राकृतिक आपदाओं, बारिश या नुकसान के समय फसल सुरक्षा के लिए बीमा कवर।',
+          'à¤ªà¥à¤°à¤¾à¤•à¥ƒà¤¤à¤¿à¤• à¤†à¤ªà¤¦à¤¾à¤“à¤‚, à¤¬à¤¾à¤°à¤¿à¤¶ à¤¯à¤¾ à¤¨à¥à¤•à¤¸à¤¾à¤¨ à¤•à¥‡ à¤¸à¤®à¤¯ à¤«à¤¸à¤² à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤•à¥‡ à¤²à¤¿à¤ à¤¬à¥€à¤®à¤¾ à¤•à¤µà¤°à¥¤',
       'descEn':
           'Insurance cover to protect crops against natural disasters, rain, and damage.',
-      'tagHi': 'केंद्र सरकार',
+      'tagHi': 'à¤•à¥‡à¤‚à¤¦à¥à¤° à¤¸à¤°à¤•à¤¾à¤°',
       'tagEn': 'Central',
     },
     {
-      'nameHi': 'किसान क्रेडिट कार्ड',
+      'nameHi': 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥à¤°à¥‡à¤¡à¤¿à¤Ÿ à¤•à¤¾à¤°à¥à¤¡',
       'nameEn': 'Kisan Credit Card',
-      'fullHi': 'किसान क्रेडिट कार्ड (KCC)',
+      'fullHi': 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥à¤°à¥‡à¤¡à¤¿à¤Ÿ à¤•à¤¾à¤°à¥à¤¡ (KCC)',
       'fullEn': 'Kisan Credit Card (KCC)',
       'emoji': '💳',
       'amountHi': '₹3 लाख तक',
       'amountEn': 'Up to ₹3 lakh',
       'descHi':
-          'कम ब्याज दर पर कृषि ऋण। समय पर भुगतान पर ब्याज में अतिरिक्त राहत मिलती है।',
+          'à¤•à¤® à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤° à¤ªà¤° à¤•à¥ƒà¤·à¤¿ à¤‹à¤£à¥¤ à¤¸à¤®à¤¯ à¤ªà¤° à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤ªà¤° à¤¬à¥à¤¯à¤¾à¤œ à¤®à¥‡à¤‚ à¤…à¤¤à¤¿à¤°à¤¿à¤•à¥à¤¤ à¤°à¤¾à¤¹à¤¤ à¤®à¤¿à¤²à¤¤à¥€ à¤¹à¥ˆà¥¤',
       'descEn':
           'Low-interest farm credit with additional interest relief for timely repayment.',
-      'tagHi': 'बैंक',
+      'tagHi': 'à¤¬à¥ˆà¤‚à¤•',
       'tagEn': 'Bank',
     },
     {
-      'nameHi': 'किसान मान-धन',
+      'nameHi': 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤®à¤¾à¤¨-à¤§à¤¨',
       'nameEn': 'Kisan Maan Dhan',
-      'fullHi': 'प्रधानमंत्री किसान मान-धन योजना',
+      'fullHi':
+          'à¤ªà¥à¤°à¤§à¤¾à¤¨à¤®à¤‚à¤¤à¥à¤°à¥€ à¤•à¤¿à¤¸à¤¾à¤¨ à¤®à¤¾à¤¨-à¤§à¤¨ à¤¯à¥‹à¤œà¤¨à¤¾',
       'fullEn': 'Pradhan Mantri Kisan Maan Dhan Yojana',
       'emoji': '👴',
       'amountHi': '₹3,000/माह',
       'amountEn': '₹3,000/month',
-      'descHi': '60 वर्ष की आयु के बाद योग्य किसानों को मासिक पेंशन सहायता।',
+      'descHi':
+          '60 à¤µà¤°à¥à¤· à¤•à¥€ à¤†à¤¯à¥ à¤•à¥‡ à¤¬à¤¾à¤¦ à¤¯à¥‹à¤—à¥à¤¯ à¤•à¤¿à¤¸à¤¾à¤¨à¥‹à¤‚ à¤•à¥‹ à¤®à¤¾à¤¸à¤¿à¤• à¤ªà¥‡à¤‚à¤¶à¤¨ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤',
       'descEn':
           'Monthly pension support for eligible farmers after the age of 60.',
-      'tagHi': 'केंद्र सरकार',
+      'tagHi': 'à¤•à¥‡à¤‚à¤¦à¥à¤° à¤¸à¤°à¤•à¤¾à¤°',
       'tagEn': 'Pension',
     },
     {
-      'nameHi': 'सॉइल हेल्थ कार्ड',
+      'nameHi': 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡',
       'nameEn': 'Soil Health Card',
-      'fullHi': 'सॉइल हेल्थ कार्ड योजना',
+      'fullHi': 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡ à¤¯à¥‹à¤œà¤¨à¤¾',
       'fullEn': 'Soil Health Card Scheme',
       'emoji': '🌱',
-      'amountHi': 'मुफ़्त',
+      'amountHi': 'à¤®à¥à¤«à¤¼à¥à¤¤',
       'amountEn': 'Free',
       'descHi':
-          'मिट्टी की जांच के आधार पर उर्वरक और पोषण संबंधी सही सलाह दी जाती है।',
+          'à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤•à¥€ à¤œà¤¾à¤‚à¤š à¤•à¥‡ à¤†à¤§à¤¾à¤° à¤ªà¤° à¤‰à¤°à¥à¤µà¤°à¤• à¤”à¤° à¤ªà¥‹à¤·à¤£ à¤¸à¤‚à¤¬à¤‚à¤§à¥€ à¤¸à¤¹à¥€ à¤¸à¤²à¤¾à¤¹ à¤¦à¥€ à¤œà¤¾à¤¤à¥€ à¤¹à¥ˆà¥¤',
       'descEn':
           'Provides fertilizer and nutrient guidance based on soil testing.',
-      'tagHi': 'मुफ़्त सेवा',
+      'tagHi': 'à¤®à¥à¤«à¤¼à¥à¤¤ à¤¸à¥‡à¤µà¤¾',
       'tagEn': 'Free service',
     },
     {
-      'nameHi': 'पीएम-कुसुम',
+      'nameHi': 'à¤ªà¥€à¤à¤®-à¤•à¥à¤¸à¥à¤®',
       'nameEn': 'PM Kusum',
-      'fullHi': 'प्रधानमंत्री किसान ऊर्जा सुरक्षा एवं उत्थान महाभियान',
+      'fullHi':
+          'à¤ªà¥à¤°à¤§à¤¾à¤¨à¤®à¤‚à¤¤à¥à¤°à¥€ à¤•à¤¿à¤¸à¤¾à¤¨ à¤Šà¤°à¥à¤œà¤¾ à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤à¤µà¤‚ à¤‰à¤¤à¥à¤¥à¤¾à¤¨ à¤®à¤¹à¤¾à¤­à¤¿à¤¯à¤¾à¤¨',
       'fullEn': 'Pradhan Mantri Kisan Urja Suraksha Evam Utthaan Mahabhiyan',
       'emoji': '☀️',
-      'amountHi': '90% सब्सिडी तक',
+      'amountHi': '90% à¤¸à¤¬à¥à¤¸à¤¿à¤¡à¥€ à¤¤à¤•',
       'amountEn': 'Up to 90% subsidy',
       'descHi':
-          'सोलर पंप और कृषि ऊर्जा समाधान के लिए वित्तीय सहायता उपलब्ध है।',
+          'à¤¸à¥‹à¤²à¤° à¤ªà¤‚à¤ª à¤”à¤° à¤•à¥ƒà¤·à¤¿ à¤Šà¤°à¥à¤œà¤¾ à¤¸à¤®à¤¾à¤§à¤¾à¤¨ à¤•à¥‡ à¤²à¤¿à¤ à¤µà¤¿à¤¤à¥à¤¤à¥€à¤¯ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¥¤',
       'descEn':
           'Financial support for solar pumps and clean energy solutions for farming.',
-      'tagHi': 'सोलर',
+      'tagHi': 'à¤¸à¥‹à¤²à¤°',
       'tagEn': 'Solar',
     },
     {
-      'nameHi': 'ई-नाम',
+      'nameHi': 'à¤ˆ-à¤¨à¤¾à¤®',
       'nameEn': 'e-NAM',
-      'fullHi': 'राष्ट्रीय कृषि बाजार',
+      'fullHi': 'à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤¬à¤¾à¤œà¤¾à¤°',
       'fullEn': 'National Agriculture Market',
       'emoji': '🏪',
-      'amountHi': 'मुफ़्त पंजीकरण',
+      'amountHi': 'à¤®à¥à¤«à¤¼à¥à¤¤ à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£',
       'amountEn': 'Free registration',
       'descHi':
-          'किसान ऑनलाइन मंडी प्लेटफॉर्म पर अपनी फसल बेहतर दाम में बेच सकते हैं।',
+          'à¤•à¤¿à¤¸à¤¾à¤¨ à¤‘à¤¨à¤²à¤¾à¤‡à¤¨ à¤®à¤‚à¤¡à¥€ à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¥‰à¤°à¥à¤® à¤ªà¤° à¤…à¤ªà¤¨à¥€ à¤«à¤¸à¤² à¤¬à¥‡à¤¹à¤¤à¤° à¤¦à¤¾à¤® à¤®à¥‡à¤‚ à¤¬à¥‡à¤š à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
       'descEn':
           'Farmers can sell produce on the online mandi platform for better price discovery.',
-      'tagHi': 'डिजिटल',
+      'tagHi': 'à¤¡à¤¿à¤œà¤¿à¤Ÿà¤²',
       'tagEn': 'Digital',
     },
     {
-      'nameHi': 'एग्री इन्फ्रास्ट्रक्चर',
+      'nameHi':
+          'à¤à¤—à¥à¤°à¥€ à¤‡à¤¨à¥à¤«à¥à¤°à¤¾à¤¸à¥à¤Ÿà¥à¤°à¤•à¥à¤šà¤°',
       'nameEn': 'Agri Infrastructure',
-      'fullHi': 'एग्रीकल्चर इन्फ्रास्ट्रक्चर फंड',
+      'fullHi':
+          'à¤à¤—à¥à¤°à¥€à¤•à¤²à¥à¤šà¤° à¤‡à¤¨à¥à¤«à¥à¤°à¤¾à¤¸à¥à¤Ÿà¥à¤°à¤•à¥à¤šà¤° à¤«à¤‚à¤¡',
       'fullEn': 'Agriculture Infrastructure Fund',
       'emoji': '🏭',
       'amountHi': '₹1 करोड़ तक',
       'amountEn': 'Up to ₹1 crore',
       'descHi':
-          'कोल्ड स्टोरेज, वेयरहाउस और कृषि प्रसंस्करण इकाइयों के लिए सहायता।',
+          'à¤•à¥‹à¤²à¥à¤¡ à¤¸à¥à¤Ÿà¥‹à¤°à¥‡à¤œ, à¤µà¥‡à¤¯à¤°à¤¹à¤¾à¤‰à¤¸ à¤”à¤° à¤•à¥ƒà¤·à¤¿ à¤ªà¥à¤°à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£ à¤‡à¤•à¤¾à¤‡à¤¯à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤',
       'descEn':
           'Support for cold storage, warehousing, and farm processing infrastructure.',
-      'tagHi': 'इन्फ्रा',
+      'tagHi': 'à¤‡à¤¨à¥à¤«à¥à¤°à¤¾',
       'tagEn': 'Infra',
     },
     {
-      'nameHi': 'आरकेवीवाई',
+      'nameHi': 'à¤†à¤°à¤•à¥‡à¤µà¥€à¤µà¤¾à¤ˆ',
       'nameEn': 'RKVY',
-      'fullHi': 'राष्ट्रीय कृषि विकास योजना',
+      'fullHi':
+          'à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤µà¤¿à¤•à¤¾à¤¸ à¤¯à¥‹à¤œà¤¨à¤¾',
       'fullEn': 'Rashtriya Krishi Vikas Yojana',
       'emoji': '📈',
-      'amountHi': 'अनुदान',
+      'amountHi': 'à¤…à¤¨à¥à¤¦à¤¾à¤¨',
       'amountEn': 'Grant support',
       'descHi':
-          'कृषि और संबंधित क्षेत्रों के विकास के लिए राज्यों और किसानों को सहायता।',
+          'à¤•à¥ƒà¤·à¤¿ à¤”à¤° à¤¸à¤‚à¤¬à¤‚à¤§à¤¿à¤¤ à¤•à¥à¤·à¥‡à¤¤à¥à¤°à¥‹à¤‚ à¤•à¥‡ à¤µà¤¿à¤•à¤¾à¤¸ à¤•à¥‡ à¤²à¤¿à¤ à¤°à¤¾à¤œà¥à¤¯à¥‹à¤‚ à¤”à¤° à¤•à¤¿à¤¸à¤¾à¤¨à¥‹à¤‚ à¤•à¥‹ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤',
       'descEn':
           'Supports states and farmers in agriculture and allied sector development.',
-      'tagHi': 'राज्य + केंद्र',
+      'tagHi': 'à¤°à¤¾à¤œà¥à¤¯ + à¤•à¥‡à¤‚à¤¦à¥à¤°',
       'tagEn': 'State + Central',
     },
     {
-      'nameHi': 'परंपरागत कृषि',
+      'nameHi': 'à¤ªà¤°à¤‚à¤ªà¤°à¤¾à¤—à¤¤ à¤•à¥ƒà¤·à¤¿',
       'nameEn': 'Organic Farming',
-      'fullHi': 'परंपरागत कृषि विकास योजना (PKVY)',
+      'fullHi':
+          'à¤ªà¤°à¤‚à¤ªà¤°à¤¾à¤—à¤¤ à¤•à¥ƒà¤·à¤¿ à¤µà¤¿à¤•à¤¾à¤¸ à¤¯à¥‹à¤œà¤¨à¤¾ (PKVY)',
       'fullEn': 'Paramparagat Krishi Vikas Yojana (PKVY)',
       'emoji': '🌿',
       'amountHi': '₹50,000/हेक्टेयर',
       'amountEn': '₹50,000/hectare',
       'descHi':
-          'जैविक खेती को बढ़ावा देने के लिए किसानों को समूह आधारित सहायता मिलती है।',
+          'à¤œà¥ˆà¤µà¤¿à¤• à¤–à¥‡à¤¤à¥€ à¤•à¥‹ à¤¬à¤¢à¤¼à¤¾à¤µà¤¾ à¤¦à¥‡à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤•à¤¿à¤¸à¤¾à¤¨à¥‹à¤‚ à¤•à¥‹ à¤¸à¤®à¥‚à¤¹ à¤†à¤§à¤¾à¤°à¤¿à¤¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤®à¤¿à¤²à¤¤à¥€ à¤¹à¥ˆà¥¤',
       'descEn':
           'Group-based support is provided to encourage organic farming practices.',
-      'tagHi': 'ऑर्गेनिक',
+      'tagHi': 'à¤‘à¤°à¥à¤—à¥‡à¤¨à¤¿à¤•',
       'tagEn': 'Organic',
     },
     {
-      'nameHi': 'मधुमक्खी पालन',
+      'nameHi': 'à¤®à¤§à¥à¤®à¤•à¥à¤–à¥€ à¤ªà¤¾à¤²à¤¨',
       'nameEn': 'Bee Keeping',
-      'fullHi': 'नेशनल बी कीपिंग एंड हनी मिशन',
+      'fullHi':
+          'à¤¨à¥‡à¤¶à¤¨à¤² à¤¬à¥€ à¤•à¥€à¤ªà¤¿à¤‚à¤— à¤à¤‚à¤¡ à¤¹à¤¨à¥€ à¤®à¤¿à¤¶à¤¨',
       'fullEn': 'National Bee Keeping and Honey Mission',
       'emoji': '🐝',
-      'amountHi': '75% सब्सिडी तक',
+      'amountHi': '75% à¤¸à¤¬à¥à¤¸à¤¿à¤¡à¥€ à¤¤à¤•',
       'amountEn': 'Up to 75% subsidy',
       'descHi':
-          'मधुमक्खी पालन, शहद उत्पादन और संबंधित उपकरणों पर सहायता मिलती है।',
+          'à¤®à¤§à¥à¤®à¤•à¥à¤–à¥€ à¤ªà¤¾à¤²à¤¨, à¤¶à¤¹à¤¦ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨ à¤”à¤° à¤¸à¤‚à¤¬à¤‚à¤§à¤¿à¤¤ à¤‰à¤ªà¤•à¤°à¤£à¥‹à¤‚ à¤ªà¤° à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤®à¤¿à¤²à¤¤à¥€ à¤¹à¥ˆà¥¤',
       'descEn':
           'Support is available for bee keeping, honey production, and related equipment.',
-      'tagHi': 'उद्यम',
+      'tagHi': 'à¤‰à¤¦à¥à¤¯à¤®',
       'tagEn': 'Enterprise',
     },
     {
-      'nameHi': 'मत्स्य संपदा',
+      'nameHi': 'à¤®à¤¤à¥à¤¸à¥à¤¯ à¤¸à¤‚à¤ªà¤¦à¤¾',
       'nameEn': 'Matsya Sampada',
-      'fullHi': 'प्रधानमंत्री मत्स्य संपदा योजना',
+      'fullHi':
+          'à¤ªà¥à¤°à¤§à¤¾à¤¨à¤®à¤‚à¤¤à¥à¤°à¥€ à¤®à¤¤à¥à¤¸à¥à¤¯ à¤¸à¤‚à¤ªà¤¦à¤¾ à¤¯à¥‹à¤œà¤¨à¤¾',
       'fullEn': 'Pradhan Mantri Matsya Sampada Yojana',
       'emoji': '🐟',
       'amountHi': '₹20,050 करोड़',
       'amountEn': '₹20,050 crore',
       'descHi':
-          'मत्स्य पालन और जलीय कृषि क्षेत्र के विकास के लिए वित्तीय सहायता।',
+          'à¤®à¤¤à¥à¤¸à¥à¤¯ à¤ªà¤¾à¤²à¤¨ à¤”à¤° à¤œà¤²à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤•à¥à¤·à¥‡à¤¤à¥à¤° à¤•à¥‡ à¤µà¤¿à¤•à¤¾à¤¸ à¤•à¥‡ à¤²à¤¿à¤ à¤µà¤¿à¤¤à¥à¤¤à¥€à¤¯ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤',
       'descEn':
           'Financial support for fisheries and aquaculture sector development.',
-      'tagHi': 'मत्स्य',
+      'tagHi': 'à¤®à¤¤à¥à¤¸à¥à¤¯',
       'tagEn': 'Fisheries',
     },
     {
-      'nameHi': 'पशुधन विकास',
+      'nameHi': 'à¤ªà¤¶à¥à¤§à¤¨ à¤µà¤¿à¤•à¤¾à¤¸',
       'nameEn': 'Livestock Development',
-      'fullHi': 'राष्ट्रीय गोकुल मिशन',
+      'fullHi': 'à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤—à¥‹à¤•à¥à¤² à¤®à¤¿à¤¶à¤¨',
       'fullEn': 'Rashtriya Gokul Mission',
       'emoji': '🐄',
-      'amountHi': 'सब्सिडी',
+      'amountHi': 'à¤¸à¤¬à¥à¤¸à¤¿à¤¡à¥€',
       'amountEn': 'Subsidy',
       'descHi':
-          'देशी नस्ल सुधार, दुग्ध उत्पादन और पशुपालन विकास के लिए सहायता।',
+          'à¤¦à¥‡à¤¶à¥€ à¤¨à¤¸à¥à¤² à¤¸à¥à¤§à¤¾à¤°, à¤¦à¥à¤—à¥à¤§ à¤‰à¤¤à¥à¤ªà¤¾à¤¦à¤¨ à¤”à¤° à¤ªà¤¶à¥à¤ªà¤¾à¤²à¤¨ à¤µà¤¿à¤•à¤¾à¤¸ à¤•à¥‡ à¤²à¤¿à¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤',
       'descEn':
           'Support for indigenous breed improvement, dairy production, and livestock growth.',
-      'tagHi': 'पशुपालन',
+      'tagHi': 'à¤ªà¤¶à¥à¤ªà¤¾à¤²à¤¨',
       'tagEn': 'Livestock',
     },
     {
-      'nameHi': 'डीएलएसए कानूनी मदद',
+      'nameHi': 'à¤¡à¥€à¤à¤²à¤à¤¸à¤ à¤•à¤¾à¤¨à¥‚à¤¨à¥€ à¤®à¤¦à¤¦',
       'nameEn': 'DLSA Legal Help',
-      'fullHi': 'जिला विधिक सेवा प्राधिकरण',
+      'fullHi':
+          'à¤œà¤¿à¤²à¤¾ à¤µà¤¿à¤§à¤¿à¤• à¤¸à¥‡à¤µà¤¾ à¤ªà¥à¤°à¤¾à¤§à¤¿à¤•à¤°à¤£',
       'fullEn': 'District Legal Services Authority',
       'emoji': '⚖️',
-      'amountHi': 'मुफ़्त',
+      'amountHi': 'à¤®à¥à¤«à¤¼à¥à¤¤',
       'amountEn': 'Free',
       'descHi':
-          'जमीन विवाद, ऋण समस्या और कानूनी मामलों के लिए मुफ्त सहायता। 15100 पर कॉल करें।',
+          'à¤œà¤®à¥€à¤¨ à¤µà¤¿à¤µà¤¾à¤¦, à¤‹à¤£ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤”à¤° à¤•à¤¾à¤¨à¥‚à¤¨à¥€ à¤®à¤¾à¤®à¤²à¥‹à¤‚ à¤•à¥‡ à¤²à¤¿à¤ à¤®à¥à¤«à¥à¤¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾à¥¤ 15100 à¤ªà¤° à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚à¥¤',
       'descEn':
           'Free legal support for land disputes, loan issues, and related matters. Call 15100.',
-      'tagHi': 'कानूनी',
+      'tagHi': 'à¤•à¤¾à¤¨à¥‚à¤¨à¥€',
       'tagEn': 'Legal',
     },
   ];
@@ -279,7 +291,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
         title: Text(
-          _screenText('Government Schemes', 'सरकारी योजनाएं'),
+          _screenText(
+              'Government Schemes', 'à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤‚'),
         ),
         centerTitle: true,
         bottom: PreferredSize(
@@ -291,7 +304,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
               decoration: InputDecoration(
                 hintText: _screenText(
                   'Search schemes...',
-                  'योजनाएं खोजें...',
+                  'à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤‚ à¤–à¥‹à¤œà¥‡à¤‚...',
                 ),
                 prefixIcon:
                     const Icon(Icons.search, color: AppTheme.primaryGreen),
@@ -321,11 +334,11 @@ class _SchemesScreenState extends State<SchemesScreen> {
               decoration: BoxDecoration(
                 color: AppTheme.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
                     color: AppTheme.shadow,
                     blurRadius: 6,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -352,7 +365,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
                       children: [
                         Text(
                           _schemeText(scheme, 'name'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppTheme.textDark,
@@ -361,7 +374,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
                         const SizedBox(height: 3),
                         Text(
                           _schemeText(scheme, 'full'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppTheme.textMid,
                           ),
@@ -464,7 +477,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
               const SizedBox(height: 12),
               Text(
                 _schemeText(scheme, 'full'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.textDark,
@@ -492,8 +505,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
                             ),
                           ),
                           Text(
-                            _screenText('Benefit', 'लाभ'),
-                            style: const TextStyle(
+                            _screenText('Benefit', 'à¤²à¤¾à¤­'),
+                            style: TextStyle(
                               fontSize: 11,
                               color: AppTheme.textMid,
                             ),
@@ -521,8 +534,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
                             ),
                           ),
                           Text(
-                            _screenText('Category', 'श्रेणी'),
-                            style: const TextStyle(
+                            _screenText('Category', 'à¤¶à¥à¤°à¥‡à¤£à¥€'),
+                            style: TextStyle(
                               fontSize: 11,
                               color: AppTheme.textMid,
                             ),
@@ -535,8 +548,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                _screenText('Details', 'विवरण'),
-                style: const TextStyle(
+                _screenText('Details', 'à¤µà¤¿à¤µà¤°à¤£'),
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.textDark,
@@ -545,7 +558,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
               const SizedBox(height: 8),
               Text(
                 _schemeText(scheme, 'desc'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   color: AppTheme.textMid,
                   height: 1.7,
@@ -558,7 +571,8 @@ class _SchemesScreenState extends State<SchemesScreen> {
                 child: ElevatedButton(
                   onPressed: () {},
                   child: Text(
-                    _screenText('Apply now', 'अभी आवेदन करें'),
+                    _screenText(
+                        'Apply now', 'à¤…à¤­à¥€ à¤†à¤µà¥‡à¤¦à¤¨ à¤•à¤°à¥‡à¤‚'),
                   ),
                 ),
               ),
@@ -570,3 +584,5 @@ class _SchemesScreenState extends State<SchemesScreen> {
     );
   }
 }
+
+

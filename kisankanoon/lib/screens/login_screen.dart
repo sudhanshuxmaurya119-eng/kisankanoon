@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'à¤…à¤ªà¤¨à¤¾ à¤ˆà¤®à¥‡à¤² à¤¡à¤¾à¤²à¥‡à¤‚ â€” à¤¹à¤® à¤†à¤ªà¤•à¥‹ à¤°à¥€à¤¸à¥‡à¤Ÿ à¤²à¤¿à¤‚à¤• à¤­à¥‡à¤œà¥‡à¤‚à¤—à¥‡à¥¤',
                 style: TextStyle(fontSize: 13, color: AppTheme.textMid),
               ),
@@ -169,26 +169,26 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('पासवर्ड भूल गए?', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text('à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤­à¥‚à¤² à¤—à¤?', style: TextStyle(fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('अपना ईमेल डालें — हम आपको रीसेट लिंक भेजेंगे।',
+            Text('अपना ईमेल डालें — हम आपको रीसेट लिंक भेजेंगे।',
                 style: TextStyle(fontSize: 13, color: AppTheme.textMid)),
             const SizedBox(height: 12),
             TextField(
               controller: ctrl,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'ईमेल पता',
+                hintText: 'à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¤¾',
                 prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryGreen),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('रद्द करें')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('à¤°à¤¦à¥à¤¦ à¤•à¤°à¥‡à¤‚')),
           ElevatedButton(
             onPressed: () async {
               final email = ctrl.text.trim();
@@ -201,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 backgroundColor: err != null ? Colors.red : AppTheme.primaryGreen,
               ));
             },
-            child: const Text('भेजें'),
+            child: Text('à¤­à¥‡à¤œà¥‡à¤‚'),
           ),
         ],
       ),
@@ -248,8 +248,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w900,
                         color: AppTheme.primaryGreen)),
               ),
-              const Center(
-                child: Text('किसान का साथी',
+              Center(
+                child: Text('à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¤¾ à¤¸à¤¾à¤¥à¥€',
                     style: TextStyle(fontSize: 14, color: AppTheme.textMid)),
               ),
               const SizedBox(height: 36),
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Email
-                    const Text('ईमेल',
+                    Text('à¤ˆà¤®à¥‡à¤²',
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -269,19 +269,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
-                        hintText: 'आपका ईमेल पता',
+                        hintText: 'à¤†à¤ªà¤•à¤¾ à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¤¾',
                         prefixIcon: Icon(Icons.email_outlined,
                             color: AppTheme.primaryGreen),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'ईमेल डालें';
-                        if (!v.contains('@')) return 'सही ईमेल डालें';
+                        if (v == null || v.isEmpty) {
+                          return 'à¤ˆà¤®à¥‡à¤² à¤¡à¤¾à¤²à¥‡à¤‚';
+                        }
+                        if (!v.contains('@')) {
+                          return 'à¤¸à¤¹à¥€ à¤ˆà¤®à¥‡à¤² à¤¡à¤¾à¤²à¥‡à¤‚';
+                        }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
                     // Password
-                    const Text('पासवर्ड',
+                    Text('à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡',
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -303,15 +307,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
-                      validator: (v) =>
-                          (v?.length ?? 0) < 6 ? 'कम से कम 6 अक्षर' : null,
+                      validator: (v) => (v?.length ?? 0) < 6
+                          ? 'à¤•à¤® à¤¸à¥‡ à¤•à¤® 6 à¤…à¤•à¥à¤·à¤°'
+                          : null,
                     ),
                     // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: _showForgotPassword,
-                        child: const Text('पासवर्ड भूल गए?',
+                        child: const Text(
+                            'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤­à¥‚à¤² à¤—à¤?',
                             style: TextStyle(
                                 color: AppTheme.primaryGreen,
                                 fontSize: 13,
@@ -352,7 +358,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                     color: Colors.white, strokeWidth: 2.5))
-                            : const Text('लॉगिन करें',
+                            : const Text('à¤²à¥‰à¤—à¤¿à¤¨ à¤•à¤°à¥‡à¤‚',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w700)),
                       ),
@@ -360,13 +366,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     // Register link
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      const Text('नया खाता बनाएं? ',
+                      Text('à¤¨à¤¯à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚? ',
                           style:
                               TextStyle(color: AppTheme.textMid, fontSize: 14)),
                       GestureDetector(
                         onTap: () =>
                             Navigator.of(context).pushNamed('/register'),
-                        child: const Text('रजिस्टर करें',
+                        child: const Text('à¤°à¤œà¤¿à¤¸à¥à¤Ÿà¤° à¤•à¤°à¥‡à¤‚',
                             style: TextStyle(
                                 color: AppTheme.primaryGreen,
                                 fontWeight: FontWeight.w700,
@@ -391,7 +397,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               Icon(Icons.phone,
                                   color: AppTheme.primaryGreen, size: 20),
                               SizedBox(width: 8),
-                              Text('मुफ्त कानूनी मदद: 15100 (DLSA)',
+                              Text(
+                                  'à¤®à¥à¤«à¥à¤¤ à¤•à¤¾à¤¨à¥‚à¤¨à¥€ à¤®à¤¦à¤¦: 15100 (DLSA)',
                                   style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,

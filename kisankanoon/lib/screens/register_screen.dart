@@ -16,8 +16,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _mobileCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
-  String _selectedCountry = 'भारत (India)';
-  String _selectedState = 'उत्तर प्रदेश';
+  String _selectedCountry = 'à¤­à¤¾à¤°à¤¤ (India)';
+  String _selectedState = 'à¤‰à¤¤à¥à¤¤à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶';
   bool _loading = false;
   bool _obscure = true;
   String? _errorMsg;
@@ -29,37 +29,82 @@ class _RegisterScreenState extends State<RegisterScreen> {
   List<String> _strengthTips = [];
 
   final List<String> _countries = [
-    'भारत (India)', 'नेपाल (Nepal)', 'बांग्लादेश (Bangladesh)', 'अन्य (Other)'
+    'à¤­à¤¾à¤°à¤¤ (India)',
+    'à¤¨à¥‡à¤ªà¤¾à¤² (Nepal)',
+    'à¤¬à¤¾à¤‚à¤—à¥à¤²à¤¾à¤¦à¥‡à¤¶ (Bangladesh)',
+    'à¤…à¤¨à¥à¤¯ (Other)'
   ];
 
   final List<String> _states = [
-    'उत्तर प्रदेश', 'मध्य प्रदेश', 'राजस्थान', 'बिहार', 'महाराष्ट्र',
-    'पंजाब', 'हरियाणा', 'गुजरात', 'कर्नाटक', 'आंध्र प्रदेश',
-    'तेलंगाना', 'ओडिशा', 'पश्चिम बंगाल', 'छत्तीसगढ़', 'झारखंड',
-    'उत्तराखंड', 'हिमाचल प्रदेश', 'दिल्ली', 'असम', 'अन्य',
+    'à¤‰à¤¤à¥à¤¤à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶',
+    'à¤®à¤§à¥à¤¯ à¤ªà¥à¤°à¤¦à¥‡à¤¶',
+    'à¤°à¤¾à¤œà¤¸à¥à¤¥à¤¾à¤¨',
+    'à¤¬à¤¿à¤¹à¤¾à¤°',
+    'à¤®à¤¹à¤¾à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°',
+    'à¤ªà¤‚à¤œà¤¾à¤¬',
+    'à¤¹à¤°à¤¿à¤¯à¤¾à¤£à¤¾',
+    'à¤—à¥à¤œà¤°à¤¾à¤¤',
+    'à¤•à¤°à¥à¤¨à¤¾à¤Ÿà¤•',
+    'à¤†à¤‚à¤§à¥à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶',
+    'à¤¤à¥‡à¤²à¤‚à¤—à¤¾à¤¨à¤¾',
+    'à¤“à¤¡à¤¿à¤¶à¤¾',
+    'à¤ªà¤¶à¥à¤šà¤¿à¤® à¤¬à¤‚à¤—à¤¾à¤²',
+    'à¤›à¤¤à¥à¤¤à¥€à¤¸à¤—à¤¢à¤¼',
+    'à¤à¤¾à¤°à¤–à¤‚à¤¡',
+    'à¤‰à¤¤à¥à¤¤à¤°à¤¾à¤–à¤‚à¤¡',
+    'à¤¹à¤¿à¤®à¤¾à¤šà¤² à¤ªà¥à¤°à¤¦à¥‡à¤¶',
+    'à¤¦à¤¿à¤²à¥à¤²à¥€',
+    'à¤…à¤¸à¤®',
+    'à¤…à¤¨à¥à¤¯',
   ];
 
   void _checkStrength(String val) {
     int score = 0;
     List<String> tips = [];
 
-    if (val.length >= 8) { score++; } else { tips.add('• कम से कम 8 अक्षर रखें'); }
-    if (val.contains(RegExp(r'[A-Z]'))) { score++; } else { tips.add('• एक बड़ा अक्षर (A-Z) जोड़ें'); }
-    if (val.contains(RegExp(r'[0-9]'))) { score++; } else { tips.add('• एक नंबर (0-9) जोड़ें'); }
-    if (val.contains(RegExp(r'[!@#\$%^&*]'))) { score++; } else { tips.add('• एक चिह्न (!@#\$) जोड़ें'); }
+    if (val.length >= 8) {
+      score++;
+    } else {
+      tips.add('• कम से कम 8 अक्षर रखें');
+    }
+    if (val.contains(RegExp(r'[A-Z]'))) {
+      score++;
+    } else {
+      tips.add('• एक बड़ा अक्षर (A-Z) जोड़ें');
+    }
+    if (val.contains(RegExp(r'[0-9]'))) {
+      score++;
+    } else {
+      tips.add('• एक नंबर (0-9) जोड़ें');
+    }
+    if (val.contains(RegExp(r'[!@#\$%^&*]'))) {
+      score++;
+    } else {
+      tips.add('• एक चिह्न (!@#\$) जोड़ें');
+    }
 
     setState(() {
       _strengthTips = tips;
       if (val.isEmpty) {
-        _passStrength = ''; _strengthColor = Colors.transparent; _strengthValue = 0;
+        _passStrength = '';
+        _strengthColor = Colors.transparent;
+        _strengthValue = 0;
       } else if (score <= 1) {
-        _passStrength = '🔴 बहुत कमज़ोर'; _strengthColor = Colors.red; _strengthValue = 0.25;
+        _passStrength = '🔴 बहुत कमज़ोर';
+        _strengthColor = Colors.red;
+        _strengthValue = 0.25;
       } else if (score == 2) {
-        _passStrength = '🟠 कमज़ोर (Weak)'; _strengthColor = Colors.orange; _strengthValue = 0.5;
+        _passStrength = '🟠 कमज़ोर (Weak)';
+        _strengthColor = Colors.orange;
+        _strengthValue = 0.5;
       } else if (score == 3) {
-        _passStrength = '🟡 ठीक है (Fair)'; _strengthColor = Colors.amber; _strengthValue = 0.75;
+        _passStrength = '🟡 ठीक है (Fair)';
+        _strengthColor = Colors.amber;
+        _strengthValue = 0.75;
       } else {
-        _passStrength = '🟢 मज़बूत (Strong)'; _strengthColor = AppTheme.primaryGreen; _strengthValue = 1.0;
+        _passStrength = '🟢 मज़बूत (Strong)';
+        _strengthColor = AppTheme.primaryGreen;
+        _strengthValue = 1.0;
         _strengthTips = [];
       }
     });
@@ -67,7 +112,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _errorMsg = null; });
+    setState(() {
+      _loading = true;
+      _errorMsg = null;
+    });
 
     final error = await AuthService.registerWithEmail(
       name: _nameCtrl.text.trim(),
@@ -84,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (error != null) {
       setState(() => _errorMsg = error);
     } else {
-      // Registration successful — show OTP verification prompt
+      // Registration successful â€” show OTP verification prompt
       _showOtpVerificationDialog();
     }
   }
@@ -109,8 +157,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose(); _mobileCtrl.dispose();
-    _emailCtrl.dispose(); _passCtrl.dispose();
+    _nameCtrl.dispose();
+    _mobileCtrl.dispose();
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
     super.dispose();
   }
 
@@ -119,11 +169,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: AppTheme.white,
       appBar: AppBar(
-        title: const Text('नया खाता बनाएं'),
+        title: const Text('à¤¨à¤¯à¤¾ à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚'),
         backgroundColor: AppTheme.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
+          icon: Icon(Icons.arrow_back, color: AppTheme.textDark),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -138,28 +188,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 Center(
                   child: Container(
-                    width: 72, height: 72,
-                    decoration: const BoxDecoration(color: AppTheme.bgGreen, shape: BoxShape.circle),
-                    child: const Center(child: Text('👨‍🌾', style: TextStyle(fontSize: 36))),
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                        color: AppTheme.bgGreen, shape: BoxShape.circle),
+                    child: const Center(
+                        child: Text('👨‍🌾', style: TextStyle(fontSize: 36))),
                   ),
                 ),
                 const SizedBox(height: 24),
 
                 // Name
-                _label('आपका नाम'),
+                _label('à¤†à¤ªà¤•à¤¾ à¤¨à¤¾à¤®'),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _nameCtrl,
                   textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
-                    hintText: 'पूरा नाम', prefixIcon: Icon(Icons.person, color: AppTheme.primaryGreen),
+                    hintText: 'à¤ªà¥‚à¤°à¤¾ à¤¨à¤¾à¤®',
+                    prefixIcon:
+                        Icon(Icons.person, color: AppTheme.primaryGreen),
                   ),
-                  validator: (v) => (v?.isEmpty ?? true) ? 'नाम डालें' : null,
+                  validator: (v) =>
+                      (v?.isEmpty ?? true) ? 'à¤¨à¤¾à¤® à¤¡à¤¾à¤²à¥‡à¤‚' : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Mobile
-                _label('मोबाइल नंबर'),
+                _label('à¤®à¥‹à¤¬à¤¾à¤‡à¤² à¤¨à¤‚à¤¬à¤°'),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _mobileCtrl,
@@ -167,70 +223,90 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   maxLength: 10,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: const InputDecoration(
-                    hintText: '10 अंकों का नंबर',
+                    hintText: '10 à¤…à¤‚à¤•à¥‹à¤‚ à¤•à¤¾ à¤¨à¤‚à¤¬à¤°',
                     prefixIcon: Icon(Icons.phone, color: AppTheme.primaryGreen),
                     counterText: '',
                   ),
-                  validator: (v) => (v?.length ?? 0) < 10 ? 'सही नंबर डालें' : null,
+                  validator: (v) => (v?.length ?? 0) < 10
+                      ? 'à¤¸à¤¹à¥€ à¤¨à¤‚à¤¬à¤° à¤¡à¤¾à¤²à¥‡à¤‚'
+                      : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Email
-                _label('ईमेल'),
+                _label('à¤ˆà¤®à¥‡à¤²'),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    hintText: 'आपका ईमेल पता',
-                    prefixIcon: Icon(Icons.email_outlined, color: AppTheme.primaryGreen),
+                    hintText: 'à¤†à¤ªà¤•à¤¾ à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¤¾',
+                    prefixIcon: Icon(Icons.email_outlined,
+                        color: AppTheme.primaryGreen),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'ईमेल डालें';
-                    if (!v.contains('@')) return 'सही ईमेल डालें';
+                    if (v == null || v.isEmpty) {
+                      return 'à¤ˆà¤®à¥‡à¤² à¤¡à¤¾à¤²à¥‡à¤‚';
+                    }
+                    if (!v.contains('@')) {
+                      return 'à¤¸à¤¹à¥€ à¤ˆà¤®à¥‡à¤² à¤¡à¤¾à¤²à¥‡à¤‚';
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
 
                 // Country
-                _label('देश'),
+                _label('à¤¦à¥‡à¤¶'),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: _selectedCountry,
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.public, color: AppTheme.primaryGreen)),
-                  items: _countries.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                  initialValue: _selectedCountry,
+                  decoration: const InputDecoration(
+                      prefixIcon:
+                          Icon(Icons.public, color: AppTheme.primaryGreen)),
+                  items: _countries
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
                   onChanged: (v) => setState(() => _selectedCountry = v!),
                 ),
                 const SizedBox(height: 16),
 
                 // State
-                _label('राज्य'),
+                _label('à¤°à¤¾à¤œà¥à¤¯'),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: _selectedState,
-                  decoration: const InputDecoration(prefixIcon: Icon(Icons.location_on, color: AppTheme.primaryGreen)),
-                  items: _states.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                  initialValue: _selectedState,
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.location_on,
+                          color: AppTheme.primaryGreen)),
+                  items: _states
+                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                      .toList(),
                   onChanged: (v) => setState(() => _selectedState = v!),
                 ),
                 const SizedBox(height: 16),
 
                 // Password
-                _label('पासवर्ड'),
+                _label('à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡'),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _passCtrl,
                   obscureText: _obscure,
                   onChanged: _checkStrength,
                   decoration: InputDecoration(
-                    hintText: 'कम से कम 8 अक्षर',
-                    prefixIcon: const Icon(Icons.lock, color: AppTheme.primaryGreen),
+                    hintText: 'à¤•à¤® à¤¸à¥‡ à¤•à¤® 8 à¤…à¤•à¥à¤·à¤°',
+                    prefixIcon:
+                        const Icon(Icons.lock, color: AppTheme.primaryGreen),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AppTheme.textLight),
+                      icon: Icon(
+                          _obscure ? Icons.visibility_off : Icons.visibility,
+                          color: AppTheme.textLight),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
-                  validator: (v) => (v?.length ?? 0) < 6 ? 'पासवर्ड कम से कम 6 अक्षर' : null,
+                  validator: (v) => (v?.length ?? 0) < 6
+                      ? 'à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡ à¤•à¤® à¤¸à¥‡ à¤•à¤® 6 à¤…à¤•à¥à¤·à¤°'
+                      : null,
                 ),
 
                 // Password Strength Indicator
@@ -247,7 +323,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(_passStrength,
-                      style: TextStyle(fontSize: 12, color: _strengthColor, fontWeight: FontWeight.w700)),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: _strengthColor,
+                          fontWeight: FontWeight.w700)),
                   if (_strengthTips.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Container(
@@ -261,9 +340,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('💡 मज़बूत पासवर्ड के लिए:',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.orange)),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.orange)),
                           ..._strengthTips.map((t) => Text(t,
-                              style: const TextStyle(fontSize: 11, color: Colors.orange))),
+                              style: const TextStyle(
+                                  fontSize: 11, color: Colors.orange))),
                         ],
                       ),
                     ),
@@ -274,15 +357,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (_errorMsg != null) ...[
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50, borderRadius: BorderRadius.circular(8),
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.red.shade200),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                      const Icon(Icons.error_outline,
+                          color: Colors.red, size: 18),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(_errorMsg!, style: const TextStyle(color: Colors.red, fontSize: 13))),
+                      Expanded(
+                          child: Text(_errorMsg!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 13))),
                     ]),
                   ),
                 ],
@@ -294,8 +383,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed: _loading ? null : _register,
                     child: _loading
-                        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                        : const Text('खाता बनाएं', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2.5))
+                        : const Text('à¤–à¤¾à¤¤à¤¾ à¤¬à¤¨à¤¾à¤à¤‚',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w700)),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -308,12 +403,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _label(String text) => Text(
-    text,
-    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark),
-  );
+        text,
+        style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textDark),
+      );
 }
 
-// ─── OTP Verification Dialog ───────────────────────────────────────────────
+// â”€â”€â”€ OTP Verification Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _OtpVerificationDialog extends StatefulWidget {
   final String email;
   final VoidCallback onVerified;
@@ -344,7 +442,10 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
   }
 
   Future<void> _sendVerificationEmail() async {
-    setState(() { _sending = true; _msg = null; });
+    setState(() {
+      _sending = true;
+      _msg = null;
+    });
     final err = await AuthService.sendEmailVerification();
     if (!mounted) return;
     setState(() {
@@ -355,14 +456,17 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
   }
 
   Future<void> _checkVerified() async {
-    setState(() { _verifying = true; });
+    setState(() {
+      _verifying = true;
+    });
     final verified = await AuthService.isEmailVerified();
     if (!mounted) return;
     setState(() => _verifying = false);
     if (verified) {
       widget.onVerified();
     } else {
-      setState(() => _msg = '⚠️ अभी verify नहीं हुआ। ईमेल में link पर click करें, फिर दोबारा try करें।');
+      setState(() => _msg =
+          '⚠️ अभी verify नहीं हुआ। ईमेल में link पर click करें, फिर दोबारा try करें।');
     }
   }
 
@@ -375,18 +479,24 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 64, height: 64,
-            decoration: BoxDecoration(color: AppTheme.bgGreen, shape: BoxShape.circle),
-            child: const Center(child: Text('📧', style: TextStyle(fontSize: 32))),
+            width: 64,
+            height: 64,
+            decoration:
+                BoxDecoration(color: AppTheme.bgGreen, shape: BoxShape.circle),
+            child:
+                const Center(child: Text('📧', style: TextStyle(fontSize: 32))),
           ),
           const SizedBox(height: 16),
-          const Text('ईमेल वेरिफाई करें',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textDark)),
+          Text('à¤ˆà¤®à¥‡à¤² à¤µà¥‡à¤°à¤¿à¤«à¤¾à¤ˆ à¤•à¤°à¥‡à¤‚',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textDark)),
           const SizedBox(height: 8),
           Text(
-            'आपके खाते की सुरक्षा के लिए ईमेल वेरिफिकेशन ज़रूरी है।',
+            'à¤†à¤ªà¤•à¥‡ à¤–à¤¾à¤¤à¥‡ à¤•à¥€ à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤•à¥‡ à¤²à¤¿à¤ à¤ˆà¤®à¥‡à¤² à¤µà¥‡à¤°à¤¿à¤«à¤¿à¤•à¥‡à¤¶à¤¨ à¤œà¤¼à¤°à¥‚à¤°à¥€ à¤¹à¥ˆà¥¤',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
+            style: TextStyle(fontSize: 13, color: AppTheme.textMid),
           ),
           const SizedBox(height: 16),
           if (_sending)
@@ -402,30 +512,39 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
-                    color: _sent ? AppTheme.primaryGreen : Colors.orange.shade800,
+                    color:
+                        _sent ? AppTheme.primaryGreen : Colors.orange.shade800,
                   )),
             ),
           const SizedBox(height: 20),
           // Verify button
           SizedBox(
-            width: double.infinity, height: 48,
+            width: double.infinity,
+            height: 48,
             child: ElevatedButton(
               onPressed: _verifying ? null : _checkVerified,
               child: _verifying
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('✅ मैंने verify कर दिया', style: TextStyle(fontWeight: FontWeight.w700)),
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Text('✅ मैंने verify कर दिया',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ),
           const SizedBox(height: 8),
           // Resend
           TextButton(
             onPressed: _sending ? null : _sendVerificationEmail,
-            child: const Text('📨 दोबारा ईमेल भेजें', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 13)),
+            child: const Text('📨 दोबारा ईमेल भेजें',
+                style: TextStyle(color: AppTheme.primaryGreen, fontSize: 13)),
           ),
           // Skip
           TextButton(
             onPressed: widget.onSkip,
-            child: const Text('अभी नहीं, बाद में करूंगा →', style: TextStyle(color: AppTheme.textLight, fontSize: 12)),
+            child: Text('अभी नहीं, बाद में करूंगा →',
+                style: TextStyle(color: AppTheme.textLight, fontSize: 12)),
           ),
         ],
       ),
@@ -434,8 +553,12 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
 
   @override
   void dispose() {
-    for (final c in _otpCtrls) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _otpCtrls) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 }

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../services/app_language_service.dart';
 import '../services/app_strings.dart';
+import '../services/app_theme_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 
@@ -22,6 +23,12 @@ class _MoreScreenState extends State<MoreScreen> {
   String _languageCode = AppLanguageService.currentCode.value;
 
   bool get _isEnglish => _languageCode == 'en';
+  String get _appearanceLabel => _isEnglish ? 'Appearance' : 'à¤¥à¥€à¤®';
+  String get _darkModeLabel =>
+      _isEnglish ? 'Dark mode' : 'à¤¡à¤¾à¤°à¥à¤• à¤®à¥‹à¤¡';
+  String get _themeModeHint => _isEnglish
+      ? 'Switch between light and dark app colors.'
+      : 'à¤à¤ª à¤•à¥‡ à¤¹à¤²à¥à¤•à¥‡ à¤”à¤° à¤—à¤¹à¤°à¥‡ à¤°à¤‚à¤— à¤•à¥‡ à¤¬à¥€à¤š à¤¬à¤¦à¤²à¥‡à¤‚à¥¤';
 
   @override
   void initState() {
@@ -71,21 +78,21 @@ class _MoreScreenState extends State<MoreScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(_languageCode == 'en' ? 'Logout' : 'लॉगआउट'),
+        title: Text(_languageCode == 'en' ? 'Logout' : 'à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ'),
         content: Text(
           _languageCode == 'en'
               ? 'Do you want to log out?'
-              : 'क्या आप लॉगआउट करना चाहते हैं?',
+              : 'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(_languageCode == 'en' ? 'No' : 'नहीं'),
+            child: Text(_languageCode == 'en' ? 'No' : 'à¤¨à¤¹à¥€à¤‚'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              _languageCode == 'en' ? 'Yes' : 'हाँ',
+              _languageCode == 'en' ? 'Yes' : 'à¤¹à¤¾à¤',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -110,111 +117,116 @@ class _MoreScreenState extends State<MoreScreen> {
   List<_HelplineContact> get _helplineContacts => [
         _HelplineContact(
           emoji: '🌾',
-          title:
-              _isEnglish ? 'Kisan Call Center (KCC)' : 'किसान कॉल सेंटर (KCC)',
+          title: _isEnglish
+              ? 'Kisan Call Center (KCC)'
+              : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥‰à¤² à¤¸à¥‡à¤‚à¤Ÿà¤° (KCC)',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
               ? 'For crop advice, weather, pest control, mandi and farming guidance.'
-              : 'फसल सलाह, मौसम, कीट नियंत्रण, मंडी और खेती मार्गदर्शन के लिए।',
+              : 'à¤«à¤¸à¤² à¤¸à¤²à¤¾à¤¹, à¤®à¥Œà¤¸à¤®, à¤•à¥€à¤Ÿ à¤¨à¤¿à¤¯à¤‚à¤¤à¥à¤°à¤£, à¤®à¤‚à¤¡à¥€ à¤”à¤° à¤–à¥‡à¤¤à¥€ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '💰',
-          title: _isEnglish ? 'PM-KISAN Helpline' : 'PM-KISAN हेल्पलाइन',
+          title: _isEnglish
+              ? 'PM-KISAN Helpline'
+              : 'PM-KISAN à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '155261 / 1800-115-526',
           dialNumber: '155261',
           description: _isEnglish
               ? 'For installment, eKYC, beneficiary status and scheme payment issues.'
-              : 'किस्त, eKYC, लाभार्थी स्थिति और योजना भुगतान समस्या के लिए।',
+              : 'à¤•à¤¿à¤¸à¥à¤¤, eKYC, à¤²à¤¾à¤­à¤¾à¤°à¥à¤¥à¥€ à¤¸à¥à¤¥à¤¿à¤¤à¤¿ à¤”à¤° à¤¯à¥‹à¤œà¤¨à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           extraDetail: _isEnglish
               ? 'Tap to call the first number shown above.'
-              : 'ऊपर दिए गए पहले नंबर पर टैप करने से कॉल लगेगी।',
+              : 'à¤Šà¤ªà¤° à¤¦à¤¿à¤ à¤—à¤ à¤ªà¤¹à¤²à¥‡ à¤¨à¤‚à¤¬à¤° à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤•à¥‰à¤² à¤²à¤—à¥‡à¤—à¥€à¥¤',
         ),
         _HelplineContact(
           emoji: '🏛️',
           title: _isEnglish
               ? 'Agriculture Ministry Helpline'
-              : 'कृषि मंत्रालय हेल्पलाइन',
+              : 'à¤•à¥ƒà¤·à¤¿ à¤®à¤‚à¤¤à¥à¤°à¤¾à¤²à¤¯ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '011-23381092',
           dialNumber: '01123381092',
           description: _isEnglish
               ? 'For ministry support, agriculture guidance and complaint routing.'
-              : 'मंत्रालय सहायता, कृषि मार्गदर्शन और शिकायत मार्गदर्शन के लिए।',
+              : 'à¤®à¤‚à¤¤à¥à¤°à¤¾à¤²à¤¯ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾, à¤•à¥ƒà¤·à¤¿ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🧪',
           title: _isEnglish
               ? 'Soil Health Card Helpline'
-              : 'सॉइल हेल्थ कार्ड हेल्पलाइन',
+              : 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
               ? 'For soil health card details, nutrient advice and soil record help.'
-              : 'सॉइल हेल्थ कार्ड, पोषक तत्व सलाह और मिट्टी रिकॉर्ड सहायता के लिए।',
+              : 'à¤¸à¥‰à¤‡à¤² à¤¹à¥‡à¤²à¥à¤¥ à¤•à¤¾à¤°à¥à¤¡, à¤ªà¥‹à¤·à¤• à¤¤à¤¤à¥à¤µ à¤¸à¤²à¤¾à¤¹ à¤”à¤° à¤®à¤¿à¤Ÿà¥à¤Ÿà¥€ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🌦️',
           title: _isEnglish
               ? 'Crop Insurance (PMFBY) Helpline'
-              : 'फसल बीमा (PMFBY) हेल्पलाइन',
+              : 'à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾ (PMFBY) à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '1800-200-7710',
           dialNumber: '18002007710',
           description: _isEnglish
               ? 'For crop insurance enrollment, claim and policy support.'
-              : 'फसल बीमा पंजीकरण, दावा और पॉलिसी सहायता के लिए।',
+              : 'à¤«à¤¸à¤² à¤¬à¥€à¤®à¤¾ à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£, à¤¦à¤¾à¤µà¤¾ à¤”à¤° à¤ªà¥‰à¤²à¤¿à¤¸à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🛒',
           title: _isEnglish
               ? 'National Agriculture Market (e-NAM)'
-              : 'राष्ट्रीय कृषि बाजार (e-NAM)',
+              : 'à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤¬à¤¾à¤œà¤¾à¤° (e-NAM)',
           numberLabel: '1800-270-0224',
           dialNumber: '18002700224',
           description: _isEnglish
               ? 'For e-NAM registration, trading and mandi platform support.'
-              : 'e-NAM पंजीकरण, ट्रेडिंग और मंडी प्लेटफॉर्म सहायता के लिए।',
+              : 'e-NAM à¤ªà¤‚à¤œà¥€à¤•à¤°à¤£, à¤Ÿà¥à¤°à¥‡à¤¡à¤¿à¤‚à¤— à¤”à¤° à¤®à¤‚à¤¡à¥€ à¤ªà¥à¤²à¥‡à¤Ÿà¤«à¥‰à¤°à¥à¤® à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🧂',
           title: _isEnglish
               ? 'Fertilizer Complaint Helpline'
-              : 'उर्वरक शिकायत हेल्पलाइन',
+              : 'à¤‰à¤°à¥à¤µà¤°à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '1800-233-3322',
           dialNumber: '18002333322',
           description: _isEnglish
               ? 'For fertilizer availability issues and complaint support.'
-              : 'उर्वरक उपलब्धता की समस्या और शिकायत सहायता के लिए।',
+              : 'à¤‰à¤°à¥à¤µà¤°à¤• à¤‰à¤ªà¤²à¤¬à¥à¤§à¤¤à¤¾ à¤•à¥€ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤”à¤° à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🧴',
           title: _isEnglish
               ? 'Pesticide Complaint Helpline'
-              : 'कीटनाशक शिकायत हेल्पलाइन',
+              : 'à¤•à¥€à¤Ÿà¤¨à¤¾à¤¶à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '1800-180-1551',
           dialNumber: '18001801551',
           description: _isEnglish
               ? 'For pesticide complaint, usage guidance and farming support.'
-              : 'कीटनाशक शिकायत, उपयोग मार्गदर्शन और खेती सहायता के लिए।',
+              : 'à¤•à¥€à¤Ÿà¤¨à¤¾à¤¶à¤• à¤¶à¤¿à¤•à¤¾à¤¯à¤¤, à¤‰à¤ªà¤¯à¥‹à¤— à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤–à¥‡à¤¤à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '☁️',
           title: _isEnglish
               ? 'Weather Info (IMD Farmer Service)'
-              : 'मौसम जानकारी (IMD किसान सेवा)',
+              : 'à¤®à¥Œà¤¸à¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ (IMD à¤•à¤¿à¤¸à¤¾à¤¨ à¤¸à¥‡à¤µà¤¾)',
           numberLabel: '1800-180-1717',
           dialNumber: '18001801717',
           description: _isEnglish
               ? 'For weather information, alerts and forecast support.'
-              : 'मौसम जानकारी, अलर्ट और पूर्वानुमान सहायता के लिए।',
+              : 'à¤®à¥Œà¤¸à¤® à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€, à¤…à¤²à¤°à¥à¤Ÿ à¤”à¤° à¤ªà¥‚à¤°à¥à¤µà¤¾à¤¨à¥à¤®à¤¾à¤¨ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
         _HelplineContact(
           emoji: '🐄',
-          title: _isEnglish ? 'Animal Husbandry Helpline' : 'पशुपालन हेल्पलाइन',
+          title: _isEnglish
+              ? 'Animal Husbandry Helpline'
+              : 'à¤ªà¤¶à¥à¤ªà¤¾à¤²à¤¨ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨',
           numberLabel: '1962',
           dialNumber: '1962',
           description: _isEnglish
               ? 'For cattle care, animal health and veterinary guidance.'
-              : 'पशु देखभाल, पशु स्वास्थ्य और पशु चिकित्सकीय मार्गदर्शन के लिए।',
+              : 'à¤ªà¤¶à¥ à¤¦à¥‡à¤–à¤­à¤¾à¤², à¤ªà¤¶à¥ à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤”à¤° à¤ªà¤¶à¥ à¤šà¤¿à¤•à¤¿à¤¤à¥à¤¸à¤•à¥€à¤¯ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
         ),
       ];
 
@@ -227,7 +239,8 @@ class _MoreScreenState extends State<MoreScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(_languageCode == 'en' ? 'Close' : 'बंद करें'),
+            child: Text(
+                _languageCode == 'en' ? 'Close' : 'à¤¬à¤‚à¤¦ à¤•à¤°à¥‡à¤‚'),
           ),
         ],
       ),
@@ -273,7 +286,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   children: [
                     Text(
                       _t('navMore'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.textDark,
@@ -297,7 +310,9 @@ class _MoreScreenState extends State<MoreScreen> {
                           const Text('🌾', style: TextStyle(fontSize: 14)),
                           const SizedBox(width: 4),
                           Text(
-                            _languageCode == 'en' ? 'Farmer' : 'किसान',
+                            _languageCode == 'en'
+                                ? 'Farmer'
+                                : 'à¤•à¤¿à¤¸à¤¾à¤¨',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -316,11 +331,11 @@ class _MoreScreenState extends State<MoreScreen> {
                 decoration: BoxDecoration(
                   color: AppTheme.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: AppTheme.shadow,
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -351,7 +366,7 @@ class _MoreScreenState extends State<MoreScreen> {
                         children: [
                           Text(
                             _name.isEmpty ? _t('farmerBrother') : _name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppTheme.textDark,
@@ -360,7 +375,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           if (_email.isNotEmpty)
                             Text(
                               _email,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppTheme.textMid,
                               ),
@@ -368,7 +383,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           if (profileLocation.isNotEmpty)
                             Text(
                               profileLocation,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: AppTheme.textMid,
                               ),
@@ -386,7 +401,9 @@ class _MoreScreenState extends State<MoreScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        _languageCode == 'en' ? 'Verified' : 'सत्यापित',
+                        _languageCode == 'en'
+                            ? 'Verified'
+                            : 'à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppTheme.primaryGreen,
@@ -399,7 +416,7 @@ class _MoreScreenState extends State<MoreScreen> {
               ),
               _sectionHeader(_isEnglish
                   ? 'Farmer Helpline Numbers (India)'
-                  : 'किसान हेल्पलाइन नंबर (भारत)'),
+                  : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤¹à¥‡à¤²à¥à¤ªà¤²à¤¾à¤‡à¤¨ à¤¨à¤‚à¤¬à¤° (à¤­à¤¾à¤°à¤¤)'),
               Container(
                 color: AppTheme.white,
                 child: Padding(
@@ -409,8 +426,8 @@ class _MoreScreenState extends State<MoreScreen> {
                       Text(
                         _isEnglish
                             ? 'Call the number that matches your issue. If two numbers are shown, tapping the card calls the first number.'
-                            : 'अपनी समस्या के अनुसार सही नंबर पर कॉल करें। यदि दो नंबर दिए हों, तो कार्ड पर टैप करने से पहला नंबर कॉल होगा।',
-                        style: const TextStyle(
+                            : 'à¤…à¤ªà¤¨à¥€ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤…à¤¨à¥à¤¸à¤¾à¤° à¤¸à¤¹à¥€ à¤¨à¤‚à¤¬à¤° à¤ªà¤° à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚à¥¤ à¤¯à¤¦à¤¿ à¤¦à¥‹ à¤¨à¤‚à¤¬à¤° à¤¦à¤¿à¤ à¤¹à¥‹à¤‚, à¤¤à¥‹ à¤•à¤¾à¤°à¥à¤¡ à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¤¾ à¤¨à¤‚à¤¬à¤° à¤•à¥‰à¤² à¤¹à¥‹à¤—à¤¾à¥¤',
+                        style: TextStyle(
                           fontSize: 13,
                           color: AppTheme.textMid,
                           height: 1.4,
@@ -432,25 +449,30 @@ class _MoreScreenState extends State<MoreScreen> {
                       '📋',
                       _languageCode == 'en'
                           ? 'Government Schemes'
-                          : 'सरकारी योजनाएँ',
-                      trailing:
-                          _languageCode == 'en' ? '15 schemes' : '15 योजनाएँ',
+                          : 'à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
+                      trailing: _languageCode == 'en'
+                          ? '15 schemes'
+                          : '15 à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
                       onTap: () => _showInfo(
-                        _languageCode == 'en' ? 'Schemes' : 'योजनाएँ',
+                        _languageCode == 'en'
+                            ? 'Schemes'
+                            : 'à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
                         _languageCode == 'en'
                             ? 'PM-KISAN, PM Fasal Bima, RKVY and other schemes are available for you.'
-                            : 'PM-KISAN, PM Fasal Bima, RKVY और अन्य योजनाएँ आपके लिए उपलब्ध हैं।',
+                            : 'PM-KISAN, PM Fasal Bima, RKVY à¤”à¤° à¤…à¤¨à¥à¤¯ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤ à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¤‚à¥¤',
                       ),
                     ),
                     _divider(),
                     _tile(
                       '❓',
-                      _languageCode == 'en' ? 'FAQ' : 'आम सवाल (FAQ)',
+                      _languageCode == 'en'
+                          ? 'FAQ'
+                          : 'à¤†à¤® à¤¸à¤µà¤¾à¤² (FAQ)',
                       onTap: () => _showInfo(
                         _languageCode == 'en' ? 'FAQ' : 'FAQ',
                         _languageCode == 'en'
                             ? 'For land disputes contact your nearest DLSA. For PM-KISAN payment issues call 155261.'
-                            : 'भूमि विवाद में नज़दीकी DLSA से संपर्क करें। PM-KISAN भुगतान समस्या के लिए 155261 पर कॉल करें।',
+                            : 'à¤­à¥‚à¤®à¤¿ à¤µà¤¿à¤µà¤¾à¤¦ à¤®à¥‡à¤‚ à¤¨à¤œà¤¼à¤¦à¥€à¤•à¥€ DLSA à¤¸à¥‡ à¤¸à¤‚à¤ªà¤°à¥à¤• à¤•à¤°à¥‡à¤‚à¥¤ PM-KISAN à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤²à¤¿à¤ 155261 à¤ªà¤° à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚à¥¤',
                       ),
                     ),
                     _divider(),
@@ -458,14 +480,14 @@ class _MoreScreenState extends State<MoreScreen> {
                       '📖',
                       _languageCode == 'en'
                           ? 'Farmer Rights Guide'
-                          : 'किसान अधिकार गाइड',
+                          : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤…à¤§à¤¿à¤•à¤¾à¤° à¤—à¤¾à¤‡à¤¡',
                       onTap: () => _showInfo(
                         _languageCode == 'en'
                             ? 'Farmer Rights'
-                            : 'किसान अधिकार',
+                            : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤…à¤§à¤¿à¤•à¤¾à¤°',
                         _languageCode == 'en'
                             ? 'You have the right to access support schemes, crop insurance claims, legal aid, and land records.'
-                            : 'आपको समर्थन योजनाओं, बीमा क्लेम, कानूनी सहायता और भूमि रिकॉर्ड देखने का अधिकार है।',
+                            : 'à¤†à¤ªà¤•à¥‹ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚, à¤¬à¥€à¤®à¤¾ à¤•à¥à¤²à¥‡à¤®, à¤•à¤¾à¤¨à¥‚à¤¨à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤”à¤° à¤­à¥‚à¤®à¤¿ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¤¾ à¤…à¤§à¤¿à¤•à¤¾à¤° à¤¹à¥ˆà¥¤',
                       ),
                     ),
                   ],
@@ -484,7 +506,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           Expanded(
                             child: Text(
                               _t('selectedLanguage'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.textMid,
@@ -530,6 +552,47 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              _sectionHeader(_appearanceLabel),
+              Container(
+                color: AppTheme.white,
+                child: ValueListenableBuilder<ThemeMode>(
+                  valueListenable: AppThemeService.currentMode,
+                  builder: (context, mode, _) {
+                    final isDarkMode = mode == ThemeMode.dark;
+                    return SwitchListTile.adaptive(
+                      contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                      secondary: Text(
+                        isDarkMode ? '🌙' : '☀️',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      title: Text(
+                        _darkModeLabel,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _themeModeHint,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMid,
+                          height: 1.35,
+                        ),
+                      ),
+                      activeThumbColor: AppTheme.primaryGreen,
+                      value: isDarkMode,
+                      onChanged: (value) {
+                        AppThemeService.setThemeMode(
+                          value ? ThemeMode.dark : ThemeMode.light,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
               _sectionHeader(_t('appInfo')),
               Container(
                 color: AppTheme.white,
@@ -537,31 +600,38 @@ class _MoreScreenState extends State<MoreScreen> {
                   children: [
                     _tile(
                       '⭐',
-                      _languageCode == 'en' ? 'Rate App' : 'ऐप रेट करें',
+                      _languageCode == 'en'
+                          ? 'Rate App'
+                          : 'à¤à¤ª à¤°à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚',
                       onTap: () => _showInfo(
-                        _languageCode == 'en' ? 'Thank you!' : 'धन्यवाद!',
+                        _languageCode == 'en'
+                            ? 'Thank you!'
+                            : 'à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!',
                         _languageCode == 'en'
                             ? 'Your support helps us improve the app.'
-                            : 'आपका समर्थन हमें ऐप बेहतर बनाने में मदद करता है।',
+                            : 'à¤†à¤ªà¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤¹à¤®à¥‡à¤‚ à¤à¤ª à¤¬à¥‡à¤¹à¤¤à¤° à¤¬à¤¨à¤¾à¤¨à¥‡ à¤®à¥‡à¤‚ à¤®à¤¦à¤¦ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤',
                       ),
                     ),
                     _divider(),
-                    _tile('📱',
-                        _languageCode == 'en' ? 'App Version' : 'ऐप संस्करण',
+                    _tile(
+                        '📱',
+                        _languageCode == 'en'
+                            ? 'App Version'
+                            : 'à¤à¤ª à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£',
                         trailing: 'v1.0.5+7'),
                     _divider(),
                     _tile(
                       '🔒',
                       _languageCode == 'en'
                           ? 'Privacy Policy'
-                          : 'गोपनीयता नीति',
+                          : 'à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿',
                       onTap: () => _showInfo(
                         _languageCode == 'en'
                             ? 'Privacy Policy'
-                            : 'गोपनीयता नीति',
+                            : 'à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿',
                         _languageCode == 'en'
                             ? 'Your data stays protected. We do not share your personal information with third parties.'
-                            : 'आपका डेटा सुरक्षित है। हम आपकी व्यक्तिगत जानकारी किसी तीसरे पक्ष को साझा नहीं करते।',
+                            : 'à¤†à¤ªà¤•à¤¾ à¤¡à¥‡à¤Ÿà¤¾ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤¹à¥ˆà¥¤ à¤¹à¤® à¤†à¤ªà¤•à¥€ à¤µà¥à¤¯à¤•à¥à¤¤à¤¿à¤—à¤¤ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¤¿à¤¸à¥€ à¤¤à¥€à¤¸à¤°à¥‡ à¤ªà¤•à¥à¤· à¤•à¥‹ à¤¸à¤¾à¤à¤¾ à¤¨à¤¹à¥€à¤‚ à¤•à¤°à¤¤à¥‡à¥¤',
                       ),
                     ),
                   ],
@@ -605,7 +675,7 @@ class _MoreScreenState extends State<MoreScreen> {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
         child: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: AppTheme.textMid,
@@ -613,7 +683,7 @@ class _MoreScreenState extends State<MoreScreen> {
         ),
       );
 
-  Widget _divider() => const Divider(
+  Widget _divider() => Divider(
         height: 1,
         indent: 56,
         color: AppTheme.divider,
@@ -653,7 +723,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           Expanded(
                             child: Text(
                               contact.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.textDark,
@@ -665,7 +735,7 @@ class _MoreScreenState extends State<MoreScreen> {
                       const SizedBox(height: 8),
                       Text(
                         contact.description,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textMid,
                           height: 1.45,
@@ -684,7 +754,7 @@ class _MoreScreenState extends State<MoreScreen> {
                         const SizedBox(height: 4),
                         Text(
                           contact.extraDetail!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppTheme.textLight,
                             height: 1.35,
@@ -718,15 +788,14 @@ class _MoreScreenState extends State<MoreScreen> {
       leading: Text(emoji, style: const TextStyle(fontSize: 22)),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, color: AppTheme.textDark),
+        style: TextStyle(fontSize: 14, color: AppTheme.textDark),
       ),
       trailing: trailing != null
           ? Text(
               trailing,
-              style: const TextStyle(fontSize: 12, color: AppTheme.textMid),
+              style: TextStyle(fontSize: 12, color: AppTheme.textMid),
             )
-          : const Icon(Icons.chevron_right,
-              color: AppTheme.textLight, size: 20),
+          : Icon(Icons.chevron_right, color: AppTheme.textLight, size: 20),
       onTap: onTap,
     );
   }

@@ -8,6 +8,7 @@ class StorageService {
   static const _docsKey = 'kk_docs';
   static const _scanCountKey = 'kk_scan_count';
   static const _langKey = 'kk_lang';
+  static const _themeKey = 'kk_theme_mode';
 
   // User
   static Future<void> saveUser(UserModel user) async {
@@ -45,14 +46,16 @@ class StorageService {
     final docs = await getDocs();
     docs.insert(0, doc);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_docsKey, jsonEncode(docs.map((d) => d.toJson()).toList()));
+    await prefs.setString(
+        _docsKey, jsonEncode(docs.map((d) => d.toJson()).toList()));
   }
 
   static Future<void> deleteDoc(String id) async {
     final docs = await getDocs();
     docs.removeWhere((d) => d.id == id);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_docsKey, jsonEncode(docs.map((d) => d.toJson()).toList()));
+    await prefs.setString(
+        _docsKey, jsonEncode(docs.map((d) => d.toJson()).toList()));
   }
 
   // Scan count
@@ -76,5 +79,16 @@ class StorageService {
   static Future<void> setLang(String code) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_langKey, code);
+  }
+
+  // Theme
+  static Future<String> getThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_themeKey) ?? 'light';
+  }
+
+  static Future<void> setThemeMode(String mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_themeKey, mode);
   }
 }

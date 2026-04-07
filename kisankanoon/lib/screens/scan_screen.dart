@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -427,7 +427,7 @@ class _ScanScreenState extends State<ScanScreen> {
           const SizedBox(height: 16),
           Text(
             _t('scanOrUploadDocument'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -439,7 +439,7 @@ class _ScanScreenState extends State<ScanScreen> {
             child: Text(
               _t('reviewAndAddDetails'),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
+              style: TextStyle(fontSize: 13, color: AppTheme.textMid),
             ),
           ),
         ],
@@ -482,7 +482,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   children: [
                     Text(
                       _t('selectedFile'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.textMid,
                         fontWeight: FontWeight.w600,
@@ -493,7 +493,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       _selectedFileName,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         color: AppTheme.textDark,
                         fontWeight: FontWeight.w700,
@@ -539,7 +539,7 @@ class _ScanScreenState extends State<ScanScreen> {
         children: [
           Text(
             _t('documentDetails'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -548,7 +548,7 @@ class _ScanScreenState extends State<ScanScreen> {
           const SizedBox(height: 8),
           Text(
             _t('onlyEnteredDetailsSaved'),
-            style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
+            style: TextStyle(fontSize: 13, color: AppTheme.textMid),
           ),
           if (_selectedFileName.isNotEmpty) ...[
             const SizedBox(height: 16),
@@ -675,7 +675,7 @@ class _ScanScreenState extends State<ScanScreen> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               _t('supportedDocuments'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.textDark,
@@ -687,7 +687,7 @@ class _ScanScreenState extends State<ScanScreen> {
               dense: true,
               title: Text(
                 item,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: AppTheme.textDark,
                 ),
@@ -705,3 +705,5 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 }
+
+

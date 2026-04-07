@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final message = Uri.encodeComponent(
       _languageCode == 'en'
           ? 'Hello! I want Agri-Shield WhatsApp updates.'
-          : 'नमस्ते! मुझे Agri-Shield के WhatsApp अपडेट चाहिए।',
+          : 'à¤¨à¤®à¤¸à¥à¤¤à¥‡! à¤®à¥à¤à¥‡ Agri-Shield à¤•à¥‡ WhatsApp à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤šà¤¾à¤¹à¤¿à¤à¥¤',
     );
     final uri = Uri.parse('https://wa.me/?text=$message');
     final launched = await launchUrl(
@@ -115,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!launched && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('WhatsApp अभी नहीं खुल पाया।'),
+          content:
+              Text('WhatsApp à¤…à¤­à¥€ à¤¨à¤¹à¥€à¤‚ à¤–à¥à¤² à¤ªà¤¾à¤¯à¤¾à¥¤'),
           backgroundColor: Colors.red,
         ),
       );
@@ -142,20 +143,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool get _isEnglish => _languageCode == 'en';
 
-  String get _websitesTileLabel =>
-      _isEnglish ? 'Govt Websites' : 'सरकारी वेबसाइटें';
+  String get _websitesTileLabel => _isEnglish
+      ? 'Govt Websites'
+      : 'à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿà¥‡à¤‚';
 
   String get _websitesSheetTitle => _isEnglish
       ? 'Important Government Websites'
-      : 'महत्वपूर्ण सरकारी वेबसाइटें';
+      : 'à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿà¥‡à¤‚';
 
   String get _websitesSheetHint => _isEnglish
       ? 'Tap any website to open it in your browser.'
-      : 'किसी भी वेबसाइट को अपने ब्राउज़र में खोलने के लिए उस पर टैप करें।';
+      : 'à¤•à¤¿à¤¸à¥€ à¤­à¥€ à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿ à¤•à¥‹ à¤…à¤ªà¤¨à¥‡ à¤¬à¥à¤°à¤¾à¤‰à¤œà¤¼à¤° à¤®à¥‡à¤‚ à¤–à¥‹à¤²à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤‰à¤¸ à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¥‡à¤‚à¥¤';
 
   String get _websiteOpenFailedMessage => _isEnglish
       ? 'The website could not be opened right now.'
-      : 'वेबसाइट अभी नहीं खुल सकी।';
+      : 'à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿ à¤…à¤­à¥€ à¤¨à¤¹à¥€à¤‚ à¤–à¥à¤² à¤¸à¤•à¥€à¥¤';
 
   List<_WebsiteCategory> _websiteCategories() {
     return [
@@ -163,63 +165,63 @@ class _HomeScreenState extends State<HomeScreen> {
         emoji: '🌾',
         title: _isEnglish
             ? 'Important Farmer Websites (India)'
-            : 'महत्वपूर्ण किसान वेबसाइटें (भारत)',
+            : 'à¤®à¤¹à¤¤à¥à¤µà¤ªà¥‚à¤°à¥à¤£ à¤•à¤¿à¤¸à¤¾à¤¨ à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿà¥‡à¤‚ (à¤­à¤¾à¤°à¤¤)',
         entries: [
           _WebsiteEntry(
             name: 'eNAM Portal',
             url: 'https://enam.gov.in',
             description: _isEnglish
                 ? 'National agriculture market portal for mandi prices and trading.'
-                : 'मंडी भाव और कृषि व्यापार के लिए राष्ट्रीय कृषि बाजार पोर्टल।',
+                : 'à¤®à¤‚à¤¡à¥€ à¤­à¤¾à¤µ à¤”à¤° à¤•à¥ƒà¤·à¤¿ à¤µà¥à¤¯à¤¾à¤ªà¤¾à¤° à¤•à¥‡ à¤²à¤¿à¤ à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤•à¥ƒà¤·à¤¿ à¤¬à¤¾à¤œà¤¾à¤° à¤ªà¥‹à¤°à¥à¤Ÿà¤²à¥¤',
           ),
           _WebsiteEntry(
             name: 'Farmers Portal',
             url: 'https://farmersportal.gov.in',
             description: _isEnglish
                 ? 'Central portal for agriculture services, advisories, and schemes.'
-                : 'कृषि सेवाओं, सलाह और योजनाओं की जानकारी के लिए केंद्रीय पोर्टल।',
+                : 'à¤•à¥ƒà¤·à¤¿ à¤¸à¥‡à¤µà¤¾à¤“à¤‚, à¤¸à¤²à¤¾à¤¹ à¤”à¤° à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¥‡ à¤²à¤¿à¤ à¤•à¥‡à¤‚à¤¦à¥à¤°à¥€à¤¯ à¤ªà¥‹à¤°à¥à¤Ÿà¤²à¥¤',
           ),
           _WebsiteEntry(
             name: 'Kisan Suvidha',
             url: 'https://kisansuvidha.gov.in',
             description: _isEnglish
                 ? 'Weather, mandi rates, plant protection, and advisory tools.'
-                : 'मौसम, मंडी भाव, फसल सुरक्षा और किसान सलाह की उपयोगी जानकारी।',
+                : 'à¤®à¥Œà¤¸à¤®, à¤®à¤‚à¤¡à¥€ à¤­à¤¾à¤µ, à¤«à¤¸à¤² à¤¸à¥à¤°à¤•à¥à¤·à¤¾ à¤”à¤° à¤•à¤¿à¤¸à¤¾à¤¨ à¤¸à¤²à¤¾à¤¹ à¤•à¥€ à¤‰à¤ªà¤¯à¥‹à¤—à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€à¥¤',
           ),
           _WebsiteEntry(
             name: 'mKisan Portal',
             url: 'https://mkisan.gov.in',
             description: _isEnglish
                 ? 'Mobile and SMS based farming advisories from government sources.'
-                : 'सरकारी स्रोतों से मोबाइल और SMS आधारित खेती संबंधी सलाह।',
+                : 'à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¸à¥à¤°à¥‹à¤¤à¥‹à¤‚ à¤¸à¥‡ à¤®à¥‹à¤¬à¤¾à¤‡à¤² à¤”à¤° SMS à¤†à¤§à¤¾à¤°à¤¿à¤¤ à¤–à¥‡à¤¤à¥€ à¤¸à¤‚à¤¬à¤‚à¤§à¥€ à¤¸à¤²à¤¾à¤¹à¥¤',
           ),
           _WebsiteEntry(
             name: 'Kisan Sarathi',
             url: 'https://kisansarathi.in',
             description: _isEnglish
                 ? 'Digital agriculture helpdesk for farmer guidance and support.'
-                : 'किसानों के मार्गदर्शन और सहायता के लिए डिजिटल कृषि हेल्पडेस्क।',
+                : 'à¤•à¤¿à¤¸à¤¾à¤¨à¥‹à¤‚ à¤•à¥‡ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤•à¥‡ à¤²à¤¿à¤ à¤¡à¤¿à¤œà¤¿à¤Ÿà¤² à¤•à¥ƒà¤·à¤¿ à¤¹à¥‡à¤²à¥à¤ªà¤¡à¥‡à¤¸à¥à¤•à¥¤',
           ),
           _WebsiteEntry(
             name: 'Agmarknet',
             url: 'https://agmarknet.gov.in',
             description: _isEnglish
                 ? 'Daily mandi arrivals and market price information.'
-                : 'दैनिक मंडी आवक और बाजार भाव देखने का पोर्टल।',
+                : 'à¤¦à¥ˆà¤¨à¤¿à¤• à¤®à¤‚à¤¡à¥€ à¤†à¤µà¤• à¤”à¤° à¤¬à¤¾à¤œà¤¾à¤° à¤­à¤¾à¤µ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¤¾ à¤ªà¥‹à¤°à¥à¤Ÿà¤²à¥¤',
           ),
           _WebsiteEntry(
             name: 'TNAU Agritech Portal',
             url: 'https://agritech.tnau.ac.in',
             description: _isEnglish
                 ? 'Crop-wise technical farming guidance from TNAU.'
-                : 'TNAU से फसलवार तकनीकी खेती मार्गदर्शन और जानकारी।',
+                : 'TNAU à¤¸à¥‡ à¤«à¤¸à¤²à¤µà¤¾à¤° à¤¤à¤•à¤¨à¥€à¤•à¥€ à¤–à¥‡à¤¤à¥€ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤”à¤° à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€à¥¤',
           ),
           _WebsiteEntry(
             name: 'Access Agriculture',
             url: 'https://www.accessagriculture.org',
             description: _isEnglish
                 ? 'Practical agriculture training videos and knowledge resources.'
-                : 'कृषि प्रशिक्षण वीडियो और व्यावहारिक जानकारी का संग्रह।',
+                : 'à¤•à¥ƒà¤·à¤¿ à¤ªà¥à¤°à¤¶à¤¿à¤•à¥à¤·à¤£ à¤µà¥€à¤¡à¤¿à¤¯à¥‹ à¤”à¤° à¤µà¥à¤¯à¤¾à¤µà¤¹à¤¾à¤°à¤¿à¤• à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¤¾ à¤¸à¤‚à¤—à¥à¤°à¤¹à¥¤',
           ),
         ],
       ),
@@ -227,63 +229,63 @@ class _HomeScreenState extends State<HomeScreen> {
         emoji: '🧾',
         title: _isEnglish
             ? 'Land Record & Checking Websites'
-            : 'भूमि अभिलेख और जांच वेबसाइटें',
+            : 'à¤­à¥‚à¤®à¤¿ à¤…à¤­à¤¿à¤²à¥‡à¤– à¤”à¤° à¤œà¤¾à¤‚à¤š à¤µà¥‡à¤¬à¤¸à¤¾à¤‡à¤Ÿà¥‡à¤‚',
         entries: [
           _WebsiteEntry(
             name: 'UP Bhulekh Portal',
             url: 'https://upbhulekh.gov.in',
             description: _isEnglish
                 ? 'Check khatauni, khasra, and land ownership records in Uttar Pradesh.'
-                : 'उत्तर प्रदेश में खसरा, खतौनी और भूमि स्वामित्व रिकॉर्ड देखने के लिए।',
+                : 'à¤‰à¤¤à¥à¤¤à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶ à¤®à¥‡à¤‚ à¤–à¤¸à¤°à¤¾, à¤–à¤¤à¥Œà¤¨à¥€ à¤”à¤° à¤­à¥‚à¤®à¤¿ à¤¸à¥à¤µà¤¾à¤®à¤¿à¤¤à¥à¤µ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'BhuNaksha UP',
             url: 'https://upbhunaksha.gov.in',
             description: _isEnglish
                 ? 'View land maps and plot boundaries for Uttar Pradesh.'
-                : 'उत्तर प्रदेश के भूमि नक्शे और प्लॉट सीमाएं देखने के लिए।',
+                : 'à¤‰à¤¤à¥à¤¤à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶ à¤•à¥‡ à¤­à¥‚à¤®à¤¿ à¤¨à¤•à¥à¤¶à¥‡ à¤”à¤° à¤ªà¥à¤²à¥‰à¤Ÿ à¤¸à¥€à¤®à¤¾à¤à¤‚ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'IGRS UP',
             url: 'https://igrsup.gov.in',
             description: _isEnglish
                 ? 'UP registration, deed details, and property related checks.'
-                : 'उत्तर प्रदेश में रजिस्ट्री, दस्तावेज़ और संपत्ति जांच सेवाओं के लिए।',
+                : 'à¤‰à¤¤à¥à¤¤à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶ à¤®à¥‡à¤‚ à¤°à¤œà¤¿à¤¸à¥à¤Ÿà¥à¤°à¥€, à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤”à¤° à¤¸à¤‚à¤ªà¤¤à¥à¤¤à¤¿ à¤œà¤¾à¤‚à¤š à¤¸à¥‡à¤µà¤¾à¤“à¤‚ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'PM-KISAN Portal',
             url: 'https://pmkisan.gov.in',
             description: _isEnglish
                 ? 'Check beneficiary status, eKYC, and scheme payment details.'
-                : 'लाभार्थी स्थिति, eKYC और योजना भुगतान की जानकारी देखने के लिए।',
+                : 'à¤²à¤¾à¤­à¤¾à¤°à¥à¤¥à¥€ à¤¸à¥à¤¥à¤¿à¤¤à¤¿, eKYC à¤”à¤° à¤¯à¥‹à¤œà¤¨à¤¾ à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'DILRMP',
             url: 'https://dilrmp.gov.in',
             description: _isEnglish
                 ? 'National land records modernization and digital reform portal.'
-                : 'भूमि अभिलेख आधुनिकीकरण और डिजिटल सुधार का राष्ट्रीय पोर्टल।',
+                : 'à¤­à¥‚à¤®à¤¿ à¤…à¤­à¤¿à¤²à¥‡à¤– à¤†à¤§à¥à¤¨à¤¿à¤•à¥€à¤•à¤°à¤£ à¤”à¤° à¤¡à¤¿à¤œà¤¿à¤Ÿà¤² à¤¸à¥à¤§à¤¾à¤° à¤•à¤¾ à¤°à¤¾à¤·à¥à¤Ÿà¥à¤°à¥€à¤¯ à¤ªà¥‹à¤°à¥à¤Ÿà¤²à¥¤',
           ),
           _WebsiteEntry(
             name: 'Mahabhulekh',
             url: 'https://mahabhulekh.maharashtra.gov.in',
             description: _isEnglish
                 ? 'Maharashtra land records including 7/12 extract services.'
-                : 'महाराष्ट्र के 7/12 और अन्य भूमि अभिलेख सेवाओं के लिए।',
+                : 'à¤®à¤¹à¤¾à¤°à¤¾à¤·à¥à¤Ÿà¥à¤° à¤•à¥‡ 7/12 à¤”à¤° à¤…à¤¨à¥à¤¯ à¤­à¥‚à¤®à¤¿ à¤…à¤­à¤¿à¤²à¥‡à¤– à¤¸à¥‡à¤µà¤¾à¤“à¤‚ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'Bhoomi Portal',
             url: 'https://landrecords.karnataka.gov.in',
             description: _isEnglish
                 ? 'Karnataka RTC, land record, and mutation related services.'
-                : 'कर्नाटक RTC, भूमि रिकॉर्ड और म्यूटेशन सेवाओं के लिए।',
+                : 'à¤•à¤°à¥à¤¨à¤¾à¤Ÿà¤• RTC, à¤­à¥‚à¤®à¤¿ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤”à¤° à¤®à¥à¤¯à¥‚à¤Ÿà¥‡à¤¶à¤¨ à¤¸à¥‡à¤µà¤¾à¤“à¤‚ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
           _WebsiteEntry(
             name: 'MeeBhoomi',
             url: 'https://meebhoomi.ap.gov.in',
             description: _isEnglish
                 ? 'Andhra Pradesh land records, passbook, and ownership details.'
-                : 'आंध्र प्रदेश में भूमि रिकॉर्ड, पासबुक और स्वामित्व जानकारी के लिए।',
+                : 'à¤†à¤‚à¤§à¥à¤° à¤ªà¥à¤°à¤¦à¥‡à¤¶ à¤®à¥‡à¤‚ à¤­à¥‚à¤®à¤¿ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡, à¤ªà¤¾à¤¸à¤¬à¥à¤• à¤”à¤° à¤¸à¥à¤µà¤¾à¤®à¤¿à¤¤à¥à¤µ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¥‡ à¤²à¤¿à¤à¥¤',
           ),
         ],
       ),
@@ -318,9 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(ctx).size.height * 0.85,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppTheme.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -340,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       _websitesSheetTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.textDark,
@@ -349,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 6),
                     Text(
                       _websitesSheetHint,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppTheme.textMid,
                         height: 1.4,
@@ -393,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: Text(
                   category.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.textDark,
@@ -428,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text(
                                 entry.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.textDark,
@@ -437,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 entry.description,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: AppTheme.textMid,
                                   height: 1.45,
@@ -481,9 +483,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Good evening';
     }
 
-    if (hour < 12) return 'सुप्रभात';
-    if (hour < 17) return 'नमस्ते';
-    return 'शुभ संध्या';
+    if (hour < 12) return 'à¤¸à¥à¤ªà¥à¤°à¤­à¤¾à¤¤';
+    if (hour < 17) return 'à¤¨à¤®à¤¸à¥à¤¤à¥‡';
+    return 'à¤¶à¥à¤­ à¤¸à¤‚à¤§à¥à¤¯à¤¾';
   }
 
   void _showInfoDialog(String title, String content) {
@@ -609,7 +611,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _t('farmerNews'),
           _languageCode == 'en'
               ? 'PM-KISAN updates, weather changes, and your saved documents can all be tracked here.'
-              : 'PM-KISAN अपडेट, मौसम बदलाव और आपके सेव किए गए दस्तावेज़ यहां एक साथ देखे जा सकते हैं।',
+              : 'PM-KISAN à¤…à¤ªà¤¡à¥‡à¤Ÿ, à¤®à¥Œà¤¸à¤® à¤¬à¤¦à¤²à¤¾à¤µ à¤”à¤° à¤†à¤ªà¤•à¥‡ à¤¸à¥‡à¤µ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤¯à¤¹à¤¾à¤‚ à¤à¤• à¤¸à¤¾à¤¥ à¤¦à¥‡à¤–à¥‡ à¤œà¤¾ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
         );
         break;
       case 'lang':
@@ -660,7 +662,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text(
                           '${_weather?['locationLabel'] ?? _t('yourLocation')} | ${_weather?['description'] ?? AppStrings.weatherDescription(_languageCode, 0)} | ${_t('humidity')}: ${_weather?['humidity'] ?? '--'}%',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppTheme.textMid,
                           ),
@@ -702,11 +704,11 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: AppTheme.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: AppTheme.shadow,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -717,7 +719,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Text(
               _t('whatsappUpdates'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.textDark,
@@ -747,7 +749,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             _t('services'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -776,11 +778,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSuggestionCard() {
-    final stateName =
-        _user?.state.isNotEmpty == true ? _user!.state : 'आपके राज्य';
+    final stateName = _user?.state.isNotEmpty == true
+        ? _user!.state
+        : 'à¤†à¤ªà¤•à¥‡ à¤°à¤¾à¤œà¥à¤¯';
     final content = _languageCode == 'en'
         ? 'Since you are in $stateName, keep your documents safe, track weather updates, and follow government schemes from one place.'
-        : 'चूंकि आप $stateName में हैं, आपके लिए दस्तावेज़ सुरक्षित रखना, मौसम अपडेट देखना और सरकारी योजनाओं की जानकारी एक ही जगह उपलब्ध है।';
+        : 'à¤šà¥‚à¤‚à¤•à¤¿ à¤†à¤ª $stateName à¤®à¥‡à¤‚ à¤¹à¥ˆà¤‚, à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤°à¤–à¤¨à¤¾, à¤®à¥Œà¤¸à¤® à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¦à¥‡à¤–à¤¨à¤¾ à¤”à¤° à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤à¤• à¤¹à¥€ à¤œà¤—à¤¹ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¥¤';
 
     return Container(
       width: double.infinity,
@@ -788,12 +791,14 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.orange.shade50, Colors.white],
+          colors: [AppTheme.warningSurfaceLight, AppTheme.white],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.orange.shade200),
+        border: Border.all(
+          color: AppTheme.warningOrange.withValues(alpha: 0.25),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -803,7 +808,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
+                  color: AppTheme.warningOrange.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
                 ),
                 child: const Text('✨', style: TextStyle(fontSize: 14)),
@@ -811,10 +816,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 8),
               Text(
                 _t('smartSuggestion'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFFE65100),
+                  color: AppTheme.warningOrange,
                 ),
               ),
             ],
@@ -822,7 +827,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           Text(
             content,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppTheme.textMid,
               height: 1.5,
@@ -842,7 +847,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             _t('farmerNews'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -853,23 +858,23 @@ class _HomeScreenState extends State<HomeScreen> {
             emoji: '🏛️',
             title: _languageCode == 'en'
                 ? 'Check PM-KISAN and other scheme updates'
-                : 'PM-KISAN और अन्य योजनाओं के अपडेट देखें',
+                : 'PM-KISAN à¤”à¤° à¤…à¤¨à¥à¤¯ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤•à¥‡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¦à¥‡à¤–à¥‡à¤‚',
             tag: _t('navSchemes'),
           ),
-          const Divider(height: 1, color: AppTheme.divider),
+          Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '🌦️',
             title: _languageCode == 'en'
                 ? 'Weather card now updates from your real location'
-                : 'मौसम कार्ड अब आपकी लोकेशन से अपडेट होता है',
+                : 'à¤®à¥Œà¤¸à¤® à¤•à¤¾à¤°à¥à¤¡ à¤…à¤¬ à¤†à¤ªà¤•à¥€ à¤²à¥‹à¤•à¥‡à¤¶à¤¨ à¤¸à¥‡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¹à¥‹à¤¤à¤¾ à¤¹à¥ˆ',
             tag: _t('weather'),
           ),
-          const Divider(height: 1, color: AppTheme.divider),
+          Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '📂',
             title: _languageCode == 'en'
                 ? 'Scanned and uploaded documents are saved in your folder'
-                : 'स्कैन और अपलोड किए गए दस्तावेज़ अब फ़ोल्डर में सेव होंगे',
+                : 'à¤¸à¥à¤•à¥ˆà¤¨ à¤”à¤° à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤…à¤¬ à¤«à¤¼à¥‹à¤²à¥à¤¡à¤° à¤®à¥‡à¤‚ à¤¸à¥‡à¤µ à¤¹à¥‹à¤‚à¤—à¥‡',
             tag: _t('myDocuments'),
           ),
         ],
@@ -880,7 +885,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTrustedSection() {
     return Container(
       width: double.infinity,
-      color: const Color(0xFFF0F2F0),
+      color: AppTheme.bgLight,
       padding: const EdgeInsets.fromLTRB(20, 30, 20, 80),
       margin: const EdgeInsets.only(top: 10),
       child: Column(
@@ -888,19 +893,19 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             _t('trustedByFarmers'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w900,
-              color: Colors.black26,
+              color: AppTheme.textLight,
               height: 1.2,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             _t('farmSmartly'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Colors.black38,
+              color: AppTheme.textMid,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -910,11 +915,11 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: AppTheme.white,
               borderRadius: BorderRadius.circular(30),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Colors.black12,
+                  color: AppTheme.shadow,
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -923,7 +928,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.bgGreen,
                     shape: BoxShape.circle,
                   ),
@@ -979,7 +984,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         '$_greeting 🙏 ${_user?.name ?? _t('farmerBrother')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.textDark,
@@ -1083,11 +1088,11 @@ class _FeatureGridItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.white,
               borderRadius: BorderRadius.circular(14),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: AppTheme.shadow,
                   blurRadius: 6,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -1101,7 +1106,7 @@ class _FeatureGridItem extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               color: AppTheme.textDark,
@@ -1149,7 +1154,7 @@ class _NewsCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.textDark,

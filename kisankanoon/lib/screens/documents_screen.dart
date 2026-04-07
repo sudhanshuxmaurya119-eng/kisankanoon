@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -49,17 +49,20 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   bool get _isEnglish => _translationCode == 'en';
 
-  String get _addDocumentLabel =>
-      _isEnglish ? 'Add document' : 'दस्तावेज़ जोड़ें';
+  String get _addDocumentLabel => _isEnglish
+      ? 'Add document'
+      : 'à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤œà¥‹à¤¡à¤¼à¥‡à¤‚';
 
-  String get _openFileLabel => _isEnglish ? 'Open file' : 'फ़ाइल खोलें';
+  String get _openFileLabel =>
+      _isEnglish ? 'Open file' : 'à¤«à¤¼à¤¾à¤‡à¤² à¤–à¥‹à¤²à¥‡à¤‚';
 
-  String get _openFileFailedMessage =>
-      _isEnglish ? 'This file could not be opened.' : 'यह फ़ाइल नहीं खुल सकी।';
+  String get _openFileFailedMessage => _isEnglish
+      ? 'This file could not be opened.'
+      : 'à¤¯à¤¹ à¤«à¤¼à¤¾à¤‡à¤² à¤¨à¤¹à¥€à¤‚ à¤–à¥à¤² à¤¸à¤•à¥€à¥¤';
 
   String get _fileUnavailableMessage => _isEnglish
       ? 'This file is not available on this device right now.'
-      : 'यह फ़ाइल अभी इस डिवाइस पर उपलब्ध नहीं है।';
+      : 'à¤¯à¤¹ à¤«à¤¼à¤¾à¤‡à¤² à¤…à¤­à¥€ à¤‡à¤¸ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤ªà¤° à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤';
 
   Future<void> _openAddDocumentScreen() async {
     await Navigator.of(
@@ -87,7 +90,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                     children: [
                       Text(
                         _t('myDocuments'),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: AppTheme.textDark,
@@ -175,7 +178,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           const SizedBox(height: 16),
           Text(
             _t('noDocumentsYet'),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -187,7 +190,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             child: Text(
               _t('documentsEmptyHint'),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: AppTheme.textMid),
+              style: TextStyle(fontSize: 13, color: AppTheme.textMid),
             ),
           ),
           const SizedBox(height: 18),
@@ -211,11 +214,11 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       decoration: BoxDecoration(
         color: AppTheme.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: AppTheme.shadow,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -226,7 +229,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         title: Text(
           (document['name'] ?? document['title'] ?? _t('documentWord'))
               .toString(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
             color: AppTheme.textDark,
@@ -247,13 +250,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               const SizedBox(height: 4),
               Text(
                 '${_t('documentIdNumber')}: $documentNumber',
-                style: const TextStyle(fontSize: 11, color: AppTheme.textDark),
+                style: TextStyle(fontSize: 11, color: AppTheme.textDark),
               ),
             ],
             const SizedBox(height: 4),
             Text(
               _formatCreatedAt(document['createdAt']?.toString()),
-              style: const TextStyle(fontSize: 11, color: AppTheme.textMid),
+              style: TextStyle(fontSize: 11, color: AppTheme.textMid),
             ),
             const SizedBox(height: 6),
             Wrap(
@@ -291,7 +294,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   ),
                   child: Text(
                     _fileTypeLabel(document, fileKind),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.textMid,
@@ -393,7 +396,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               Text(
                 (document['name'] ?? document['title'] ?? _t('documentWord'))
                     .toString(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.textDark,
@@ -402,7 +405,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               const SizedBox(height: 6),
               Text(
                 '${(document['type'] ?? _t('generalDocument')).toString()} | ${_formatCreatedAt(document['createdAt']?.toString())}',
-                style: const TextStyle(fontSize: 12, color: AppTheme.textMid),
+                style: TextStyle(fontSize: 12, color: AppTheme.textMid),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -467,7 +470,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 const SizedBox(height: 16),
                 Text(
                   _t('notesLabel'),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.textDark,
@@ -476,7 +479,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   notes,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     color: AppTheme.textDark,
                     height: 1.5,
@@ -589,7 +592,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             width: 118,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppTheme.textMid,
@@ -706,7 +709,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -718,7 +721,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               document,
               (document['fileKind'] ?? 'document').toString(),
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppTheme.textMid,
             ),
@@ -806,3 +809,5 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     return '$day/$month/$year | $hour:$minute';
   }
 }
+
+

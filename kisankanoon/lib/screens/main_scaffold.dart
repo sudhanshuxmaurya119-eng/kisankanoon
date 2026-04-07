@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../services/app_language_service.dart';
 import '../services/app_strings.dart';
@@ -40,7 +40,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: screens,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(top: BorderSide(color: AppTheme.divider, width: 0.5)),
         ),
         child: ValueListenableBuilder<String>(
@@ -83,3 +83,5 @@ class _MainScaffoldState extends State<MainScaffold> {
     );
   }
 }
+
+
