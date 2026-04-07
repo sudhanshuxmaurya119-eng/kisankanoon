@@ -16,19 +16,19 @@ app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'Agri-Shield API is running 🌾', version: '1.0.0' });
+  res.json({ status: 'Agri-Shield API is running', version: '1.0.0' });
 });
 
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/documents', documentsRouter);
 
-// 404 Handler
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Error Handler
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Internal server error' });
@@ -38,12 +38,12 @@ app.use((err, req, res, next) => {
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
     app.listen(PORT, () => {
-      console.log(`🚀 Agri-Shield API running on port ${PORT}`);
+      console.log(`Agri-Shield API running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection failed:', err.message);
+    console.error('MongoDB connection failed:', err.message);
     process.exit(1);
   });

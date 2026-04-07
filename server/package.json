@@ -1,7 +1,7 @@
 {
   "name": "agri-shield-server",
   "version": "1.0.0",
-  "description": "Agri-Shield REST API — MongoDB + Node.js",
+  "description": "Agri-Shield REST API - MongoDB + Node.js",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,7 +10,31 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["farmer", "india", "legal", "api"],
-  "author": "Agri-Shield Team",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sudhanshuxmaurya119-eng/kisankanoon.git"
+  },
+  "keywords": [
+    "agri-shield",
+    "farmer",
+    "india",
+    "legal-aid",
+    "api"
+  ],
+  "author": "Sudhanshu Maurya",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "multer": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }
