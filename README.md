@@ -9,6 +9,10 @@ This repository contains the complete final project workspace:
 - `.github/workflows/` - GitHub Actions for Shorebird OTA patching and Android release builds
 - `docs/` - supporting project documentation
 
+## Live Deployment
+
+- Production web app: https://agri-shield-rho.vercel.app
+
 ## Project Highlights
 
 - Farmer-friendly mobile UI with Hindi-first support and multiple language options
