@@ -22,7 +22,7 @@ class _MoreScreenState extends State<MoreScreen> {
   String _country = '';
   String _languageCode = AppLanguageService.currentCode.value;
 
-  bool get _isEnglish => _languageCode == 'en';
+  bool get _isEnglish => _languageCode != 'hi';
   String get _appearanceLabel => _isEnglish ? 'Appearance' : 'à¤¥à¥€à¤®';
   String get _darkModeLabel =>
       _isEnglish ? 'Dark mode' : 'à¤¡à¤¾à¤°à¥à¤• à¤®à¥‹à¤¡';
@@ -78,21 +78,21 @@ class _MoreScreenState extends State<MoreScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(_languageCode == 'en' ? 'Logout' : 'à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ'),
+        title: Text(_isEnglish ? 'Logout' : 'à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ'),
         content: Text(
-          _languageCode == 'en'
+          _isEnglish
               ? 'Do you want to log out?'
               : 'à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤²à¥‰à¤—à¤†à¤‰à¤Ÿ à¤•à¤°à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(_languageCode == 'en' ? 'No' : 'à¤¨à¤¹à¥€à¤‚'),
+            child: Text(_isEnglish ? 'No' : 'à¤¨à¤¹à¥€à¤‚'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              _languageCode == 'en' ? 'Yes' : 'à¤¹à¤¾à¤',
+              _isEnglish ? 'Yes' : 'à¤¹à¤¾à¤',
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -253,7 +253,7 @@ class _MoreScreenState extends State<MoreScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-                _languageCode == 'en' ? 'Close' : 'à¤¬à¤‚à¤¦ à¤•à¤°à¥‡à¤‚'),
+                _isEnglish ? 'Close' : 'à¤¬à¤‚à¤¦ à¤•à¤°à¥‡à¤‚'),
           ),
         ],
       ),
@@ -323,7 +323,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           const Text('🌾', style: TextStyle(fontSize: 14)),
                           const SizedBox(width: 4),
                           Text(
-                            _languageCode == 'en'
+                            _isEnglish
                                 ? 'Farmer'
                                 : 'à¤•à¤¿à¤¸à¤¾à¤¨',
                             style: const TextStyle(
@@ -414,7 +414,7 @@ class _MoreScreenState extends State<MoreScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Verified'
                             : 'à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤',
                         style: const TextStyle(
@@ -457,17 +457,17 @@ class _MoreScreenState extends State<MoreScreen> {
                   children: [
                     _tile(
                       '📋',
-                      _languageCode == 'en'
+                      _isEnglish
                           ? 'Government Schemes'
                           : 'à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
-                      trailing: _languageCode == 'en'
+                      trailing: _isEnglish
                           ? '15 schemes'
                           : '15 à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
                       onTap: () => _showInfo(
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Schemes'
                             : 'à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤',
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'PM-KISAN, PM Fasal Bima, RKVY and other schemes are available for you.'
                             : 'PM-KISAN, PM Fasal Bima, RKVY à¤”à¤° à¤…à¤¨à¥à¤¯ à¤¯à¥‹à¤œà¤¨à¤¾à¤à¤ à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¤‚à¥¤',
                       ),
@@ -475,12 +475,12 @@ class _MoreScreenState extends State<MoreScreen> {
                     _divider(),
                     _tile(
                       '❓',
-                      _languageCode == 'en'
+                      _isEnglish
                           ? 'FAQ'
                           : 'à¤†à¤® à¤¸à¤µà¤¾à¤² (FAQ)',
                       onTap: () => _showInfo(
-                        _languageCode == 'en' ? 'FAQ' : 'FAQ',
-                        _languageCode == 'en'
+                        _isEnglish ? 'FAQ' : 'FAQ',
+                        _isEnglish
                             ? 'For land disputes contact your nearest DLSA. For PM-KISAN payment issues call 155261.'
                             : 'à¤­à¥‚à¤®à¤¿ à¤µà¤¿à¤µà¤¾à¤¦ à¤®à¥‡à¤‚ à¤¨à¤œà¤¼à¤¦à¥€à¤•à¥€ DLSA à¤¸à¥‡ à¤¸à¤‚à¤ªà¤°à¥à¤• à¤•à¤°à¥‡à¤‚à¥¤ PM-KISAN à¤­à¥à¤—à¤¤à¤¾à¤¨ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤•à¥‡ à¤²à¤¿à¤ 155261 à¤ªà¤° à¤•à¥‰à¤² à¤•à¤°à¥‡à¤‚à¥¤',
                       ),
@@ -488,14 +488,14 @@ class _MoreScreenState extends State<MoreScreen> {
                     _divider(),
                     _tile(
                       '📖',
-                      _languageCode == 'en'
+                      _isEnglish
                           ? 'Farmer Rights Guide'
                           : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤…à¤§à¤¿à¤•à¤¾à¤° à¤—à¤¾à¤‡à¤¡',
                       onTap: () => _showInfo(
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Farmer Rights'
                             : 'à¤•à¤¿à¤¸à¤¾à¤¨ à¤…à¤§à¤¿à¤•à¤¾à¤°',
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'You have the right to access support schemes, crop insurance claims, legal aid, and land records.'
                             : 'à¤†à¤ªà¤•à¥‹ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚, à¤¬à¥€à¤®à¤¾ à¤•à¥à¤²à¥‡à¤®, à¤•à¤¾à¤¨à¥‚à¤¨à¥€ à¤¸à¤¹à¤¾à¤¯à¤¤à¤¾ à¤”à¤° à¤­à¥‚à¤®à¤¿ à¤°à¤¿à¤•à¥‰à¤°à¥à¤¡ à¤¦à¥‡à¤–à¤¨à¥‡ à¤•à¤¾ à¤…à¤§à¤¿à¤•à¤¾à¤° à¤¹à¥ˆà¥¤',
                       ),
@@ -610,14 +610,14 @@ class _MoreScreenState extends State<MoreScreen> {
                   children: [
                     _tile(
                       '⭐',
-                      _languageCode == 'en'
+                      _isEnglish
                           ? 'Rate App'
                           : 'à¤à¤ª à¤°à¥‡à¤Ÿ à¤•à¤°à¥‡à¤‚',
                       onTap: () => _showInfo(
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Thank you!'
                             : 'à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦!',
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Your support helps us improve the app.'
                             : 'à¤†à¤ªà¤•à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¨ à¤¹à¤®à¥‡à¤‚ à¤à¤ª à¤¬à¥‡à¤¹à¤¤à¤° à¤¬à¤¨à¤¾à¤¨à¥‡ à¤®à¥‡à¤‚ à¤®à¤¦à¤¦ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤',
                       ),
@@ -625,21 +625,21 @@ class _MoreScreenState extends State<MoreScreen> {
                     _divider(),
                     _tile(
                         '📱',
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'App Version'
                             : 'à¤à¤ª à¤¸à¤‚à¤¸à¥à¤•à¤°à¤£',
                         trailing: 'v1.0.5+7'),
                     _divider(),
                     _tile(
                       '🔒',
-                      _languageCode == 'en'
+                      _isEnglish
                           ? 'Privacy Policy'
                           : 'à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿',
                       onTap: () => _showInfo(
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Privacy Policy'
                             : 'à¤—à¥‹à¤ªà¤¨à¥€à¤¯à¤¤à¤¾ à¤¨à¥€à¤¤à¤¿',
-                        _languageCode == 'en'
+                        _isEnglish
                             ? 'Your data stays protected. We do not share your personal information with third parties.'
                             : 'à¤†à¤ªà¤•à¤¾ à¤¡à¥‡à¤Ÿà¤¾ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤¹à¥ˆà¥¤ à¤¹à¤® à¤†à¤ªà¤•à¥€ à¤µà¥à¤¯à¤•à¥à¤¤à¤¿à¤—à¤¤ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤•à¤¿à¤¸à¥€ à¤¤à¥€à¤¸à¤°à¥‡ à¤ªà¤•à¥à¤· à¤•à¥‹ à¤¸à¤¾à¤à¤¾ à¤¨à¤¹à¥€à¤‚ à¤•à¤°à¤¤à¥‡à¥¤',
                       ),

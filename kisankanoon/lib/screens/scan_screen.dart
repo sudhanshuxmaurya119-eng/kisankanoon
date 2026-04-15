@@ -40,7 +40,7 @@ class _ScanScreenState extends State<ScanScreen> {
   String? _selectedDocTypeKey;
   String _languageCode = AppLanguageService.currentCode.value;
 
-  String get _translationCode => _languageCode == 'en' ? 'en' : 'hi';
+  String get _translationCode => _languageCode == 'hi' ? 'hi' : 'en';
 
   @override
   void initState() {

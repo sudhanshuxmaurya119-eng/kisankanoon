@@ -443,6 +443,8 @@ class AppStrings {
   static String t(String languageCode, String key) {
     return _extraStrings[languageCode]?[key] ??
         _strings[languageCode]?[key] ??
+        _extraStrings['en']?[key] ??
+        _strings['en']?[key] ??
         _extraStrings['hi']?[key] ??
         _strings['hi']?[key] ??
         key;

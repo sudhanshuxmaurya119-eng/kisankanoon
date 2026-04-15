@@ -22,7 +22,7 @@ class DocumentsScreen extends StatefulWidget {
 class _DocumentsScreenState extends State<DocumentsScreen> {
   String _languageCode = AppLanguageService.currentCode.value;
 
-  String get _translationCode => _languageCode == 'en' ? 'en' : 'hi';
+  String get _translationCode => _languageCode == 'hi' ? 'hi' : 'en';
 
   @override
   void initState() {
@@ -269,7 +269,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                   decoration: BoxDecoration(
                     color: syncedToFirebase
                         ? AppTheme.bgGreen
-                        : Colors.orange.shade50,
+                        : AppTheme.warningSurface(context),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -281,7 +281,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                       fontWeight: FontWeight.w700,
                       color: syncedToFirebase
                           ? AppTheme.primaryGreen
-                          : Colors.orange.shade800,
+                          : AppTheme.warningText(context),
                     ),
                   ),
                 ),
@@ -443,7 +443,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                     ? _t('syncedSuccessfully')
                     : _t('notSyncedYet'),
                 valueColor:
-                    syncedToFirebase ? AppTheme.primaryGreen : Colors.orange,
+                    syncedToFirebase
+                        ? AppTheme.primaryGreen
+                        : AppTheme.warningText(context),
               ),
               _detailRow(
                 _t('fileType'),
@@ -458,13 +460,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 _detailRow(
                   _t('syncMessage'),
                   _t('fileKeptOnDevice'),
-                  valueColor: Colors.orange.shade800,
+                  valueColor: AppTheme.warningText(context),
                 ),
               if (syncError.isNotEmpty)
                 _detailRow(
                   _t('syncMessage'),
                   syncError,
-                  valueColor: Colors.orange.shade800,
+                  valueColor: AppTheme.warningText(context),
                 ),
               if (notes.isNotEmpty) ...[
                 const SizedBox(height: 16),

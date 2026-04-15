@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openWhatsAppUpdates() async {
     final message = Uri.encodeComponent(
-      _languageCode == 'en'
+      _isEnglish
           ? 'Hello! I want Agri-Shield WhatsApp updates.'
           : 'à¤¨à¤®à¤¸à¥à¤¤à¥‡! à¤®à¥à¤à¥‡ Agri-Shield à¤•à¥‡ WhatsApp à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤šà¤¾à¤¹à¤¿à¤à¥¤',
     );
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await launchUrl(Uri.parse('tel:15100'));
   }
 
-  bool get _isEnglish => _languageCode == 'en';
+  bool get _isEnglish => _languageCode != 'hi';
 
   String get _websitesTileLabel => _isEnglish
       ? 'Govt Websites'
@@ -477,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String get _greeting {
     final hour = DateTime.now().hour;
-    if (_languageCode == 'en') {
+    if (_isEnglish) {
       if (hour < 12) return 'Good morning';
       if (hour < 17) return 'Hello';
       return 'Good evening';
@@ -609,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'news':
         _showInfoDialog(
           _t('farmerNews'),
-          _languageCode == 'en'
+          _isEnglish
               ? 'PM-KISAN updates, weather changes, and your saved documents can all be tracked here.'
               : 'PM-KISAN à¤…à¤ªà¤¡à¥‡à¤Ÿ, à¤®à¥Œà¤¸à¤® à¤¬à¤¦à¤²à¤¾à¤µ à¤”à¤° à¤†à¤ªà¤•à¥‡ à¤¸à¥‡à¤µ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤¯à¤¹à¤¾à¤‚ à¤à¤• à¤¸à¤¾à¤¥ à¤¦à¥‡à¤–à¥‡ à¤œà¤¾ à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚à¥¤',
         );
@@ -781,7 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final stateName = _user?.state.isNotEmpty == true
         ? _user!.state
         : 'à¤†à¤ªà¤•à¥‡ à¤°à¤¾à¤œà¥à¤¯';
-    final content = _languageCode == 'en'
+    final content = _isEnglish
         ? 'Since you are in $stateName, keep your documents safe, track weather updates, and follow government schemes from one place.'
         : 'à¤šà¥‚à¤‚à¤•à¤¿ à¤†à¤ª $stateName à¤®à¥‡à¤‚ à¤¹à¥ˆà¤‚, à¤†à¤ªà¤•à¥‡ à¤²à¤¿à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤¸à¥à¤°à¤•à¥à¤·à¤¿à¤¤ à¤°à¤–à¤¨à¤¾, à¤®à¥Œà¤¸à¤® à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¦à¥‡à¤–à¤¨à¤¾ à¤”à¤° à¤¸à¤°à¤•à¤¾à¤°à¥€ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤à¤• à¤¹à¥€ à¤œà¤—à¤¹ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¹à¥ˆà¥¤';
 
@@ -856,7 +856,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           _NewsCard(
             emoji: '🏛️',
-            title: _languageCode == 'en'
+            title: _isEnglish
                 ? 'Check PM-KISAN and other scheme updates'
                 : 'PM-KISAN à¤”à¤° à¤…à¤¨à¥à¤¯ à¤¯à¥‹à¤œà¤¨à¤¾à¤“à¤‚ à¤•à¥‡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¦à¥‡à¤–à¥‡à¤‚',
             tag: _t('navSchemes'),
@@ -864,7 +864,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '🌦️',
-            title: _languageCode == 'en'
+            title: _isEnglish
                 ? 'Weather card now updates from your real location'
                 : 'à¤®à¥Œà¤¸à¤® à¤•à¤¾à¤°à¥à¤¡ à¤…à¤¬ à¤†à¤ªà¤•à¥€ à¤²à¥‹à¤•à¥‡à¤¶à¤¨ à¤¸à¥‡ à¤…à¤ªà¤¡à¥‡à¤Ÿ à¤¹à¥‹à¤¤à¤¾ à¤¹à¥ˆ',
             tag: _t('weather'),
@@ -872,7 +872,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Divider(height: 1, color: AppTheme.divider),
           _NewsCard(
             emoji: '📂',
-            title: _languageCode == 'en'
+            title: _isEnglish
                 ? 'Scanned and uploaded documents are saved in your folder'
                 : 'à¤¸à¥à¤•à¥ˆà¤¨ à¤”à¤° à¤…à¤ªà¤²à¥‹à¤¡ à¤•à¤¿à¤ à¤—à¤ à¤¦à¤¸à¥à¤¤à¤¾à¤µà¥‡à¤œà¤¼ à¤…à¤¬ à¤«à¤¼à¥‹à¤²à¥à¤¡à¤° à¤®à¥‡à¤‚ à¤¸à¥‡à¤µ à¤¹à¥‹à¤‚à¤—à¥‡',
             tag: _t('myDocuments'),

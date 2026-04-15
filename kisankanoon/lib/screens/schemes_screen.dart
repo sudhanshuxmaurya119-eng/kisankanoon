@@ -238,7 +238,7 @@ class _SchemesScreenState extends State<SchemesScreen> {
     },
   ];
 
-  bool get _isEnglish => _languageCode == 'en';
+  bool get _isEnglish => _languageCode != 'hi';
 
   @override
   void initState() {
@@ -409,14 +409,14 @@ class _SchemesScreenState extends State<SchemesScreen> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFFF3E0),
+                                color: AppTheme.warningSurface(context),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 _schemeText(scheme, 'tag'),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
-                                  color: Color(0xFFE65100),
+                                  color: AppTheme.warningText(context),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -520,17 +520,17 @@ class _SchemesScreenState extends State<SchemesScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF3E0),
+                        color: AppTheme.warningSurface(context),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
                         children: [
                           Text(
                             _schemeText(scheme, 'tag'),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFFE65100),
+                              color: AppTheme.warningText(context),
                             ),
                           ),
                           Text(
