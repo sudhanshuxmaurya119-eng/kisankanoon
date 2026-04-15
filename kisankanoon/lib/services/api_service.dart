@@ -84,9 +84,9 @@ class ApiService {
     if (existing != null) {
       return {'message': 'यह ईमेल पहले से पंजीकृत है।'};
     }
-    // Password must be >= 6 chars
-    if (password.length < 6) {
-      return {'message': 'पासवर्ड कम से कम 6 अक्षर का होना चाहिए।'};
+    // Password must be >= 8 chars
+    if (password.length < 8) {
+      return {'message': 'पासवर्ड कम से कम 8 अक्षर का होना चाहिए।'};
     }
     // Save user locally
     final userData = {

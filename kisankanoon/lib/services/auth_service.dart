@@ -138,7 +138,7 @@ class AuthService {
       case 'internal-error':
         return 'Firebase could not process this request. Please check your setup and try again.';
       default:
-        return 'कुछ गलत हुआ। कृपया पुनः प्रयास करें।';
+        return 'कुछ गलत है। कृपया पुनः प्रयास करें।';
     }
   }
 }
